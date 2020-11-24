@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/qmfile">
+        <file>translations/ukui-bluetooth_zh_CN.qm</file>
+    </qresource>
+</RCC>

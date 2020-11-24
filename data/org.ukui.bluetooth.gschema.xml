@@ -1,0 +1,29 @@
+<schemalist gettext-domain="ukui-bluetooth">
+  <schema id="org.ukui.bluetooth" path="/org/ukui/bluetooth/">
+    <key type="i" name="switch">
+      <default>0</default>
+      <summary>bluetooth switch</summary>
+      <description>bluetooth switch</description>
+    </key>
+    <key type="s" name="file-save-path">
+      <default>""</default>
+      <summary>File save path</summary>
+      <description>File save path</description>
+    </key>
+    <key type="s" name="finally-connect-the-device">
+      <default>""</default>
+      <summary>Finally connect the device</summary>
+      <description>Last connected device saved</description>
+    </key>
+    <key type="as" name="paired-device">
+      <default>[]</default>
+      <summary>List of paired devices</summary>
+      <description>Save a list of paired devices</description>
+    </key>
+    <key type="as" name="paired-device-address">
+      <default>[]</default>
+      <summary>List of paired device address</summary>
+      <description>Save a list of paired device address</description>
+    </key>
+  </schema>
+</schemalist>

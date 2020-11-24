@@ -1,0 +1,64 @@
+#ifndef FILERECEIVINGPOPUPWIDGET_H
+#define FILERECEIVINGPOPUPWIDGET_H
+
+#include <KF5/BluezQt/bluezqt/adapter.h>
+#include <KF5/BluezQt/bluezqt/device.h>
+#include <KF5/BluezQt/bluezqt/manager.h>
+#include <KF5/BluezQt/bluezqt/initmanagerjob.h>
+#include <KF5/BluezQt/bluezqt/obextransfer.h>
+
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QWidget>
+#include <QDialog>
+#include <QIcon>
+#include <QLabel>
+#include <QPushButton>
+#include <QProgressBar>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
+#include <QPalette>
+#include <QString>
+#include <QRect>
+#include <QPoint>
+#include <QDebug>
+
+class FileReceivingPopupWidget : public QDialog
+{
+    Q_OBJECT
+public:
+    explicit FileReceivingPopupWidget(QString address = "", QString source = "");
+    ~FileReceivingPopupWidget();
+    QString getDeviceNameByAddress(QString);
+    void configuration_transfer_progress_bar(quint64);
+    void window_pop_up_animation();
+
+public slots:
+    void OnClickedAcceptBtn();
+    void update_transfer_progress_bar(quint64);
+    void file_transfer_completed(BluezQt::ObexTransfer::Status);
+
+signals:
+    void cancel();
+
+private:
+    QRect desktop;
+
+    QString target_address;
+    QString target_name;
+    QString target_source;
+
+    QPushButton *close_btn;
+    QPushButton *cancel_btn;
+    QPushButton *accept_btn;
+    QPushButton *view_btn;
+
+    QLabel *icon_label;
+    QLabel *file_source;
+    QLabel *file_name;
+    QLabel *file_icon;
+
+    QProgressBar *transfer_progress;
+};
+
+#endif // FILERECEIVINGPOPUPWIDGET_H
