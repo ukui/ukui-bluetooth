@@ -22,13 +22,19 @@ private:
     int daemonIsNotRunning();
 
 signals:
-    void sendDevAddress(QString);
-    void sendTransferMesg(QString,QString);
+    void ConnectTheSendingDevice(QString);
+    void RemoveTheSendingDevice(QString);
+    void DisconnectTheSendingDevice(QString);
+    void sendTransferMesg(QString);
+    void switch_signals(bool);
 public slots:
     void connectToDevice(QString);
+    void disConnectToDevice(QString);
+    void removeDevice(QString);
     QStringList getPairedDevice();
     QString getDevcieByAddress(QString);
-    void file_transfer(QString,QString);
+    void file_transfer(QString);
+    void Bluetooth_switch(bool);
 };
 
 #endif // BLUETOOTHDBUS_H

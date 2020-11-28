@@ -1,9 +1,8 @@
 #include "bluetoothfiletransferwidget.h"
 
-BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString dev, QString dev_address):
+BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString dev_address):
 //    QWidget(parent),
-    file_name(name),
-    dev_name(dev)
+    file_name(name)
 {
     qDebug() << Q_FUNC_INFO << __LINE__;
     this->resize(440,510);
@@ -146,6 +145,9 @@ void BluetoothFileTransferWidget::Get_file_size(float t)
 
 void BluetoothFileTransferWidget::Initialize_and_start_animation()
 {
+    tip_text->setText(tr("Transferring to \"")+dev_widget->get_seleter_dev_name()+"\"");
+    tip_text->update();
+
     ok_btn->setVisible(false);
 
     main_animation_group = new QParallelAnimationGroup(this);
@@ -236,8 +238,13 @@ void BluetoothFileTransferWidget::set_m_progressbar_value(quint64 value)
 void BluetoothFileTransferWidget::onClicked_OK_Btn()
 {
 //    qDebug() << Q_FUNC_INFO << this->rect() << this->geometry() << dev_widget->geometry() << ok_btn->geometry() << target_frame->geometry();
-    Initialize_and_start_animation();
+
     qDebug() << Q_FUNC_INFO;
     qDebug() << Q_FUNC_INFO << dev_widget->get_seleter_device();
-    emit this->sender_dev_name(dev_widget->get_seleter_device());
+    if(dev_widget->get_seleter_device() == ""){
+
+    }else{
+        Initialize_and_start_animation();
+        emit this->sender_dev_name(dev_widget->get_seleter_device());
+    }
 }

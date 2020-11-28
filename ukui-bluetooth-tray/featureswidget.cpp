@@ -10,13 +10,18 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
         finally_connect_the_device = settings->get("finally-connect-the-device").toString();
         paired_device = settings->get("paired-device").toStringList();
         Default_Adapter = settings->get("adapter-address").toString();
+        File_save_path = settings->get("file-save-path").toString();
 
         qDebug() << "GSetting Value: " << Default_Adapter << finally_connect_the_device << paired_device;
         connect(settings, &QGSettings::changed,this,&FeaturesWidget::GSettings_value_chanage);
     }
 
     session_dbus = new BluetoothDbus(this);
-    connect(session_dbus,&BluetoothDbus::sendDevAddress,this,&FeaturesWidget::Pair_device_by_address);
+    connect(session_dbus,&BluetoothDbus::ConnectTheSendingDevice,this,&FeaturesWidget::Pair_device_by_address);
+    connect(session_dbus,&BluetoothDbus::DisconnectTheSendingDevice,this,&FeaturesWidget::Disconnect_device_by_address);
+    connect(session_dbus,&BluetoothDbus::RemoveTheSendingDevice,this,&FeaturesWidget::Remove_device_by_address);
+    connect(session_dbus,&BluetoothDbus::sendTransferMesg,this,&FeaturesWidget::Dbus_file_transfer);
+    connect(session_dbus,&BluetoothDbus::switch_signals,this,&FeaturesWidget::Dbus_bluetooth_switch);
 
     m_manager = new BluezQt::Manager(this);
     bluetoothAgent = new BluetoothAgent(this);
@@ -24,12 +29,14 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     BluezQt::InitManagerJob *job = m_manager->init();
     job->exec();
     qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
+
     if(Default_Adapter.isEmpty()){
         m_adapter = m_manager->adapters().at(0).data();
         settings->set("adapter-address",QVariant::fromValue(m_adapter->address()));
     }else{
         m_adapter = m_manager->adapterForAddress(Default_Adapter).data();
     }
+
     qDebug() << m_adapter->isPowered();
     if(m_adapter->isPowered()){
         flag = true;
@@ -37,6 +44,13 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     }else{
         flag = false;
         settings->set("switch",QVariant::fromValue(flag));
+    }
+    connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,[=](bool power){
+        settings->set("switch",QVariant::fromValue(power));
+    });
+
+    if(File_save_path.isEmpty()){
+        settings->set("file-save-path",QVariant::fromValue(QDir::homePath()));
     }
     qDebug() << Q_FUNC_INFO << m_manager->isInitialized() << m_manager->isOperational();
 
@@ -57,6 +71,8 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     bluetooth_tray_icon->setContextMenu(tray_Menu);
     bluetooth_tray_icon->setToolTip(tr("Bluetooth"));
     bluetooth_tray_icon->show();
+    bluetooth_tray_icon->setVisible(settings->get("tray-show").toBool());
+
     connect(bluetooth_tray_icon,
             &QSystemTrayIcon::activated,
             [=](QSystemTrayIcon::ActivationReason reason){
@@ -74,48 +90,51 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
 FeaturesWidget::~FeaturesWidget()
 {
+    delete settings;
 }
 
 void FeaturesWidget::InitTrayMenu()
 {
     tray_Menu->clear();
-    if(flag)
-        tray_Menu->addAction(tr("Turn off bluetooth"));
-    else
+    if(!flag){
         tray_Menu->addAction(tr("Turn on bluetooth"));
+        tray_Menu->addSeparator();
+    }else{
+        tray_Menu->addAction(tr("Turn off bluetooth"));
+        tray_Menu->addSeparator();
+        QList<BluezQt::DevicePtr> device_list = m_adapter->devices();
+        QAction *head = new QAction(tr("Devices"));
+        head->setDisabled(true);
+        tray_Menu->addAction(head);
+        for(int i=0; i < device_list.size(); i++){
+            if(device_list.at(i)->isPaired()){
+                QMenu *device_menu = new QMenu(/*QIcon::fromTheme("pan-end-symbolic-rtl"),*/device_list.at(i)->name());
+                QAction *status = new QAction();
+                QAction *send   = new QAction();
+                QAction *remove = new QAction();
+                if(!flag){
+                    device_menu->setDisabled(true);
+                }
+                status->setStatusTip(device_list.at(i)->address());
+                send->setStatusTip(device_list.at(i)->address());
+                remove->setStatusTip(device_list.at(i)->address());
+                if(device_list.at(i)->isConnected()){
+                    device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
+                    status->setText(tr("Disconnection"));
 
-    QList<BluezQt::DevicePtr> device_list = m_adapter->devices();
-    tray_Menu->addSeparator();
-    QAction *head = new QAction(tr("Devices"));
-    head->setDisabled(true);
-    tray_Menu->addAction(head);
-    for(int i=0; i < device_list.size(); i++){
-        if(device_list.at(i)->isPaired()){
-            QMenu *device_menu = new QMenu(/*QIcon::fromTheme("pan-end-symbolic-rtl"),*/device_list.at(i)->name());
-            QAction *status = new QAction();
-            QAction *send   = new QAction();
-            QAction *remove = new QAction();
-            if(!flag){
-                device_menu->setDisabled(true);
+                }else{
+                    status->setText(tr("Connection"));
+                    remove->setText(tr("Remove"));
+                    device_menu->addAction(remove);
+                }
+                device_menu->addAction(status);
+                send->setText(tr("Send files"));
+                if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
+                    device_menu->addAction(send);
+                tray_Menu->addMenu(device_menu);
+
+    //            connect(device_menu,&QMenu::triggered,this,&FeaturesWidget::TrayItemSignalProcessing);
             }
-            status->setStatusTip(device_list.at(i)->address());
-            send->setStatusTip(device_list.at(i)->address());
-            remove->setStatusTip(device_list.at(i)->address());
-            if(device_list.at(i)->isConnected()){
-                device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
-                status->setText(tr("Disconnection"));
-
-            }else{
-                status->setText(tr("Connection"));
-                remove->setText(tr("Remove"));
-                device_menu->addAction(remove);
-            }
-            device_menu->addAction(status);
-            send->setText(tr("Send files"));
-            device_menu->addAction(send);
-            tray_Menu->addMenu(device_menu);
-
-//            connect(device_menu,&QMenu::triggered,this,&FeaturesWidget::TrayItemSignalProcessing);
         }
     }
     tray_Menu->addSeparator();
@@ -128,64 +147,160 @@ void FeaturesWidget::Pair_device_by_address(QString address)
     qDebug() << Q_FUNC_INFO << address;
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
     qDebug() << Q_FUNC_INFO << device->name();
-    device->pair();
-    Connect_device_by_address(address);
+    BluezQt::PendingCall *call = device->pair();
+//    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+//        if(q->error() == 0){
+//            Connect_device_by_address(address);
+//        }
+//    });
 }
 
 void FeaturesWidget::Disconnect_device_by_address(QString address)
 {
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
     BluezQt::PendingCall *call = device->disconnectFromDevice();
-    QProcess *process = new QProcess(this);
-    QString cmd = "notify-send";
-    QStringList arg;
-    if(call->error() == 0){
-        qDebug() << Q_FUNC_INFO;
-        QString text = tr("Disconnect from the Bluetooth device \"")+device->name()+tr("\"");
-        arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
-        process->start(cmd,arg);
-    }else{
-        qDebug() << Q_FUNC_INFO;
-        QString text = tr("Disconnect Error!!!");
-        arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
-        process->start(cmd,arg);
-    }
+    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+        QProcess *process = new QProcess(this);
+        QString cmd = "notify-send";
+        QStringList arg;
+        if(q->error() == 0){
+            qDebug() << Q_FUNC_INFO;
+            QString text = tr("Disconnect from the Bluetooth device \"")+device->name()+tr("\"");
+            arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
+            process->start(cmd,arg);
+        }else{
+            qDebug() << Q_FUNC_INFO;
+            QString text = tr("Disconnect Error!!!");
+            arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
+            process->start(cmd,arg);
+        }
+    });
+}
+
+void FeaturesWidget::Remove_device_by_address(QString address)
+{
+    BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
+    BluezQt::PendingCall *call = m_adapter->removeDevice(device);
+    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+        if(q->error() == 0){
+
+        }else{
+            qDebug() << Q_FUNC_INFO << "Device Remove failed!!!";
+        }
+    });
 }
 
 void FeaturesWidget::Connect_device_by_address(QString address)
 {
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
+    connect(device.data(),&BluezQt::Device::connectedChanged,this,[=](bool connected){
+        if(!connected){
+            QProcess *process = new QProcess(this);
+            QString cmd = "notify-send";
+            QStringList arg;
+            qDebug() << Q_FUNC_INFO;
+            QString text = tr("Bluetooth device")+" \""+device->name()+"\" "+tr("disconnected!");
+            arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
+            process->start(cmd,arg);
+        }
+    });
+
+    BluezQt::DevicePtr finally_device = m_adapter->deviceForAddress(settings->get("finally-connect-the-device").toString());
+    if(finally_device.isNull()){
+        Connect_device(device);
+    }else{
+        if(finally_device->isConnected()){
+               BluezQt::PendingCall *call = device->disconnectFromDevice();
+               connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+                    if(q->error() == 0){
+                        Connect_device(device);
+                    }
+               });
+        }else{
+            Connect_device(device);
+        }
+    }
+}
+
+void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
+{
     BluezQt::PendingCall *call = device->connectToDevice();
     device->setTrusted(true);
     qDebug() << Q_FUNC_INFO << call->error();
-    QProcess *process = new QProcess(this);
-    QString cmd = "notify-send";
-    QStringList arg;
-    if(call->error() == 0){
-        qDebug() << Q_FUNC_INFO;
-        QString text = tr("The connection with the Bluetooth device \"")+device->name()+tr("\" is successful!");
-        arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
-        process->start(cmd,arg);
+    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+        QProcess *process = new QProcess(this);
+        QString cmd = "notify-send";
+        QStringList arg;
+        if(q->error() == 0){
+            qDebug() << Q_FUNC_INFO;
+            QString text = tr("The connection with the Bluetooth device \"")+device->name()+tr("\" is successful!");
+            arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
+            process->start(cmd,arg);
 
-        settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
-    }else{
-        qDebug() << Q_FUNC_INFO;
-        QString text = tr("The connection with the Bluetooth device \"")+device->name()+tr("\" failed!");
-        arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
-        process->start(cmd,arg);
-    }
+            settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
+        }else{
+            qDebug() << Q_FUNC_INFO;
+            QString text = tr("The connection with the Bluetooth device \"")+device->name()+tr("\" failed!");
+            arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
+            process->start(cmd,arg);
+        }
+    });
+}
+
+void FeaturesWidget::Open_bluetooth_settings()
+{
+    QProcess *process = new QProcess(this);
+    QString cmd = "ukui-control-center";
+    QStringList arg;
+    qDebug() << Q_FUNC_INFO;
+    arg << "--bluetooth";
+    process->start(cmd,arg);
 }
 
 void FeaturesWidget::Send_files_by_address(QString address)
 {
     qDebug() << Q_FUNC_INFO << address;
-    QString dev_name = m_adapter->deviceForAddress(address)->name();
     selected_file = QFileDialog::getOpenFileName(0,
         tr("Select the file to be sent"), getenv("HOME"), tr("All Files (*)"));
 
     qDebug() << "Select file:" << selected_file;
     if(!selected_file.isNull()){
-        transfer_widget = new BluetoothFileTransferWidget(selected_file,dev_name,address);
+        transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
+        connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
+        connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
+        transfer_widget->exec();
+    }
+}
+
+void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
+{
+    if(f){
+        BluezQt::PendingCall *call = m_adapter->setPowered(true);
+        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
+            if(p->error() == 0){
+                flag = true;
+    //            qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+            }else
+                qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
+        });
+    }else{
+        BluezQt::PendingCall *call = m_adapter->setPowered(false);
+        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
+            if(p->error() == 0){
+                flag = false;
+    //            qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+            }else
+                qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
+        });
+    }
+}
+
+void FeaturesWidget::Dbus_file_transfer(QString file_path)
+{
+    qDebug() << "Select file:" << file_path;
+    selected_file = file_path;
+    if(!selected_file.isNull()){
+        transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
         connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
         connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
         transfer_widget->exec();
@@ -196,27 +311,13 @@ void FeaturesWidget::TraySignalProcessing(QAction *action)
 {
     qDebug() << Q_FUNC_INFO << action->text() ;
     if(action->text() == tr("Turn on bluetooth")){
-
-        BluezQt::PendingCall *call = m_adapter->setPowered(true);
-        if(call->error() == 0){
-            action->setText(tr("Turn off bluetooth"));
-            flag = true;
-            settings->set("switch",QVariant::fromValue(flag));
-        }else
-            qDebug() << "Failed to turn on Bluetooth:" << call->errorText();
+        Turn_on_or_off_bluetooth(true);
 
     }else if(action->text() == tr("Turn off bluetooth")){
-
-        BluezQt::PendingCall *call = m_adapter->setPowered(false);
-        if(call->error() == 0){
-            action->setText(tr("Turn on bluetooth"));
-            flag = false;
-            settings->set("switch",QVariant::fromValue(flag));
-        }else
-            qDebug() << "Failed to turn off Bluetooth:" << call->errorText();
+        Turn_on_or_off_bluetooth(false);
 
     }else if(action->text() == tr("Bluetooth settings")){
-
+        Open_bluetooth_settings();
     }else if(action->text() == tr("Disconnection")){
         Disconnect_device_by_address(action->statusTip());
     }else if(action->text() == tr("Connection")){
@@ -224,8 +325,7 @@ void FeaturesWidget::TraySignalProcessing(QAction *action)
     }else if(action->text() == tr("Send files")){
         Send_files_by_address(action->statusTip());
     }else if(action->text() == tr("Remove")){
-        BluezQt::DevicePtr device = m_adapter->deviceForAddress(action->statusTip());
-        qDebug() << m_adapter->removeDevice(device);
+        Remove_device_by_address(action->statusTip());
     }
 }
 
@@ -241,6 +341,11 @@ void FeaturesWidget::file_transfer_session_add(BluezQt::ObexSessionPtr sessionPt
 
 void FeaturesWidget::file_transfer_creator(QString dev)
 {
+    BluezQt::DevicePtr device = m_adapter->deviceForAddress(dev);
+    if(!device->isConnected()){
+        Connect_device_by_address(dev);
+    }
+
     qDebug() << Q_FUNC_INFO << dev << m_adapter->address();
     QMap<QString,QVariant> map;
 
@@ -248,6 +353,7 @@ void FeaturesWidget::file_transfer_creator(QString dev)
     map["Target"] = "OPP";
 
     BluezQt::PendingCall *target = obex_manager->createSession(dev,map);
+    qDebug() << Q_FUNC_INFO << target->error() << target->errorText();
     connect(target,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
         QVariant v = call->value();
         QDBusObjectPath session = v.value<QDBusObjectPath>();
@@ -255,6 +361,7 @@ void FeaturesWidget::file_transfer_creator(QString dev)
         pre_session = session;
         opp = new BluezQt::ObexObjectPush(session);
         BluezQt::PendingCall *transfer = opp->sendFile(selected_file);
+        qDebug() << Q_FUNC_INFO << transfer->error() << transfer->errorText();
         connect(transfer,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
             QVariant v = call->value();
             BluezQt::ObexTransferPtr ptr = v.value<BluezQt::ObexTransferPtr>();
@@ -308,5 +415,20 @@ void FeaturesWidget::propertyChanged(QString name, QVariantMap map, QStringList 
 void FeaturesWidget::GSettings_value_chanage(const QString &key)
 {
     qDebug() << Q_FUNC_INFO << key;
+    if(key == "switch"){
+        flag = settings->get(key).toBool();
+    }else if(key == "trayShow"){
+        if(bluetooth_tray_icon->isVisible() != settings->get(key).toBool()){
+            bluetooth_tray_icon->setVisible(settings->get(key).toBool());
+        }
+    }else if(key == "file-save-path"){
+
+    }
 }
 
+void FeaturesWidget::Dbus_bluetooth_switch(bool value)
+{
+    if(value != settings->get("switch").toBool()){
+        Turn_on_or_off_bluetooth(value);
+    }
+}

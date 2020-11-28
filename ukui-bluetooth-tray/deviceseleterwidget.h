@@ -32,6 +32,7 @@ public:
     ~DeviceSeleterWidget();
     void InitUI();
     QString get_seleter_device();
+    QString get_seleter_dev_name();
 signals:
 
 private slots:
@@ -40,6 +41,7 @@ private slots:
 private:
     BluezQt::Manager *m_manager;
     QString select_dev;
+    QString select_name = "";
 
     QList<QToolButton*> toolbutton_list;
     QToolButton *btn = nullptr;

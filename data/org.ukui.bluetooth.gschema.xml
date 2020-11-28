@@ -1,7 +1,7 @@
 <schemalist gettext-domain="ukui-bluetooth">
   <schema id="org.ukui.bluetooth" path="/org/ukui/bluetooth/">
-    <key type="i" name="switch">
-      <default>0</default>
+    <key type="b" name="switch">
+      <default>false</default>
       <summary>bluetooth switch</summary>
       <description>bluetooth switch</description>
     </key>
@@ -24,6 +24,16 @@
       <default>[]</default>
       <summary>List of paired device address</summary>
       <description>Save a list of paired device address</description>
+    </key>
+    <key type="s" name="adapter-address">
+      <default>""</default>
+      <summary>Save the Adapter used by default</summary>
+      <description>Save the Adapter used by default</description>
+    </key>
+    <key type="b" name="tray-show">
+      <default>true</default>
+      <summary>Whether to display the icon in the tray</summary>
+      <description>Whether to display the icon in the tray</description>
     </key>
   </schema>
 </schemalist>

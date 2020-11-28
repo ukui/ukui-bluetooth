@@ -7,6 +7,16 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
     this->setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
     this->resize(440,250);
 
+    if(QGSettings::isSchemaInstalled("org.ukui.bluetooth")){
+        settings = new QGSettings("org.ukui.bluetooth");
+
+        file_path = settings->get("file-save-path").toString();
+
+        connect(settings, &QGSettings::changed,this,&FileReceivingPopupWidget::GSettings_value_chanage);
+    }else{
+        file_path = QDir::homePath();
+    }
+
     QDesktopWidget *desktop_widget = QApplication::desktop();
     desktop = desktop_widget->availableGeometry();
     qDebug() << Q_FUNC_INFO << this->width() << this->height();
@@ -75,7 +85,7 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
 
 FileReceivingPopupWidget::~FileReceivingPopupWidget()
 {
-
+    delete settings;
 }
 
 QString FileReceivingPopupWidget::getDeviceNameByAddress(QString address)
@@ -110,7 +120,18 @@ void FileReceivingPopupWidget::window_pop_up_animation()
 //    window_action->setStartValue(QPoint(desktop.right()-1,desktop.bottom()-this->height()));
 //    window_action->setEndValue(QPoint(desktop.right()-this->width(),desktop.bottom()-this->height()));
 //    qDebug() << Q_FUNC_INFO << this_rect << this->geometry() << QRect(desktop.right()-1,desktop.bottom()-this->height(),desktop.right(),desktop.bottom()) <<QRect(desktop.right()-this->width(),desktop.bottom()-this->height(),desktop.right(),desktop.bottom());
-//    window_action->start();
+    //    window_action->start();
+}
+
+bool FileReceivingPopupWidget::move_file()
+{
+    QString s = QDir::homePath()+"/.cache/obexd/"+target_source;
+    QString d = file_path+"/"+target_source;
+    GError *error;
+    GFile *source = g_file_new_for_path(s.toLatin1().data());
+    GFile *destination = g_file_new_for_path(d.toLatin1().data());
+    bool flag = g_file_move(source,destination,G_FILE_COPY_OVERWRITE,NULL,NULL,NULL,&error);
+    return flag;
 }
 
 void FileReceivingPopupWidget::OnClickedAcceptBtn()
@@ -166,7 +187,24 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
             this->close();
         });
         cancel_btn->setVisible(false);
+
+//        bool x= QFile::rename(QDir::homePath()+"/.cache/obexd/"+target_source,file_path+"/"+target_source);
+        bool x = move_file();
         view_btn->setVisible(true);
+        qDebug() << Q_FUNC_INFO << __LINE__ << x;
+        if(x){
+            connect(view_btn,&QPushButton::clicked,this,[=]{
+                this->close();
+                qDebug() << Q_FUNC_INFO << __LINE__;
+                QProcess *process = new QProcess(this);
+                QString cmd = "peony";
+                QStringList arg;
+                qDebug() << Q_FUNC_INFO;
+                arg << file_path;
+                process->start(cmd,arg);
+            });
+        }
+
     }else if(status == BluezQt::ObexTransfer::Error){
         close_btn->disconnect();
         close_btn->connect(close_btn,&QPushButton::clicked,this,[=]{
@@ -184,5 +222,12 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
         QLabel *warn_text = new QLabel(tr("Sender canceled or transmission error"),this);
         warn_text->setGeometry(100,176,300,30);
         warn_text->show();
+    }
+}
+
+void FileReceivingPopupWidget::GSettings_value_chanage(const QString &key)
+{
+    if(key == "file-save-path"){
+        file_path = settings->get("file-save-path").toString();
     }
 }

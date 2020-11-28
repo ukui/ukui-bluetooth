@@ -10,6 +10,7 @@
 #include <KF5/BluezQt/bluezqt/initobexmanagerjob.h>
 #include <KF5/BluezQt/bluezqt/obexobjectpush.h>
 #include <KF5/BluezQt/bluezqt/obexfiletransfer.h>
+#include <KF5/BluezQt/bluezqt/device.h>
 
 #include "deviceseleterwidget.h"
 
@@ -43,7 +44,7 @@ class BluetoothFileTransferWidget : public QDialog
 {
     Q_OBJECT
 public:
-    explicit BluetoothFileTransferWidget(QString name = "", QString dev = "",QString dev_address = "");
+    explicit BluetoothFileTransferWidget(QString name = "",QString dev_address = "");
     ~BluetoothFileTransferWidget();
 
     void Get_fie_type();

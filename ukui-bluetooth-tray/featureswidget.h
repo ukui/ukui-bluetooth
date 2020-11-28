@@ -20,6 +20,7 @@
 #include <KF5/BluezQt/bluezqt/obexsession.h>
 #include <KF5/BluezQt/bluezqt/obextransfer.h>
 
+#include <iostream>
 #include <QWidget>
 #include <QSystemTrayIcon>
 #include <QAction>
@@ -31,7 +32,9 @@
 #include <QFileDialog>
 #include <QVariant>
 #include <QProcess>
+#include <QDir>
 
+using namespace std;
 class BluetoothDbus;
 
 class FeaturesWidget : public QWidget
@@ -44,8 +47,15 @@ public:
     void InitTrayMenu();
     void Pair_device_by_address(QString);
     void Disconnect_device_by_address(QString);
+    void Remove_device_by_address(QString);
     void Connect_device_by_address(QString);
     void Send_files_by_address(QString);
+    void Turn_on_or_off_bluetooth(bool);
+    void Connect_device(BluezQt::DevicePtr);
+    void Open_bluetooth_settings();
+
+    void Dbus_file_transfer(QString);
+
 public slots:
     void TraySignalProcessing(QAction *action);
     void file_transfer_session_add(BluezQt::ObexSessionPtr);
@@ -53,6 +63,7 @@ public slots:
     void close_session();
     void propertyChanged(QString name, QVariantMap map, QStringList list);
     void GSettings_value_chanage(const QString &key);
+    void Dbus_bluetooth_switch(bool);
 private:
     QSystemTrayIcon *bluetooth_tray_icon;
     QMenu *tray_Menu;
@@ -62,6 +73,7 @@ private:
     QStringList paired_device;
     QString finally_connect_the_device;
     QString Default_Adapter;
+    QString File_save_path;
 
     QString selected_file;
     quint64 transfer_file_size = 0;

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=ukui-bluetooth
+Name[zh_CN]=蓝牙
+Comment=Simple bluetooth tool for ukui desktop environment
+Comment[zh_CN]=UKUI桌面环境简单的蓝牙工具
+Exec=/usr/bin/ukui-bluetooth
+Icon=bluetooth
+StartupNotify=true
+OnlyShowIn=UKUI;
+NoDisplay=true
+Terminal=false

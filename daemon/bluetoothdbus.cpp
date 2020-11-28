@@ -12,7 +12,7 @@ BluetoothDbus::BluetoothDbus(QObject *parent)
                 exit(1);
         }
         // "QDBusConnection::ExportAllSlots"表示把类Hotel的所有Slot都导出为这个Object的method
-        qDebug() << Q_FUNC_INFO << __LINE__ << bus.registerObject("/org/ukui/bluetooth", "org.ukui.bluetooth", this,QDBusConnection::ExportAllSlots|QDBusConnection::ExportAllSignals);
+        qDebug() << Q_FUNC_INFO << __LINE__ << bus.registerObject("/org/ukui/bluetooth", "org.ukui.bluetooth", this,QDBusConnection::ExportAllSlots/*|QDBusConnection::ExportAllSignals*/);
     }
 }
 
@@ -34,7 +34,19 @@ int BluetoothDbus::daemonIsNotRunning()
 void BluetoothDbus::connectToDevice(QString address)
 {
     qDebug() << Q_FUNC_INFO << address;
-    emit this->sendDevAddress(address);
+    emit this->ConnectTheSendingDevice(address);
+}
+
+void BluetoothDbus::disConnectToDevice(QString address)
+{
+    qDebug() << Q_FUNC_INFO << address;
+    emit this->DisconnectTheSendingDevice(address);
+}
+
+void BluetoothDbus::removeDevice(QString address)
+{
+    qDebug() << Q_FUNC_INFO << address;
+    emit this->RemoveTheSendingDevice(address);
 }
 
 QStringList BluetoothDbus::getPairedDevice()
@@ -47,8 +59,14 @@ QString BluetoothDbus::getDevcieByAddress(QString)
 
 }
 
-void BluetoothDbus::file_transfer(QString dev, QString file)
+void BluetoothDbus::file_transfer(QString file)
 {
-    qDebug() << Q_FUNC_INFO << dev << file;
-    emit this->sendTransferMesg(dev,file);
+    qDebug() << Q_FUNC_INFO << file;
+    emit this->sendTransferMesg(file);
+}
+
+void BluetoothDbus::Bluetooth_switch(bool value)
+{
+    qDebug() << Q_FUNC_INFO ;
+    emit this->switch_signals(value);
 }

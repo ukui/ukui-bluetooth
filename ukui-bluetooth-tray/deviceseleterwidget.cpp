@@ -56,39 +56,45 @@ void DeviceSeleterWidget::InitUI()
     QList<BluezQt::DevicePtr> device_list = m_manager->usableAdapter()->devices();
     qDebug() << Q_FUNC_INFO << __LINE__ << device_list.size();
     for(int i=0; i < device_list.size(); i++){
-        if(device_list.at(i)->isPaired()){
-            QIcon icon;
-            switch (device_list.at(i)->type()){
-            case BluezQt::Device::Type::Phone:
-                icon = QIcon::fromTheme("phone-apple-iphone-symbolic");
-                break;
-            case BluezQt::Device::Type::Computer:
-                icon = QIcon::fromTheme("video-display-symbolic");
-                break;
-            case BluezQt::Device::Type::Uncategorized:
-            default:
-                icon = QIcon::fromTheme("bluetooth-symbolic");
-                break;
+//        qDebug() << Q_FUNC_INFO << device_list.at(i)->type() << device_list.at(i)->name();
+        if((device_list.at(i)->type() == BluezQt::Device::Phone)||(device_list.at(i)->type() == BluezQt::Device::Computer)){
+            if(device_list.at(i)->isPaired()){
+                QIcon icon;
+                switch (device_list.at(i)->type()){
+                case BluezQt::Device::Type::Phone:
+                    icon = QIcon::fromTheme("phone-apple-iphone-symbolic");
+                    break;
+                case BluezQt::Device::Type::Computer:
+                    icon = QIcon::fromTheme("video-display-symbolic");
+                    break;
+                case BluezQt::Device::Type::Uncategorized:
+                default:
+                    icon = QIcon::fromTheme("bluetooth-symbolic");
+                    break;
+                }
+
+                QToolButton *item = new QToolButton(dev_widget);
+                item->setFixedSize(this->width()-16,40);
+                item->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+                item->setStatusTip(device_list.at(i)->address());
+                item->setIcon(icon);
+                item->setProperty("useIconHighlightEffect", 0x8);
+                item->setText("  "+device_list.at(i)->name());
+
+                if(select_dev != ""){
+                    if(device_list.at(i)->address() == select_dev){
+                        item->setStyleSheet("QToolButton{background:white;}");
+                        item->setChecked(true);
+                        btn = item;
+                        select_name = device_list.at(i)->name();
+                    }
+                }
+
+                connect(item,&QToolButton::clicked,this,&DeviceSeleterWidget::itemToolbuttonClicked);
+                toolbutton_list.append(item);
+                device_list_layout->addWidget(item,Qt::AlignTop);
+    //            qDebug() << Q_FUNC_INFO << dev_widget->width() <<device_list.at(i)->name();
             }
-
-            QToolButton *item = new QToolButton(dev_widget);
-            item->setFixedSize(this->width()-16,40);
-            item->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            item->setStatusTip(device_list.at(i)->address());
-            item->setIcon(icon);
-            item->setProperty("useIconHighlightEffect", 0x8);
-            item->setText("  "+device_list.at(i)->name());
-
-            if(device_list.at(i)->address() == select_dev){
-                item->setStyleSheet("QToolButton{background:white;}");
-                item->setChecked(true);
-                btn = item;
-            }
-
-            connect(item,&QToolButton::clicked,this,&DeviceSeleterWidget::itemToolbuttonClicked);
-            toolbutton_list.append(item);
-            device_list_layout->addWidget(item,Qt::AlignTop);
-//            qDebug() << Q_FUNC_INFO << dev_widget->width() <<device_list.at(i)->name();
         }
     }
     device_list_layout->addStretch();
@@ -108,6 +114,11 @@ QString DeviceSeleterWidget::get_seleter_device()
     return select_dev;
 }
 
+QString DeviceSeleterWidget::get_seleter_dev_name()
+{
+    return select_name;
+}
+
 void DeviceSeleterWidget::itemToolbuttonClicked()
 {
 
@@ -121,6 +132,7 @@ void DeviceSeleterWidget::itemToolbuttonClicked()
     p->setStyleSheet("QToolButton{background:white;}");
     p->setChecked(true);
     select_dev = p->statusTip();
+    select_name = p->text();
 
     if(flag == false)
         flag = true;

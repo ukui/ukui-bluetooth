@@ -1,6 +1,10 @@
 #ifndef FILERECEIVINGPOPUPWIDGET_H
 #define FILERECEIVINGPOPUPWIDGET_H
 
+#include <gio/gio.h>
+#include <gio/gfile.h>
+#include <gio/gioerror.h>
+
 #include <KF5/BluezQt/bluezqt/adapter.h>
 #include <KF5/BluezQt/bluezqt/device.h>
 #include <KF5/BluezQt/bluezqt/manager.h>
@@ -22,6 +26,10 @@
 #include <QRect>
 #include <QPoint>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QProcess>
+#include <QGSettings>
 
 class FileReceivingPopupWidget : public QDialog
 {
@@ -32,12 +40,12 @@ public:
     QString getDeviceNameByAddress(QString);
     void configuration_transfer_progress_bar(quint64);
     void window_pop_up_animation();
-
+    bool move_file();
 public slots:
     void OnClickedAcceptBtn();
     void update_transfer_progress_bar(quint64);
     void file_transfer_completed(BluezQt::ObexTransfer::Status);
-
+    void GSettings_value_chanage(const QString &key);
 signals:
     void cancel();
 
@@ -47,6 +55,9 @@ private:
     QString target_address;
     QString target_name;
     QString target_source;
+
+    QGSettings *settings;
+    QString file_path;
 
     QPushButton *close_btn;
     QPushButton *cancel_btn;

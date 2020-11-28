@@ -4,10 +4,12 @@
 #include <QApplication>
 #include <QTranslator>
 #include <QLibraryInfo>
+#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+//    QApplication::setStyle(QStyleFactory::create("ukui-default"));
     QApplication::setQuitOnLastWindowClosed(false);
 
 
