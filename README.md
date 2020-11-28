@@ -1,2 +1,2 @@
 # UKUI-Bluetooth
-##Simple bluetooth tool for ukui desktop environment
+## Simple bluetooth tool for ukui desktop environment
