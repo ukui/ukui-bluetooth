@@ -1,11 +1,23 @@
 #include "filereceivingpopupwidget.h"
+#include "xatom-helper.h"
 
 FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString source):
     target_address(address),
     target_source(source)
 {
-    this->setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
-    this->resize(440,250);
+    // 添加窗管协议
+    MotifWmHints hints;
+    hints.flags = MWM_HINTS_FUNCTIONS|MWM_HINTS_DECORATIONS;
+    hints.functions = MWM_FUNC_ALL;
+    hints.decorations = MWM_DECOR_BORDER;
+    XAtomHelper::getInstance()->setWindowMotifHint(this->winId(), hints);
+
+    this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
+    this->setFixedSize(440,250);
+
+    QPalette palette;
+    palette.setColor(QPalette::Background,QColor(255,255,255));
+    this->setPalette(palette);
 
     if(QGSettings::isSchemaInstalled("org.ukui.bluetooth")){
         settings = new QGSettings("org.ukui.bluetooth");
@@ -212,16 +224,25 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
         });
         cancel_btn->setVisible(false);
 
+        QFrame *warn_frame = new QFrame(this);
+        warn_frame->setGeometry(0,176,440,30);
+        QHBoxLayout *warn_layout = new QHBoxLayout(warn_frame);
+        warn_layout->setSpacing(10);
+        warn_layout->setContentsMargins(0,0,0,0);
+
         QLabel *warn_icon = new QLabel(this);
         warn_icon->setPixmap(QIcon::fromTheme("emblem-important-symbolic").pixmap(30,30));
-        warn_icon->setGeometry(60,176,30,30);
         warn_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(248, 206, 83));
         warn_icon->setProperty("useIconHighlightEffect", 0x10);
-        warn_icon->show();
 
         QLabel *warn_text = new QLabel(tr("Sender canceled or transmission error"),this);
-        warn_text->setGeometry(100,176,300,30);
-        warn_text->show();
+        warn_text->setAlignment(Qt::AlignVCenter);
+
+        warn_layout->addStretch();
+        warn_layout->addWidget(warn_icon);
+        warn_layout->addWidget(warn_text);
+        warn_layout->addStretch();
+        warn_frame->show();
     }
 }
 

@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
 //    QApplication::setStyle(QStyleFactory::create("ukui-default"));
     QApplication::setQuitOnLastWindowClosed(false);
 
-
     QString locale = QLocale::system().name();
 //        QString locale = "es";
     QTranslator translator;

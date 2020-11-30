@@ -2,26 +2,30 @@ TARGET = ukui-bluetooth
 DESTDIR = .
 TEMPLATE = app
 
-QT       += core gui dbus
+QT       += core gui dbus KWindowSystem x11extras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11 link_pkgconfig
 
 PKGCONFIG += gsettings-qt gio-2.0
+# 适配窗口管理器圆角阴影
+LIBS +=-lpthread
+LIBS +=-lX11 -lXrandr -lXinerama -lXi -lXcursor
+
 LIBS += -L /usr/lib/x86_64-linux-gnu -l KF5BluezQt -lgio-2.0 -lglib-2.0
 
 inst1.files += data/org.bluez.Agent1.conf
 inst1.path = /etc/dbus-1/system.d/
 inst2.files += data/org.ukui.bluetooth.gschema.xml
 inst2.path = /usr/share/glib-2.0/schemas/
-inst3.files += data/ukui-bluetooth.desktop
-inst3.files = /etc/xdg/autostart/
+#inst3.files += data/ukui-bluetooth.desktop
+#inst3.files = /etc/xdg/autostart/
 target.source += $$TARGET
 target.path = /usr/bin
 INSTALLS += inst1 \
     inst2 \
-    inst3 \
+#    inst3 \
     target
 
 # The following define makes your compiler emit warnings if you use
@@ -50,7 +54,8 @@ SOURCES += \
     ukui-bluetooth-tray/pincodewidget.cpp \
     ukui-bluetooth-tray/deviceseleterwidget.cpp \
     daemon/bluetoothagent.cpp \
-    daemon/bluetoothdbus.cpp
+    daemon/bluetoothdbus.cpp \
+    ukui-bluetooth-tray/xatom-helper.cpp
 
 HEADERS += \
     daemon/bluetoothobexagent.h \
@@ -60,7 +65,8 @@ HEADERS += \
     ukui-bluetooth-tray/pincodewidget.h \
     ukui-bluetooth-tray/deviceseleterwidget.h \
     daemon/bluetoothagent.h \
-    daemon/bluetoothdbus.h
+    daemon/bluetoothdbus.h \
+    ukui-bluetooth-tray/xatom-helper.h
 
 TRANSLATIONS += \
     translations/ukui-bluetooth_zh_CN.ts

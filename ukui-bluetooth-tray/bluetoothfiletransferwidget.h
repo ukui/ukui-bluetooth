@@ -1,6 +1,8 @@
 #ifndef BLUETOOTHFILETRANSFERWIDGET_H
 #define BLUETOOTHFILETRANSFERWIDGET_H
 
+
+
 #include <gio/gio.h>
 #include <gio/gfile.h>
 #include <gio/gfileinfo.h>
@@ -11,7 +13,6 @@
 #include <KF5/BluezQt/bluezqt/obexobjectpush.h>
 #include <KF5/BluezQt/bluezqt/obexfiletransfer.h>
 #include <KF5/BluezQt/bluezqt/device.h>
-
 #include "deviceseleterwidget.h"
 
 #include <QWidget>

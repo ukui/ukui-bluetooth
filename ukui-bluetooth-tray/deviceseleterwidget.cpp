@@ -5,6 +5,9 @@ DeviceSeleterWidget::DeviceSeleterWidget(QWidget *parent, QString dev, bool f):
     select_dev(dev)
 {
     this->resize(372,270);
+    QPalette palette;
+    palette.setColor(QPalette::Background,QColor(235,235,235));
+    this->setPalette(palette);
 
     m_manager = new BluezQt::Manager(this);
     BluezQt::InitManagerJob *job = m_manager->init();
@@ -26,10 +29,7 @@ DeviceSeleterWidget::DeviceSeleterWidget(QWidget *parent, QString dev, bool f):
         main_layout->addWidget(Tiptop);
     }
 
-    QPalette palette;
-    palette.setColor(QPalette::Background,QColor(151,151,151));
     m_scroll = new QScrollArea(this);
-//    m_scroll->setPalette(palette);
     m_scroll->setWidgetResizable(true);
     m_scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 //    m_scroll->setFixedSize(376,240);

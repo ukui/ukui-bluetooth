@@ -1,15 +1,23 @@
 #include "bluetoothfiletransferwidget.h"
+#include "xatom-helper.h"
 
 BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString dev_address):
 //    QWidget(parent),
     file_name(name)
 {
+    // 添加窗管协议
+    MotifWmHints hints;
+    hints.flags = MWM_HINTS_FUNCTIONS|MWM_HINTS_DECORATIONS;
+    hints.functions = MWM_FUNC_ALL;
+    hints.decorations = MWM_DECOR_BORDER;
+    XAtomHelper::getInstance()->setWindowMotifHint(this->winId(), hints);
+
     qDebug() << Q_FUNC_INFO << __LINE__;
-    this->resize(440,510);
-    this->setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
-//    QPalette palette;
-//    palette.setColor(QPalette::Background,QColor(255,255,255));
-//    this->setPalette(palette);
+    this->setFixedSize(440,510);
+    this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
+    QPalette palette;
+    palette.setColor(QPalette::Background,QColor(255,255,255));
+    this->setPalette(palette);
 
     title_icon = new QLabel(this);
     title_icon->setPixmap(QIcon::fromTheme("preferences-system-bluetooth").pixmap(20,20));
@@ -72,6 +80,10 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString d
     cancel_btn->setFixedSize(120,36);
     cancel_btn->setGeometry(288,221,120,36);
     cancel_btn->setVisible(false);
+    connect(cancel_btn,&QPushButton::clicked,this,[=]{
+        emit this->close_the_pre_session();
+        this->close();
+    });
 
     tranfer_status_icon = new QLabel(this);
     tranfer_status_icon->setFixedSize(64,64);
@@ -145,6 +157,7 @@ void BluetoothFileTransferWidget::Get_file_size(float t)
 
 void BluetoothFileTransferWidget::Initialize_and_start_animation()
 {
+    this->resize(440,510);
     tip_text->setText(tr("Transferring to \"")+dev_widget->get_seleter_dev_name()+"\"");
     tip_text->update();
 
@@ -183,6 +196,9 @@ void BluetoothFileTransferWidget::Initialize_and_start_animation()
     main_animation_group->addAnimation(dev_widget_action);
     main_animation_group->addAnimation(target_frame_action);
     main_animation_group->start();
+    connect(main_animation_group,&QParallelAnimationGroup::finished,this,[=]{
+        this->setFixedSize(440,300);
+    });
 }
 
 void BluetoothFileTransferWidget::init_m_progressbar_value(quint64 value)
@@ -213,9 +229,18 @@ void BluetoothFileTransferWidget::get_transfer_status(QString status)
         tranfer_status_icon->setVisible(true);
         tranfer_status_text->setText(tr("Successfully transmitted!"));
         tranfer_status_text->setVisible(true);
+
+        cancel_btn->setText(tr("Close"));
     }else if(status == "active"){
 
     }else if(status == "error"){
+        if(main_animation_group->state() == QAbstractAnimation::Running){
+            connect(main_animation_group,&QParallelAnimationGroup::finished,this,[=]{
+                tip_text->setVisible(false);
+                target_frame->setVisible(false);
+                m_progressbar->setVisible(false);
+            });
+        }
         tip_text->setVisible(false);
         target_frame->setVisible(false);
         m_progressbar->setVisible(false);
@@ -226,6 +251,8 @@ void BluetoothFileTransferWidget::get_transfer_status(QString status)
         tranfer_status_icon->setVisible(true);
         tranfer_status_text->setText(tr("Transmission failed!"));
         tranfer_status_text->setVisible(true);
+
+        cancel_btn->setText(tr("Close"));
     }
 }
 

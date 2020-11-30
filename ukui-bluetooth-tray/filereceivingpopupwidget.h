@@ -30,6 +30,7 @@
 #include <QFile>
 #include <QProcess>
 #include <QGSettings>
+#include <QHBoxLayout>
 
 class FileReceivingPopupWidget : public QDialog
 {
@@ -44,8 +45,9 @@ public:
 public slots:
     void OnClickedAcceptBtn();
     void update_transfer_progress_bar(quint64);
-    void file_transfer_completed(BluezQt::ObexTransfer::Status);
+    void file_transfer_completed(BluezQt::ObexTransfer::Status status);
     void GSettings_value_chanage(const QString &key);
+
 signals:
     void cancel();
 
