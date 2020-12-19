@@ -55,7 +55,7 @@ public:
     void Open_bluetooth_settings();
 
     void Dbus_file_transfer(QString);
-
+    void Monitor_sleep_signal();
 public slots:
     void TraySignalProcessing(QAction *action);
     void file_transfer_session_add(BluezQt::ObexSessionPtr);
@@ -64,6 +64,7 @@ public slots:
     void propertyChanged(QString name, QVariantMap map, QStringList list);
     void GSettings_value_chanage(const QString &key);
     void Dbus_bluetooth_switch(bool);
+    void Monitor_sleep_Slot(bool);
 private:
     QSystemTrayIcon *bluetooth_tray_icon;
     QMenu *tray_Menu;
@@ -85,10 +86,10 @@ private:
     BluezQt::Manager *m_manager = nullptr;
     BluezQt::Adapter *m_adapter = nullptr;
     BluezQt::ObexManager *obex_manager = nullptr;
-    BluezQt::AdapterPtr m_localDevice = nullptr;
     BluetoothAgent *bluetoothAgent = nullptr;
     BluetoothObexAgent *bluetoothObexAgent = nullptr;
     BluezQt::ObexObjectPush *opp = nullptr;
     QDBusObjectPath pre_session;
+    bool dev_remove_flag = false;
 } ;
 #endif // FEATURESWIDGET_H

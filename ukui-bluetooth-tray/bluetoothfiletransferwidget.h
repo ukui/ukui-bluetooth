@@ -1,8 +1,6 @@
 #ifndef BLUETOOTHFILETRANSFERWIDGET_H
 #define BLUETOOTHFILETRANSFERWIDGET_H
 
-
-
 #include <gio/gio.h>
 #include <gio/gfile.h>
 #include <gio/gfileinfo.h>

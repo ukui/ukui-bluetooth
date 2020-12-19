@@ -15,6 +15,8 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString d
     qDebug() << Q_FUNC_INFO << __LINE__;
     this->setFixedSize(440,510);
     this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
+    this->setWindowIcon(QIcon::fromTheme("bluetooth"));
+
     QPalette palette;
     palette.setColor(QPalette::Background,QColor(255,255,255));
     this->setPalette(palette);
@@ -28,8 +30,10 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString d
 
     close_btn = new QPushButton(this);
     close_btn->setIcon(QIcon::fromTheme("window-close-symbolic"));
-    close_btn->setIconSize(QSize(15,15));
-    close_btn->setGeometry(413,10,15,15);
+    close_btn->setProperty("isWindowButton", 0x2);
+    close_btn->setProperty("useIconHighlightEffect", 0x8);
+    close_btn->setFlat(true);
+    close_btn->setGeometry(406,4,30,30);
     connect(close_btn,&QPushButton::clicked,this,[=]{
         emit this->close_the_pre_session();
         this->close();

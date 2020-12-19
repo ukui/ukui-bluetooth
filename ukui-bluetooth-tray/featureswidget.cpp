@@ -67,7 +67,8 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
     //Create taskbar tray icon and connect to signal slot
     //创建任务栏托盘图标，并连接信号槽
-    bluetooth_tray_icon = new QSystemTrayIcon(QIcon::fromTheme("bluetooth-symbolic"),this);
+    qDebug() << Q_FUNC_INFO << QIcon::hasThemeIcon("bluetooth-active-symbolic");
+    bluetooth_tray_icon = new QSystemTrayIcon(QIcon::fromTheme("bluetooth-active-symbolic"),this);
     bluetooth_tray_icon->setContextMenu(tray_Menu);
     bluetooth_tray_icon->setToolTip(tr("Bluetooth"));
     bluetooth_tray_icon->show();
@@ -86,6 +87,8 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
                         break;
                 }
             });
+
+    Monitor_sleep_signal();
 }
 
 FeaturesWidget::~FeaturesWidget()
@@ -95,6 +98,7 @@ FeaturesWidget::~FeaturesWidget()
 
 void FeaturesWidget::InitTrayMenu()
 {
+    bool noDev = true;
     tray_Menu->clear();
     if(!flag){
         tray_Menu->addAction(tr("Turn on bluetooth"));
@@ -108,6 +112,7 @@ void FeaturesWidget::InitTrayMenu()
         tray_Menu->addAction(head);
         for(int i=0; i < device_list.size(); i++){
             if(device_list.at(i)->isPaired()){
+                noDev = false;
                 QMenu *device_menu = new QMenu(/*QIcon::fromTheme("pan-end-symbolic-rtl"),*/device_list.at(i)->name());
                 QAction *status = new QAction();
                 QAction *send   = new QAction();
@@ -136,6 +141,12 @@ void FeaturesWidget::InitTrayMenu()
     //            connect(device_menu,&QMenu::triggered,this,&FeaturesWidget::TrayItemSignalProcessing);
             }
         }
+
+        if(noDev){
+            QAction *text = new QAction(tr("No paired devices"));
+            text->setDisabled(true);
+            tray_Menu->addAction(text);
+        }
     }
     tray_Menu->addSeparator();
     tray_Menu->addAction(tr("Bluetooth settings"));
@@ -146,13 +157,18 @@ void FeaturesWidget::Pair_device_by_address(QString address)
 {
     qDebug() << Q_FUNC_INFO << address;
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
-    qDebug() << Q_FUNC_INFO << device->name();
-    BluezQt::PendingCall *call = device->pair();
-//    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
-//        if(q->error() == 0){
-//            Connect_device_by_address(address);
-//        }
-//    });
+
+    if(device->isPaired()){
+        Connect_device_by_address(address);
+    }else{
+        qDebug() << Q_FUNC_INFO << device->name();
+        BluezQt::PendingCall *call = device->pair();
+//        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+//            if(q->error() == 0){
+//                Connect_device_by_address(address);
+//            }
+//        });
+    }
 }
 
 void FeaturesWidget::Disconnect_device_by_address(QString address)
@@ -206,7 +222,7 @@ void FeaturesWidget::Connect_device_by_address(QString address)
     });
 
     BluezQt::DevicePtr finally_device = m_adapter->deviceForAddress(settings->get("finally-connect-the-device").toString());
-    if(finally_device.isNull()){
+    if(finally_device.isNull() || address == settings->get("finally-connect-the-device").toString()){
         Connect_device(device);
     }else{
         if(finally_device->isConnected()){
@@ -263,7 +279,7 @@ void FeaturesWidget::Send_files_by_address(QString address)
     selected_file = QFileDialog::getOpenFileName(0,
         tr("Select the file to be sent"), getenv("HOME"), tr("All Files (*)"));
 
-    qDebug() << "Select file:" << selected_file;
+    qDebug() << "Select file:" << selected_file.unicode();
     if(!selected_file.isNull()){
         transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
         connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
@@ -297,13 +313,52 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
 
 void FeaturesWidget::Dbus_file_transfer(QString file_path)
 {
-    qDebug() << "Select file:" << file_path;
+    qDebug() << "Select file:" << file_path.unicode();
     selected_file = file_path;
     if(!selected_file.isNull()){
         transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
         connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
         connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
         transfer_widget->exec();
+    }
+}
+
+void FeaturesWidget::Monitor_sleep_signal()
+{
+    if (QDBusConnection::systemBus().connect("org.freedesktop.login1", "/org/freedesktop/login1",
+            "org.freedesktop.login1.Manager", "PrepareForSleep", this,
+            SLOT(Monitor_sleep_Slot(bool)))) {
+        qDebug() << "PrepareForSleep signal connected successfully to slot";
+    } else {
+        qDebug() << "PrepareForSleep signal connection was not successful";
+    }
+
+    //如果进行了移除蓝牙适配器操作，则将dev_remove_flag标志位设为true
+    connect(m_manager,&BluezQt::Manager::adapterRemoved,this,[=]{
+        qDebug() << Q_FUNC_INFO << __LINE__;
+        dev_remove_flag = true;
+    });
+}
+
+void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
+{
+    if(!sleep){
+        qDebug() << "System wakes up from sleep!!!" << dev_remove_flag;
+        if(dev_remove_flag){
+            connect(m_manager,&BluezQt::Manager::adapterAdded,this,[=](BluezQt::AdapterPtr adapter){
+                if(m_adapter != adapter.data()){
+                    m_adapter = adapter.data();
+                    connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,[=](bool power){
+                        settings->set("switch",QVariant::fromValue(power));
+                    });
+                }
+            });
+        }else{
+
+        }
+        dev_remove_flag = false;
+    }else{
+        qDebug() << "System goes to sleep!!!" << dev_remove_flag;
     }
 }
 

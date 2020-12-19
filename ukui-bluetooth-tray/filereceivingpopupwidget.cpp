@@ -14,6 +14,7 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
 
     this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setFixedSize(440,250);
+    this->setWindowIcon(QIcon::fromTheme("bluetooth"));
 
     QPalette palette;
     palette.setColor(QPalette::Background,QColor(255,255,255));
@@ -39,8 +40,10 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
 
     close_btn = new QPushButton(this);
     close_btn->setIcon(QIcon::fromTheme("window-close-symbolic"));
-    close_btn->setIconSize(QSize(15,15));
-    close_btn->setGeometry(413,14,14,14);
+    close_btn->setGeometry(406,4,30,30);
+    close_btn->setProperty("isWindowButton", 0x2);
+    close_btn->setProperty("useIconHighlightEffect", 0x8);
+    close_btn->setFlat(true);
     connect(close_btn,&QPushButton::clicked,this,[=]{
         emit this->rejected();
         this->close();

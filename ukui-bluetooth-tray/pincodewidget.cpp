@@ -1,11 +1,20 @@
 #include "pincodewidget.h"
+#include "xatom-helper.h"
 
 PinCodeWidget::PinCodeWidget(QString name, QString pin)
    : dev_name(name),
      PINCode(pin)
 {
-    this->setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
+    // 添加窗管协议
+    MotifWmHints hints;
+    hints.flags = MWM_HINTS_FUNCTIONS|MWM_HINTS_DECORATIONS;
+    hints.functions = MWM_FUNC_ALL;
+    hints.decorations = MWM_DECOR_BORDER;
+    XAtomHelper::getInstance()->setWindowMotifHint(this->winId(), hints);
+
+    this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setFixedSize(420,330);
+    this->setWindowIcon(QIcon::fromTheme("bluetooth"));
     this->setStyleSheet("QDialog{background:white;}");
 
     QString top_text = tr("Is it paired with \"")+dev_name+tr("\"");
@@ -44,7 +53,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
                               border: 0px solid #979797;}\
                               QPushButton:hover{background:rgba(67,127,240,1);\
                               border-radius:6px;color:white;border: 0px solid #979797;}");
-    accept_btn->setGeometry(60,255,120,36);
+    accept_btn->setGeometry(160,255,120,36);
     connect(accept_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_accept_btn);
 
     refuse_btn = new QPushButton(tr("Refush"),this);
@@ -54,14 +63,17 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
                               border: 0px solid #979797;}\
                               QPushButton:hover{background:rgba(67,127,240,1);\
                               border-radius:6px;color:white;border: 0px solid #979797;}");
-    refuse_btn->setGeometry(250,255,120,36);
+    refuse_btn->setGeometry(290,255,120,36);
     connect(refuse_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_refuse_btn);
 
     close_btn = new QPushButton(this);
     QIcon icon = QIcon::fromTheme("window-close-symbolic");
     close_btn->setIcon(icon);
-    close_btn->setIconSize(QSize(13,13));
-    close_btn->setGeometry(393,14,13,13);
+    close_btn->setProperty("isWindowButton", 0x2);
+    close_btn->setProperty("useIconHighlightEffect", 0x8);
+//    close_btn->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
+    close_btn->setFlat(true);
+    close_btn->setGeometry(386,4,30,30);
     connect(close_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_close_btn);
 }
 
