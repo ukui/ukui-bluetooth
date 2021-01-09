@@ -10,6 +10,8 @@
 #include <QPushButton>
 #include <QString>
 #include <QDialog>
+#include <QMessageBox>
+#include <QAbstractButton>
 
 class PinCodeWidget : public QDialog
 {
@@ -17,6 +19,7 @@ class PinCodeWidget : public QDialog
 public:
     explicit PinCodeWidget(QString name = "", QString pin = "");
     ~PinCodeWidget();
+    void Connection_timed_out();
 
 private slots:
     void onClick_close_btn(bool);

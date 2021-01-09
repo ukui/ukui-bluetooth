@@ -15,6 +15,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
     this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setFixedSize(420,330);
     this->setWindowIcon(QIcon::fromTheme("bluetooth"));
+    this->setWindowTitle(tr("Bluetooth pairing"));
     this->setStyleSheet("QDialog{background:white;}");
 
     QString top_text = tr("Is it paired with \"")+dev_name+tr("\"");
@@ -80,6 +81,17 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
 PinCodeWidget::~PinCodeWidget()
 {
 
+}
+
+void PinCodeWidget::Connection_timed_out()
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(tr("Connection timed out !!!"));
+    int ret = msgBox.exec();
+    if(ret){
+        this->close();
+    }
 }
 
 void PinCodeWidget::onClick_close_btn(bool)

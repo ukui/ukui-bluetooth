@@ -111,6 +111,8 @@ void BluetoothAgent::cancel()
 {
     qDebug() << Q_FUNC_INFO;
     m_cancelCalled = true;
+
+    pincodewidget->Connection_timed_out();
 }
 
 void BluetoothAgent::release()

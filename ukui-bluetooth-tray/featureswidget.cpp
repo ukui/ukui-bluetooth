@@ -3,6 +3,30 @@
 FeaturesWidget::FeaturesWidget(QWidget *parent)
     : QWidget(parent)
 {
+    //=============初始化蓝牙管理器，失败则退出进程===================
+    m_manager = new BluezQt::Manager(this);
+    BluezQt::InitManagerJob *job = m_manager->init();
+    job->exec();
+
+    qDebug() << m_manager->isInitialized();
+    if(!m_manager->isInitialized()){
+        qDebug() << "BluezQt::Manager init failed !!!";
+        qDebug() << "Program exit !!!";
+        exit_flag = true;
+        return;
+    }
+
+    if(!m_manager->isOperational()){
+        qDebug() << "BluezQt::Manager  manager is not operational !!!";
+        qDebug() << "BlueZ system daemon is not running";
+        qDebug() << "Program exit !!!";
+        exit_flag = true;
+        return;
+    }
+    //========================End=================================
+
+
+    //==============获取gsettings的配置信息==========================
     if(QGSettings::isSchemaInstalled("org.ukui.bluetooth")){
         settings = new QGSettings("org.ukui.bluetooth");
 
@@ -15,6 +39,7 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
         qDebug() << "GSetting Value: " << Default_Adapter << finally_connect_the_device << paired_device;
         connect(settings, &QGSettings::changed,this,&FeaturesWidget::GSettings_value_chanage);
     }
+    //========================End===================================
 
     session_dbus = new BluetoothDbus(this);
     connect(session_dbus,&BluetoothDbus::ConnectTheSendingDevice,this,&FeaturesWidget::Pair_device_by_address);
@@ -23,13 +48,6 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     connect(session_dbus,&BluetoothDbus::sendTransferMesg,this,&FeaturesWidget::Dbus_file_transfer);
     connect(session_dbus,&BluetoothDbus::switch_signals,this,&FeaturesWidget::Dbus_bluetooth_switch);
 
-    m_manager = new BluezQt::Manager(this);
-    bluetoothAgent = new BluetoothAgent(this);
-    bluetoothObexAgent = new BluetoothObexAgent(this);
-    BluezQt::InitManagerJob *job = m_manager->init();
-    job->exec();
-    qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
-
     if(Default_Adapter.isEmpty()){
         m_adapter = m_manager->adapters().at(0).data();
         settings->set("adapter-address",QVariant::fromValue(m_adapter->address()));
@@ -37,6 +55,13 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
         m_adapter = m_manager->adapterForAddress(Default_Adapter).data();
     }
 
+    if(!m_adapter->isDiscoverable()){
+        m_adapter->setDiscoverable(true);
+    }
+
+    bluetoothAgent = new BluetoothAgent(this);
+    bluetoothObexAgent = new BluetoothObexAgent(this);
+    qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
     qDebug() << m_adapter->isPowered();
     if(m_adapter->isPowered()){
         flag = true;
@@ -62,12 +87,11 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 //    qDebug() << m_adapter->devices().size();
     connect(obex_manager,&BluezQt::ObexManager::sessionAdded,this,&FeaturesWidget::file_transfer_session_add);
 
-    tray_Menu = new QMenu();
+    tray_Menu = new QMenu(this);
     connect(tray_Menu,&QMenu::triggered,this,&FeaturesWidget::TraySignalProcessing);
 
     //Create taskbar tray icon and connect to signal slot
     //创建任务栏托盘图标，并连接信号槽
-    qDebug() << Q_FUNC_INFO << QIcon::hasThemeIcon("bluetooth-active-symbolic");
     bluetooth_tray_icon = new QSystemTrayIcon(QIcon::fromTheme("bluetooth-active-symbolic"),this);
     bluetooth_tray_icon->setContextMenu(tray_Menu);
     bluetooth_tray_icon->setToolTip(tr("Bluetooth"));
@@ -161,18 +185,23 @@ void FeaturesWidget::Pair_device_by_address(QString address)
     if(device->isPaired()){
         Connect_device_by_address(address);
     }else{
-        qDebug() << Q_FUNC_INFO << device->name();
-        BluezQt::PendingCall *call = device->pair();
-//        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
-//            if(q->error() == 0){
-//                Connect_device_by_address(address);
-//            }
-//        });
+        if(device->type() == BluezQt::Device::Mouse || device->type() == BluezQt::Device::Keyboard){
+            Connect_device_by_address(address);
+        }else{
+            qDebug() << Q_FUNC_INFO << device->name();
+            BluezQt::PendingCall *call = device->pair();
+            connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+                if(q->error() == 0){
+                    Connect_device_by_address(address);
+                }
+            });
+        }
     }
 }
 
 void FeaturesWidget::Disconnect_device_by_address(QString address)
 {
+    qDebug() << Q_FUNC_INFO << address;
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
     BluezQt::PendingCall *call = device->disconnectFromDevice();
     connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
@@ -190,6 +219,7 @@ void FeaturesWidget::Disconnect_device_by_address(QString address)
             arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
             process->start(cmd,arg);
         }
+        dev_disconnected_flag = false;
     });
 }
 
@@ -211,13 +241,16 @@ void FeaturesWidget::Connect_device_by_address(QString address)
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
     connect(device.data(),&BluezQt::Device::connectedChanged,this,[=](bool connected){
         if(!connected){
-            QProcess *process = new QProcess(this);
-            QString cmd = "notify-send";
-            QStringList arg;
-            qDebug() << Q_FUNC_INFO;
-            QString text = tr("Bluetooth device")+" \""+device->name()+"\" "+tr("disconnected!");
-            arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
-            process->start(cmd,arg);
+            if(dev_disconnected_flag){
+                QProcess *process = new QProcess(this);
+                QString cmd = "notify-send";
+                QStringList arg;
+                qDebug() << Q_FUNC_INFO;
+                QString text = tr("Bluetooth device")+" \""+device->name()+"\" "+tr("disconnected!");
+                arg << tr("BlueTooth") << text << "-t" << "5000" << "-i" << "blueman";
+                process->start(cmd,arg);
+                dev_disconnected_flag = false;
+            }
         }
     });
 
@@ -254,6 +287,8 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
             process->start(cmd,arg);
 
             settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
+
+            dev_disconnected_flag = true;
         }else{
             qDebug() << Q_FUNC_INFO;
             QString text = tr("The connection with the Bluetooth device \"")+device->name()+tr("\" failed!");
@@ -340,10 +375,16 @@ void FeaturesWidget::Monitor_sleep_signal()
     });
 }
 
+void FeaturesWidget::Connect_the_last_connected_device()
+{
+    qDebug() << Q_FUNC_INFO;
+    Connect_device_by_address(settings->get("finally-connect-the-device").toString());
+}
+
 void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
 {
     if(!sleep){
-        qDebug() << "System wakes up from sleep!!!" << dev_remove_flag;
+        qDebug() << "System wakes up from sleep !!!" << dev_remove_flag;
         if(dev_remove_flag){
             connect(m_manager,&BluezQt::Manager::adapterAdded,this,[=](BluezQt::AdapterPtr adapter){
                 if(m_adapter != adapter.data()){
@@ -351,6 +392,7 @@ void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
                     connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,[=](bool power){
                         settings->set("switch",QVariant::fromValue(power));
                     });
+                    Connect_the_last_connected_device();
                 }
             });
         }else{
@@ -358,7 +400,7 @@ void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
         }
         dev_remove_flag = false;
     }else{
-        qDebug() << "System goes to sleep!!!" << dev_remove_flag;
+        qDebug() << "System goes to sleep !!!" << dev_remove_flag;
     }
 }
 

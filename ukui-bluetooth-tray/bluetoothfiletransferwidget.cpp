@@ -16,6 +16,7 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString d
     this->setFixedSize(440,510);
     this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setWindowIcon(QIcon::fromTheme("bluetooth"));
+    this->setWindowTitle(tr("Bluetooth file transfer"));
 
     QPalette palette;
     palette.setColor(QPalette::Background,QColor(255,255,255));

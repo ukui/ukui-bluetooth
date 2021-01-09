@@ -15,6 +15,7 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
     this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setFixedSize(440,250);
     this->setWindowIcon(QIcon::fromTheme("bluetooth"));
+    this->setWindowTitle(tr("Bluetooth file transfer"));
 
     QPalette palette;
     palette.setColor(QPalette::Background,QColor(255,255,255));

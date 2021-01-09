@@ -21,6 +21,8 @@
 #include <KF5/BluezQt/bluezqt/obextransfer.h>
 
 #include <iostream>
+#include <QApplication>
+#include <QTimer>
 #include <QWidget>
 #include <QSystemTrayIcon>
 #include <QAction>
@@ -56,6 +58,12 @@ public:
 
     void Dbus_file_transfer(QString);
     void Monitor_sleep_signal();
+
+    void Connect_the_last_connected_device();
+
+    bool exit_flag = false;
+signals:
+    void ProgramExit();
 public slots:
     void TraySignalProcessing(QAction *action);
     void file_transfer_session_add(BluezQt::ObexSessionPtr);
@@ -91,5 +99,6 @@ private:
     BluezQt::ObexObjectPush *opp = nullptr;
     QDBusObjectPath pre_session;
     bool dev_remove_flag = false;
+    bool dev_disconnected_flag = true;
 } ;
 #endif // FEATURESWIDGET_H

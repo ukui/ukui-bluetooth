@@ -1,10 +1,12 @@
 #include "featureswidget.h"
 #include "../daemon/bluetoothdbus.h"
 
+#include <QObject>
 #include <QApplication>
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QStyleFactory>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -29,6 +31,9 @@ int main(int argc, char *argv[])
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     app.installTranslator(&qtTranslator);
 
-    FeaturesWidget w;
+    FeaturesWidget *w = new FeaturesWidget();
+    if( w->exit_flag ){
+        return -1;
+    }
     return app.exec();
 }
