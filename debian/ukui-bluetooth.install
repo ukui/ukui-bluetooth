@@ -1,0 +1,2 @@
+translations/*.qm /usr/share/ukui-bluetooth/translations/
+data/ukui-bluetooth.desktop /etc/xdg/autostart/

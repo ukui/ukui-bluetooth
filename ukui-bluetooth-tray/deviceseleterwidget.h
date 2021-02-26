@@ -23,6 +23,7 @@
 #include <QList>
 #include <QPalette>
 #include <QColor>
+#include <QGSettings>
 
 class DeviceSeleterWidget : public QWidget
 {
@@ -34,10 +35,14 @@ public:
     QString get_seleter_device();
     QString get_seleter_dev_name();
 signals:
+    void sign_select();
 
 private slots:
     void itemToolbuttonClicked();
-
+    void GSettingsChanges(const QString &key);
+private:
+    QGSettings *GSettings;
+    QGSettings *settings;
 private:
     BluezQt::Manager *m_manager;
     QString select_dev;

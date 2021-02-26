@@ -1,10 +1,16 @@
 #include "filereceivingpopupwidget.h"
 #include "xatom-helper.h"
 
-FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString source):
+FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString source, QString root):
     target_address(address),
-    target_source(source)
+    target_source(source),
+    root_address(root)
 {
+    if(QGSettings::isSchemaInstalled("org.ukui.style")){
+        StyleSettings = new QGSettings("org.ukui.style");
+        connect(StyleSettings,&QGSettings::changed,this,&FileReceivingPopupWidget::GSettingsChanges);
+    }
+
     // 添加窗管协议
     MotifWmHints hints;
     hints.flags = MWM_HINTS_FUNCTIONS|MWM_HINTS_DECORATIONS;
@@ -12,13 +18,18 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
     hints.decorations = MWM_DECOR_BORDER;
     XAtomHelper::getInstance()->setWindowMotifHint(this->winId(), hints);
 
-    this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
+//    this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setFixedSize(440,250);
     this->setWindowIcon(QIcon::fromTheme("bluetooth"));
     this->setWindowTitle(tr("Bluetooth file transfer"));
+    this->setAttribute(Qt::WA_DeleteOnClose);
 
     QPalette palette;
-    palette.setColor(QPalette::Background,QColor(255,255,255));
+    if(StyleSettings->get("style-name").toString() == "ukui-black"){
+        palette.setColor(QPalette::Background,QColor(Qt::black));
+    }else{
+        palette.setColor(QPalette::Background,QColor(Qt::white));
+    }
     this->setPalette(palette);
 
     if(QGSettings::isSchemaInstalled("org.ukui.bluetooth")){
@@ -63,7 +74,6 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
                                font-size: 18px;\
                                font-family: PingFangSC-Medium, PingFang SC;\
                                font-weight: 500;\
-                               color: rgba(0, 0, 0, 0.85);\
                                line-height: 25px;}");
 
     file_icon = new QLabel(this);
@@ -110,8 +120,10 @@ QString FileReceivingPopupWidget::getDeviceNameByAddress(QString address)
     BluezQt::Manager *manager = new BluezQt::Manager(this);
     BluezQt::InitManagerJob *job = manager->init();
     job->exec();
-    BluezQt::AdapterPtr adapter = manager->usableAdapter();
+    BluezQt::AdapterPtr adapter = manager->adapterForAddress(root_address);
+//    BluezQt::AdapterPtr adapter = manager->usableAdapter();
     QString name = adapter->deviceForAddress(address)->name();
+    qDebug() << Q_FUNC_INFO << __LINE__;
     return name;
 }
 
@@ -144,9 +156,10 @@ bool FileReceivingPopupWidget::move_file()
     QString s = QDir::homePath()+"/.cache/obexd/"+target_source;
     QString d = file_path+"/"+target_source;
     GError *error;
-    GFile *source = g_file_new_for_path(s.toLatin1().data());
-    GFile *destination = g_file_new_for_path(d.toLatin1().data());
+    GFile *source = g_file_new_for_path(s.toStdString().c_str());
+    GFile *destination = g_file_new_for_path(d.toStdString().c_str());
     bool flag = g_file_move(source,destination,G_FILE_COPY_OVERWRITE,NULL,NULL,NULL,&error);
+    qDebug() << Q_FUNC_INFO << "move file" << "target_path =" << s << " source_path =" << d << "flag =" << flag;
     return flag;
 }
 
@@ -210,14 +223,14 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
         qDebug() << Q_FUNC_INFO << __LINE__ << x;
         if(x){
             connect(view_btn,&QPushButton::clicked,this,[=]{
-                this->close();
                 qDebug() << Q_FUNC_INFO << __LINE__;
                 QProcess *process = new QProcess(this);
                 QString cmd = "peony";
                 QStringList arg;
                 qDebug() << Q_FUNC_INFO;
                 arg << file_path;
-                process->start(cmd,arg);
+                process->startDetached(cmd,arg);
+                this->close();
             });
         }
 
@@ -255,4 +268,18 @@ void FileReceivingPopupWidget::GSettings_value_chanage(const QString &key)
     if(key == "file-save-path"){
         file_path = settings->get("file-save-path").toString();
     }
+}
+
+void FileReceivingPopupWidget::GSettingsChanges(const QString &key)
+{
+    QPalette palette;
+    qDebug() << Q_FUNC_INFO << key;
+    if(key == "styleName"){
+        if(StyleSettings->get("style-name").toString() == "ukui-black"){
+            palette.setColor(QPalette::Background,QColor(Qt::black));
+        }else{
+            palette.setColor(QPalette::Background,QColor(Qt::white));
+        }
+    }
+    this->setPalette(palette);
 }

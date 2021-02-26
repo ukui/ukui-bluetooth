@@ -80,11 +80,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
         return;
     });
 
-    pincodewidget->exec();
-
-//    QMessageBox msgBox;
-//    msgBox.setText(device->name()+"------"+passkey);
-//    msgBox.exec();
+    pincodewidget->show();
 
     request.accept();
 }

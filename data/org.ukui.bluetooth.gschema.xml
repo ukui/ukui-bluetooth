@@ -25,6 +25,11 @@
       <summary>List of paired device address</summary>
       <description>Save a list of paired device address</description>
     </key>
+    <key type="as" name="adapter-address-list">
+      <default>[]</default>
+      <summary>List of adapter address</summary>
+      <description>Save a list of adapter address</description>
+    </key>
     <key type="s" name="adapter-address">
       <default>""</default>
       <summary>Save the Adapter used by default</summary>

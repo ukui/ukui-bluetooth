@@ -4,9 +4,23 @@ DeviceSeleterWidget::DeviceSeleterWidget(QWidget *parent, QString dev, bool f):
     QWidget(parent),
     select_dev(dev)
 {
+    if(QGSettings::isSchemaInstalled("org.ukui.style")){
+        GSettings = new QGSettings("org.ukui.style");
+        connect(GSettings,&QGSettings::changed,this,&DeviceSeleterWidget::GSettingsChanges);
+    }
+    if(QGSettings::isSchemaInstalled("org.ukui.bluetooth")){
+        settings = new QGSettings("org.ukui.bluetooth");
+    }
+
     this->resize(372,270);
+    this->setAutoFillBackground(false);
+
     QPalette palette;
-    palette.setColor(QPalette::Background,QColor(235,235,235));
+    if(GSettings->get("style-name").toString() == "ukui-black"){
+        palette.setColor(QPalette::Background,QColor(Qt::black));
+    }else{
+        palette.setColor(QPalette::Background,QColor(235,235,235));
+    }
     this->setPalette(palette);
 
     m_manager = new BluezQt::Manager(this);
@@ -53,7 +67,7 @@ DeviceSeleterWidget::~DeviceSeleterWidget()
 
 void DeviceSeleterWidget::InitUI()
 {
-    QList<BluezQt::DevicePtr> device_list = m_manager->usableAdapter()->devices();
+    QList<BluezQt::DevicePtr> device_list = m_manager->adapterForAddress(settings->get("adapter-address").toString())->devices();
     qDebug() << Q_FUNC_INFO << __LINE__ << device_list.size();
     for(int i=0; i < device_list.size(); i++){
 //        qDebug() << Q_FUNC_INFO << device_list.at(i)->type() << device_list.at(i)->name();
@@ -83,7 +97,7 @@ void DeviceSeleterWidget::InitUI()
 
                 if(select_dev != ""){
                     if(device_list.at(i)->address() == select_dev){
-                        item->setStyleSheet("QToolButton{background:white;}");
+                        item->setStyleSheet("QToolButton{background:white;color:black;}");
                         item->setChecked(true);
                         btn = item;
                         select_name = device_list.at(i)->name();
@@ -123,17 +137,33 @@ void DeviceSeleterWidget::itemToolbuttonClicked()
 {
 
     if(btn != nullptr || flag){
-        btn->setStyleSheet("QToolButton{background:#D9D9D9;}");
+        btn->setStyleSheet("QToolButton{background:#D9D9D9;color:black;}");
         btn->setChecked(false);
     }
 
     QToolButton *p = qobject_cast<QToolButton *>(sender());
     btn = p;
-    p->setStyleSheet("QToolButton{background:white;}");
+    p->setStyleSheet("QToolButton{background:lightgreen;color:black;}");
     p->setChecked(true);
     select_dev = p->statusTip();
     select_name = p->text();
 
+    emit sign_select();
+
     if(flag == false)
         flag = true;
+}
+
+void DeviceSeleterWidget::GSettingsChanges(const QString &key)
+{
+    QPalette palette;
+    qDebug() << Q_FUNC_INFO << key;
+    if(key == "styleName"){
+        if(GSettings->get("style-name").toString() == "ukui-black"){
+            palette.setColor(QPalette::Background,QColor(Qt::black));
+        }else{
+            palette.setColor(QPalette::Background,QColor(235,235,235));
+        }
+    }
+    this->setPalette(palette);
 }

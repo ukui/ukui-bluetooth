@@ -12,8 +12,10 @@
 #include <QDialog>
 #include <QMessageBox>
 #include <QAbstractButton>
+#include <QPalette>
+#include <QGSettings>
 
-class PinCodeWidget : public QDialog
+class PinCodeWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -25,10 +27,13 @@ private slots:
     void onClick_close_btn(bool);
     void onClick_accept_btn(bool);
     void onClick_refuse_btn(bool);
-
+    void GSettingsChanges(const QString &key);
 signals:
-
+    void accepted();
+    void rejected();
 private:
+    QGSettings *settings;
+
     QVBoxLayout *main_layout;
 
     QPushButton *close_btn;

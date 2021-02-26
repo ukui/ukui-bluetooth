@@ -6,6 +6,7 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QStyleFactory>
+#include <QTextCodec>
 #include <QDebug>
 
 int main(int argc, char *argv[])

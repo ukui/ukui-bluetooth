@@ -6,6 +6,8 @@
 #include <gio/gfileinfo.h>
 #include <gio/gioerror.h>
 
+#include <string>
+
 #include <KF5/BluezQt/bluezqt/obexmanager.h>
 #include <KF5/BluezQt/bluezqt/initobexmanagerjob.h>
 #include <KF5/BluezQt/bluezqt/obexobjectpush.h>
@@ -23,12 +25,14 @@
 #include <QString>
 #include <QFont>
 #include <QDebug>
+#include <QUrl>
 #include <QDialog>
 #include <QFileInfo>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
 #include <QParallelAnimationGroup>
 #include <QProgressBar>
+#include <QGSettings>
 
 class DeviceSeleterWidget;
 
@@ -39,25 +43,31 @@ enum FILE_TYPE{
     image,
 };
 
-class BluetoothFileTransferWidget : public QDialog
+class BluetoothFileTransferWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BluetoothFileTransferWidget(QString name = "",QString dev_address = "");
+    explicit BluetoothFileTransferWidget(QUrl name,QString dev_address = "");
     ~BluetoothFileTransferWidget();
+
+    static bool isShow;
 
     void Get_fie_type();
     void Get_file_size(float);
     void Initialize_and_start_animation();
     void init_m_progressbar_value(quint64);
     void get_transfer_status(QString);
+    void tranfer_error();
 signals:
     void sender_dev_name(QString);
     void close_the_pre_session();
 public slots:
     void onClicked_OK_Btn();
     void set_m_progressbar_value(quint64);
+    void GSettingsChanges(const QString &key);
 private:
+    QGSettings *GSettings;
+
     QLabel *tip_text;
 
     QLabel *title_icon;
@@ -83,7 +93,7 @@ private:
     QPushButton *cancel_btn;
     QPushButton *ok_btn;
 
-    QString file_name;
+    QUrl file_name;
     QString file_size;
     QString dev_name;
 };
