@@ -82,11 +82,17 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
 
     connect(m_device.data(), &BluezQt::Device::pairedChanged, this, [=]{
         request.reject();
-        pincodewidget->close();
+        if (pincodewidget != nullptr)
+            pincodewidget->close();
         return;
     });
+    connect(pincodewidget, &PinCodeWidget::destroyed, this, [=] {
+        pincodewidget = nullptr;
+    });
 
+    //保持在最前
     pincodewidget->show();
+    pincodewidget->activateWindow();
 
     request.accept();
 }
