@@ -80,6 +80,12 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
         return;
     });
 
+    connect(m_device.data(), &BluezQt::Device::pairedChanged, this, [=]{
+        request.reject();
+        pincodewidget->close();
+        return;
+    });
+
     pincodewidget->show();
 
     request.accept();
