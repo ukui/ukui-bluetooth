@@ -342,6 +342,7 @@ bool FeaturesWidget::Connect_device_by_address(QString address)
 
     BluezQt::DevicePtr finally_device = m_adapter->deviceForAddress(settings->get("finally-connect-the-device").toString());
     if(finally_device.isNull() || address == settings->get("finally-connect-the-device").toString()){
+        qDebug() << Q_FUNC_INFO << finally_device.isNull() << address << settings->get("finally-connect-the-device").toString();
         return Connect_device(device);
     }else{
         if(finally_device->isConnected()){
@@ -375,7 +376,7 @@ bool FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
 
             return true;
         }else{
-            qDebug() << Q_FUNC_INFO;
+            qDebug() << Q_FUNC_INFO << q->errorText();
             QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
             SendNotifyMessage(text);
 
@@ -518,7 +519,7 @@ void FeaturesWidget::Connect_the_last_connected_device()
         if(call->error() == 0){
             writeDeviceInfoToFile(dev->address(),dev->name());
         }else{
-            if(dev_callbak_flag < target_list.length()){
+            if(dev_callbak_flag < target_list.length()-1){
                 dev_callbak_flag++;
                 Connect_the_last_connected_device();
             }else{
