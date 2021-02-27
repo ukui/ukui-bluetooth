@@ -55,7 +55,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
                              font-size: 36px;\
                              font-family: ArialMT;\
                              line-height: 42px;}");
-    PIN_label->setGeometry(151,166,120,40);
+    PIN_label->setGeometry(151,166,160,40);
 
     accept_btn = new QPushButton(tr("Accept"),this);
 //    accept_btn->setStyleSheet("QPushButton{\

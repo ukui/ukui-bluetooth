@@ -267,6 +267,10 @@ void FeaturesWidget::Pair_device_by_address(QString address)
                 if(q->error() == 0){
                     Connect_device_by_address(address);
                 }
+                else {
+                    qDebug() << Q_FUNC_INFO << q->error();
+                    emit device.data()->pairedChanged(false);
+                }
             });
         }
     }
