@@ -147,8 +147,6 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
                     case QSystemTrayIcon::Trigger: /* 来自于单击激活。 */
                     case QSystemTrayIcon::Context:
                         InitTrayMenu();
-                        tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
-                        tray_Menu->exec();
                         break;
                 }
             });
@@ -188,17 +186,13 @@ void FeaturesWidget::InitTrayMenu()
                 palette.setBrush(QPalette::Base,QColor(Qt::black));
                 palette.setBrush(QPalette::Text,QColor(Qt::white));
                 QMenu *device_menu = new QMenu(/*QIcon::fromTheme("pan-end-symbolic-rtl"),*/device_list.at(i)->name());
-//                qDebug() << Q_FUNC_INFO << device_menu->size();
-//                connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,device_menu,[=](bool value){
-//                    qDebug() << Q_FUNC_INFO;
-//                    if(value)
-//                        device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
-//                    else
-//                        device_menu->;
-//                });
                 device_menu->setPalette(palette);
                 device_menu->setObjectName(device_list.at(i)->address());
                 device_menu->setMinimumWidth(160);
+                device_menu->setIcon(QIcon::fromTheme("software-update-available-symbolic"));
+                device_menu->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
+                device_menu->setProperty("useIconHighlightEffect", 0x10);
+
                 QAction *status = new QAction(tray_Menu);
                 QAction *send   = new QAction(tray_Menu);
                 QAction *remove = new QAction(tray_Menu);
@@ -233,6 +227,44 @@ void FeaturesWidget::InitTrayMenu()
                 send->setText(tr("Send files"));
                 if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
                     device_menu->addAction(send);
+
+                qDebug() << Q_FUNC_INFO << device_menu->size();
+                connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,device_menu,[=](bool value){
+                    qDebug() << Q_FUNC_INFO;
+                    if(value) {
+                        device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
+                        status->setText(tr("Disconnection"));
+                        device_menu->addAction(status);
+                        device_menu->removeAction(remove);
+
+                        BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
+                        qDebug() << Q_FUNC_INFO << __LINE__ << dev_battery.isNull();
+                        if(!dev_battery.isNull()){
+                           QAction *battery = new QAction();
+                           battery->setDisabled(true);
+                           battery->setIcon(QIcon::fromTheme("battery-level-100-symbolic"));
+                           battery->setText(tr("Power ")+QString::number(dev_battery->percentage(),10)+"%");
+                           device_menu->addAction(battery);
+                        }
+
+                        send->setText(tr("Send files"));
+                        if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
+                            device_menu->addAction(send);
+                    }
+                    else {
+                        device_menu->setIcon(QIcon::fromTheme("software-update-available-symbolic"));
+
+                        status->setText(tr("Connection"));
+                        remove->setText(tr("Remove"));
+                        device_menu->addAction(remove);
+                        device_menu->addAction(status);
+
+                        send->setText(tr("Send files"));
+                        if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
+                            device_menu->addAction(send);
+                    }
+                });
+
                 tray_Menu->addMenu(device_menu);
 
     //            connect(device_menu,&QMenu::triggered,this,&FeaturesWidget::TrayItemSignalProcessing);
@@ -247,6 +279,8 @@ void FeaturesWidget::InitTrayMenu()
     }
     tray_Menu->addSeparator();
     tray_Menu->addAction(tr("Bluetooth settings"));
+    tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
+    tray_Menu->exec();
 
 }
 
@@ -570,8 +604,8 @@ void FeaturesWidget::adapterChangeFUN()
         settings->set("adapter-address-list",QVariant::fromValue(adapter_list));
     });
 
-//    connect(m_manager,&BluezQt::Manager::adapterChanged,this,[=](BluezQt::AdapterPtr adapter){
-//        qDebug() << Q_FUNC_INFO <<__LINE__;
+    connect(m_manager,&BluezQt::Manager::adapterChanged,this,[=](BluezQt::AdapterPtr adapter){
+        qDebug() << Q_FUNC_INFO <<__LINE__;
 //        m_adapter = adapter.data();
 //        connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
 //        if(m_adapter->address() == cur_adapter_address)
@@ -583,7 +617,7 @@ void FeaturesWidget::adapterChangeFUN()
 //                cur_adapter_address = m_adapter->address();
 //            });
 //        }
-//    });
+    });
 
     connect(m_manager,&BluezQt::Manager::usableAdapterChanged,this,[=](BluezQt::AdapterPtr adapter){
         qDebug() << Q_FUNC_INFO <<__LINE__;
@@ -720,10 +754,8 @@ void FeaturesWidget::TraySignalProcessing(QAction *action)
     qDebug() << Q_FUNC_INFO << action->text() ;
     if(action->text() == tr("Turn on bluetooth")){
         Turn_on_or_off_bluetooth(true);
-
     }else if(action->text() == tr("Turn off bluetooth")){
         Turn_on_or_off_bluetooth(false);
-
     }else if(action->text() == tr("Bluetooth settings")){
         Open_bluetooth_settings();
     }else if(action->text() == tr("Disconnection")){
