@@ -16,10 +16,10 @@ DeviceSeleterWidget::DeviceSeleterWidget(QWidget *parent, QString dev, bool f):
     this->setAutoFillBackground(false);
 
     QPalette palette;
-    if(GSettings->get("style-name").toString() == "ukui-black"){
-        palette.setColor(QPalette::Background,QColor(Qt::black));
-    }else{
+    if(GSettings->get("style-name").toString() == "ukui-default"){
         palette.setColor(QPalette::Background,QColor(235,235,235));
+    }else{
+        palette.setColor(QPalette::Background,QColor(Qt::black));
     }
     this->setPalette(palette);
 
@@ -159,10 +159,10 @@ void DeviceSeleterWidget::GSettingsChanges(const QString &key)
     QPalette palette;
     qDebug() << Q_FUNC_INFO << key;
     if(key == "styleName"){
-        if(GSettings->get("style-name").toString() == "ukui-black"){
-            palette.setColor(QPalette::Background,QColor(Qt::black));
-        }else{
+        if(GSettings->get("style-name").toString() == "ukui-default"){
             palette.setColor(QPalette::Background,QColor(235,235,235));
+        }else{
+            palette.setColor(QPalette::Background,QColor(Qt::black));
         }
     }
     this->setPalette(palette);
