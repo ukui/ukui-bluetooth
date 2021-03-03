@@ -67,6 +67,7 @@ public:
     void Connect_device(BluezQt::DevicePtr);
     void Open_bluetooth_settings();
     void SendNotifyMessage(QString);
+    void NotifyOnOff();
 
     void Dbus_file_transfer(QUrl);
     void Monitor_sleep_signal();

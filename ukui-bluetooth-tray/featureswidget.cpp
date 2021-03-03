@@ -138,6 +138,7 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
         bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
     }
 
+    NotifyOnOff();
     connect(bluetooth_tray_icon,
             &QSystemTrayIcon::activated,
             [=](QSystemTrayIcon::ActivationReason reason){
@@ -230,6 +231,7 @@ void FeaturesWidget::InitTrayMenu()
                     device_menu->addAction(send);
 
                 qDebug() << Q_FUNC_INFO << device_menu->size();
+                disconnect(device_list.at(i).data(), &BluezQt::Device::connectedChanged, device_menu, nullptr);
                 connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,device_menu,[=](bool value){
                     qDebug() << Q_FUNC_INFO;
                     if(value) {
@@ -318,12 +320,12 @@ void FeaturesWidget::Disconnect_device_by_address(QString address)
     connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
         if(q->error() == 0){
             qDebug() << Q_FUNC_INFO;
-            QString text = QString(tr("Bluetooth device “%1” disconnected successfully").arg(device->name()));
-            SendNotifyMessage(text);
+//            QString text = QString(tr("Bluetooth device “%1” disconnected successfully").arg(device->name()));
+//            SendNotifyMessage(text);
         }else{
             qDebug() << Q_FUNC_INFO;
-            QString text = tr("Disconnect Error!!!");
-            SendNotifyMessage(text);
+//            QString text = tr("Disconnect Error!!!");
+//            SendNotifyMessage(text);
         }
         dev_disconnected_flag = false;
     });
@@ -366,8 +368,8 @@ void FeaturesWidget::Connect_device_by_address(QString address)
         if(!connected){
             if(dev_disconnected_flag){
                 qDebug() << Q_FUNC_INFO;
-                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device->name()));
-                SendNotifyMessage(text);
+//                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device->name()));
+//                SendNotifyMessage(text);
                 dev_disconnected_flag = false;
             }
         }
@@ -399,8 +401,8 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
     connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
         if(q->error() == 0){
             qDebug() << Q_FUNC_INFO;
-            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
-            SendNotifyMessage(text);
+//            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
+//            SendNotifyMessage(text);
 
             settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
             dev_disconnected_flag = true;
@@ -408,8 +410,8 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
             writeDeviceInfoToFile(device->address(),device->name());
         }else{
             qDebug() << Q_FUNC_INFO << q->errorText();
-            QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
-            SendNotifyMessage(text);
+//            QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
+//            SendNotifyMessage(text);
         }
     });
 }
@@ -440,6 +442,51 @@ void FeaturesWidget::SendNotifyMessage(QString message)
         <<QVariantMap()
         <<(int)-1;
     iface.callWithArgumentList(QDBus::AutoDetect,"Notify",args);
+}
+
+void FeaturesWidget::NotifyOnOff()
+{
+    QList<BluezQt::DevicePtr> device_list = m_adapter->devices();
+    qDebug() << Q_FUNC_INFO << device_list.size();
+
+    for(int i=0; i < device_list.size(); i++){
+        if(device_list.at(i)->isPaired()){
+            connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,this,[=](bool value){
+                qDebug() << Q_FUNC_INFO << "connectedChanged";
+                if(value) {
+                    QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device_list.at(i)->name()));
+                    SendNotifyMessage(text);
+                }
+                else {
+                    QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device_list.at(i)->name()));
+                    SendNotifyMessage(text);
+                }
+            });
+        }
+    }
+
+    connect(m_adapter, &BluezQt::Adapter::deviceAdded, this, [=](BluezQt::DevicePtr dev) {
+        qDebug() << Q_FUNC_INFO << dev.data()->name();
+        connect(dev.data(),&BluezQt::Device::pairedChanged,this,[=](bool value){
+            qDebug() << Q_FUNC_INFO << "pairedChanged" << value;
+            if(value) {
+                QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
+                SendNotifyMessage(text);
+            }
+        });
+
+        connect(dev.data(),&BluezQt::Device::connectedChanged,this,[=](bool value){
+            qDebug() << Q_FUNC_INFO << "connectedChanged" << value;
+            if(value) {
+                QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
+                SendNotifyMessage(text);
+            }
+            else {
+                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(dev->name()));
+                SendNotifyMessage(text);
+            }
+        });
+    });
 }
 
 void FeaturesWidget::Send_files_by_address(QString address)
