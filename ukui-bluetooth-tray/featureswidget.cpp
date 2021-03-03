@@ -351,13 +351,12 @@ void FeaturesWidget::Remove_device_by_address(QString address)
     });
 }
 
-bool FeaturesWidget::Connect_device_by_address(QString address)
+void FeaturesWidget::Connect_device_by_address(QString address)
 {
     qDebug() << Q_FUNC_INFO << (m_adapter == nullptr);
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
     if(!device){
         qDebug() << Q_FUNC_INFO << "The connected device does not exist !";
-        return false;
     }
     qDebug() << Q_FUNC_INFO << device->uuids();
     connect(device.data(),&BluezQt::Device::connectedChanged,this,[=](bool connected){
@@ -374,7 +373,7 @@ bool FeaturesWidget::Connect_device_by_address(QString address)
     BluezQt::DevicePtr finally_device = m_adapter->deviceForAddress(settings->get("finally-connect-the-device").toString());
     if(finally_device.isNull() || address == settings->get("finally-connect-the-device").toString()){
         qDebug() << Q_FUNC_INFO << finally_device.isNull() << address << settings->get("finally-connect-the-device").toString();
-        return Connect_device(device);
+        Connect_device(device);
     }else{
         if(finally_device->isConnected()){
                BluezQt::PendingCall *call = device->disconnectFromDevice();
@@ -384,12 +383,12 @@ bool FeaturesWidget::Connect_device_by_address(QString address)
                     }
                });
         }else{
-            return Connect_device(device);
+            Connect_device(device);
         }
     }
 }
 
-bool FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
+void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
 {
     BluezQt::PendingCall *call = device->connectToDevice();
     device->setTrusted(true);
@@ -404,14 +403,10 @@ bool FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
             dev_disconnected_flag = true;
 
             writeDeviceInfoToFile(device->address(),device->name());
-
-            return true;
         }else{
             qDebug() << Q_FUNC_INFO << q->errorText();
             QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
             SendNotifyMessage(text);
-
-            return false;
         }
     });
 }
@@ -542,6 +537,21 @@ void FeaturesWidget::Connect_the_last_connected_device()
     QStringList target_list;
     target_list.clear();
     target_list = getDeviceConnectTimeList();
+
+    QStringList list;
+    list.clear();
+    for (int i = 0; i < m_adapter->devices().length(); ++i) {
+        if(m_adapter->devices().at(i)->isPaired()){
+            list << m_adapter->devices().at(i)->address();
+        }
+    }
+
+    if(target_list.length() == 1){
+        target_list += list;
+    }else if(target_list.length() == 0){
+        target_list << settings->get("finallyConnectTheDevice").toString();
+        target_list += list;
+    }
     qDebug() << Q_FUNC_INFO << target_list.at(dev_callbak_flag);
 
     BluezQt::DevicePtr dev = m_adapter->deviceForAddress(target_list.at(dev_callbak_flag));
@@ -624,9 +634,11 @@ void FeaturesWidget::adapterChangeFUN()
 
 void FeaturesWidget::createPairDeviceFile()
 {
+    qDebug() << Q_FUNC_INFO ;
     if(pair_device_file.isNull())
-        pair_device_file = QDir::homePath() + "/.config/pairDevice.list";
+        pair_device_file = "/tmp/pairDevice.list";
 
+    qDebug() << Q_FUNC_INFO << QFile::exists(pair_device_file);
     if(!QFile::exists(pair_device_file)){
         QFile file(pair_device_file);
         file.open(QIODevice::WriteOnly);
@@ -639,6 +651,7 @@ void FeaturesWidget::createPairDeviceFile()
 void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QString &devName)
 {
     createPairDeviceFile();
+    qDebug() << Q_FUNC_INFO ;
     GKeyFile *key_file = nullptr;
     key_file = g_key_file_new();
     char *data;
@@ -658,8 +671,11 @@ void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QStr
 QStringList FeaturesWidget::getDeviceConnectTimeList()
 {
     QStringList pair_device_list;
-    QVector<int> pair_device_time_list;
     pair_device_list.clear();
+    if(!QFile::exists(pair_device_file))
+        return pair_device_list;
+
+    QVector<int> pair_device_time_list;
     pair_device_time_list.clear();
     GKeyFile *key_file = nullptr;
     key_file = g_key_file_new();

@@ -1,7 +1,7 @@
 <schemalist gettext-domain="ukui-bluetooth">
   <schema id="org.ukui.bluetooth" path="/org/ukui/bluetooth/">
     <key type="b" name="switch">
-      <default>false</default>
+      <default>true</default>
       <summary>bluetooth switch</summary>
       <description>bluetooth switch</description>
     </key>
