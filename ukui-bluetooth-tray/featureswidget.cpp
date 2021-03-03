@@ -189,9 +189,7 @@ void FeaturesWidget::InitTrayMenu()
                 device_menu->setPalette(palette);
                 device_menu->setObjectName(device_list.at(i)->address());
                 device_menu->setMinimumWidth(160);
-                device_menu->setIcon(QIcon::fromTheme("software-update-available-symbolic"));
-                device_menu->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
-                device_menu->setProperty("useIconHighlightEffect", 0x10);
+                QIcon icon_null = device_menu->icon();
 
                 QAction *status = new QAction(tray_Menu);
                 QAction *send   = new QAction(tray_Menu);
@@ -203,9 +201,7 @@ void FeaturesWidget::InitTrayMenu()
                 send->setStatusTip(device_list.at(i)->address());
                 remove->setStatusTip(device_list.at(i)->address());
                 if(device_list.at(i)->isConnected()){
-                    device_menu->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
-                    device_menu->setProperty("useIconHighlightEffect", 0x10);
-                    device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));                    
+                    device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
                     status->setText(tr("Disconnection"));
 
                     BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
@@ -218,6 +214,8 @@ void FeaturesWidget::InitTrayMenu()
                        device_menu->addAction(battery);
                     }
                 }else{
+                    device_menu->setIcon(icon_null);
+
                     status->setText(tr("Connection"));
                     remove->setText(tr("Remove"));
                     device_menu->addAction(remove);
@@ -252,8 +250,7 @@ void FeaturesWidget::InitTrayMenu()
                             device_menu->addAction(send);
                     }
                     else {
-                        device_menu->setIcon(QIcon::fromTheme("software-update-available-symbolic"));
-
+                        device_menu->setIcon(icon_null);
                         status->setText(tr("Connection"));
                         remove->setText(tr("Remove"));
                         device_menu->addAction(remove);
