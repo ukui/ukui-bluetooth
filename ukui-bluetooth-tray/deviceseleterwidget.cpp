@@ -97,7 +97,7 @@ void DeviceSeleterWidget::InitUI()
 
                 if(select_dev != ""){
                     if(device_list.at(i)->address() == select_dev){
-                        item->setStyleSheet("QToolButton{background:white;color:black;}");
+                        item->setStyleSheet("QToolButton{background:lightgreen;color:black;}");
                         item->setChecked(true);
                         btn = item;
                         select_name = device_list.at(i)->name();
