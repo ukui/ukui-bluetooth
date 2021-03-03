@@ -152,6 +152,9 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
             });
 
     Monitor_sleep_signal();
+    QTimer::singleShot(500,this,[=]{
+        Connect_the_last_connected_device();
+    });
 }
 
 FeaturesWidget::~FeaturesWidget()

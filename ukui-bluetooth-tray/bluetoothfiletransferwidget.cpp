@@ -29,10 +29,10 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     QPalette palette;
-    if(GSettings->get("style-name").toString() == "ukui-black"){
-        palette.setColor(QPalette::Background,QColor(Qt::black));
-    }else{
+    if(GSettings->get("style-name").toString() == "ukui-default"){
         palette.setColor(QPalette::Background,QColor(Qt::white));
+    }else{
+        palette.setColor(QPalette::Background,QColor(Qt::black));
     }
     this->setPalette(palette);
 
@@ -299,13 +299,13 @@ void BluetoothFileTransferWidget::GSettingsChanges(const QString &key)
     QPalette palette;
     qDebug() << Q_FUNC_INFO << key;
     if(key == "styleName"){
-        if(GSettings->get("style-name").toString() == "ukui-black"){
-            palette.setColor(QPalette::Background,QColor(Qt::black));
-            target_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
-            target_icon->setProperty("useIconHighlightEffect", 0x10);
-        }else{
+        if(GSettings->get("style-name").toString() == "ukui-default"){
             palette.setColor(QPalette::Background,QColor(Qt::white));
             target_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::black));
+            target_icon->setProperty("useIconHighlightEffect", 0x10);
+        }else{
+            palette.setColor(QPalette::Background,QColor(Qt::black));
+            target_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
             target_icon->setProperty("useIconHighlightEffect", 0x10);
         }
     }

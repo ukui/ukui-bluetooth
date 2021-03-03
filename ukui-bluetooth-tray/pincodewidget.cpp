@@ -24,10 +24,10 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
     this->setAttribute(Qt::WA_DeleteOnClose);
 
     QPalette palette;
-    if(settings->get("style-name").toString() == "ukui-black"){
-        palette.setColor(QPalette::Background,QColor(Qt::black));
-    }else{
+    if(settings->get("style-name").toString() == "ukui-default"){
         palette.setColor(QPalette::Background,QColor(Qt::white));
+    }else{
+        palette.setColor(QPalette::Background,QColor(Qt::black));
     }
     this->setPalette(palette);
 
@@ -128,10 +128,10 @@ void PinCodeWidget::GSettingsChanges(const QString &key)
     QPalette palette;
     qDebug() << Q_FUNC_INFO << key;
     if(key == "styleName"){
-        if(settings->get("style-name").toString() == "ukui-black"){
-            palette.setColor(QPalette::Background,QColor(Qt::black));
-        }else{
+        if(settings->get("style-name").toString() == "ukui-default"){
             palette.setColor(QPalette::Background,QColor(Qt::white));
+        }else{
+            palette.setColor(QPalette::Background,QColor(Qt::black));
         }
     }
     this->setPalette(palette);
