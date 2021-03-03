@@ -61,10 +61,10 @@ public:
     void Pair_device_by_address(QString);
     void Disconnect_device_by_address(QString);
     void Remove_device_by_address(QString);
-    bool Connect_device_by_address(QString);
+    void Connect_device_by_address(QString);
     void Send_files_by_address(QString);
     void Turn_on_or_off_bluetooth(bool);
-    bool Connect_device(BluezQt::DevicePtr);
+    void Connect_device(BluezQt::DevicePtr);
     void Open_bluetooth_settings();
     void SendNotifyMessage(QString);
 
