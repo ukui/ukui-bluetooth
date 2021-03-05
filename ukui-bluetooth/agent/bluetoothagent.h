@@ -1,7 +1,7 @@
 #ifndef BLUETOOTHAGENT_H
 #define BLUETOOTHAGENT_H
 
-#include "../ukui-bluetooth-tray/pincodewidget.h"
+#include "pin/pincodewidget.h"
 
 #include <QObject>
 #include <KF5/BluezQt/bluezqt/agent.h>

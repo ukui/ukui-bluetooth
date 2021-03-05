@@ -1,10 +1,10 @@
 #ifndef FEATURESWIDGET_H
 #define FEATURESWIDGET_H
 
-#include "bluetoothfiletransferwidget.h"
-#include "../daemon/bluetoothagent.h"
-#include "../daemon/bluetoothdbus.h"
-#include "../daemon/bluetoothobexagent.h"
+#include "../fileSend/bluetoothfiletransferwidget.h"
+#include "../agent/bluetoothagent.h"
+#include "daemon/bluetoothdbus.h"
+#include "../agent/bluetoothobexagent.h"
 
 #include <string>
 #include <glib.h>
@@ -46,6 +46,9 @@
 #include <QDir>
 #include <QFile>
 #include <QDateTime>
+#include <QDBusMessage>
+
+#define LIST_PATH "/etc/pairDevice.list"
 
 using namespace std;
 class BluetoothDbus;

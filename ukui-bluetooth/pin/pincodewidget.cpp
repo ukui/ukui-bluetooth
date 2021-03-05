@@ -1,5 +1,5 @@
 #include "pincodewidget.h"
-#include "xatom-helper.h"
+#include "../config/xatom-helper.h"
 
 PinCodeWidget::PinCodeWidget(QString name, QString pin)
    : dev_name(name),

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     QTranslator translator;
     if(locale == "zh_CN" || locale == "es" || locale == "fr" || locale == "de" || locale == "ru") {//中文 西班牙语 法语 德语 俄语
         if(!translator.load("ukui-bluetooth_" + locale + ".qm",
-                            ":/qmfile/translations/"))
+                            ":/translations/"))
             qDebug() << "Load translation file："<< "ukui-bluetooth_" + locale + ".qm" << " failed!";
         else
             app.installTranslator(&translator);

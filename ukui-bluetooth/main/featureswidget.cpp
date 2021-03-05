@@ -342,11 +342,11 @@ void FeaturesWidget::Remove_device_by_address(QString address)
             gsize length = 0;
             GError *error;
             key_file = g_key_file_new();
-            g_key_file_load_from_file(key_file,pair_device_file.toStdString().c_str(),G_KEY_FILE_NONE,NULL);
+            g_key_file_load_from_file(key_file,QString(LIST_PATH).toStdString().c_str(),G_KEY_FILE_NONE,NULL);
             if(g_key_file_has_group(key_file,address.toStdString().c_str())){
                 g_key_file_remove_group(key_file,address.toStdString().c_str(),&error);
                 data = g_key_file_to_data(key_file,&length,NULL);
-                g_file_set_contents(pair_device_file.toStdString().c_str(),data,length,NULL);
+                g_file_set_contents(QString(LIST_PATH).toStdString().c_str(),data,length,NULL);
                 g_free(data);
             }
             g_key_file_free(key_file);
@@ -684,52 +684,56 @@ void FeaturesWidget::adapterChangeFUN()
 
 void FeaturesWidget::createPairDeviceFile()
 {
-    qDebug() << Q_FUNC_INFO ;
-    if(pair_device_file.isNull())
-        pair_device_file = "/tmp/pairDevice.list";
+//    qDebug() << Q_FUNC_INFO ;
+//    if(pair_device_file.isNull())
+//        pair_device_file = QDir::homePath() + "/.config/pairDevice.list";
 
-    qDebug() << Q_FUNC_INFO << QFile::exists(pair_device_file);
-    if(!QFile::exists(pair_device_file)){
-        QFile file(pair_device_file);
-        file.open(QIODevice::WriteOnly);
-        file.close();
-    }else{
-        return;
-    }
+//    qDebug() << Q_FUNC_INFO << QFile::exists(pair_device_file);
+//    if(!QFile::exists(pair_device_file)){
+//        QFile file(pair_device_file);
+//        file.open(QIODevice::WriteOnly);
+//        file.close();
+//    }else{
+//        return;
+//    }
 }
 
 void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QString &devName)
 {
-    createPairDeviceFile();
-    qDebug() << Q_FUNC_INFO ;
-    GKeyFile *key_file = nullptr;
-    key_file = g_key_file_new();
-    char *data;
-    gsize length = 0;
-    g_key_file_load_from_file(key_file,pair_device_file.toStdString().c_str(),G_KEY_FILE_NONE,NULL);
-    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"Name",devName.toStdString().c_str());
-    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"ConnectTime",QString::number(QDateTime::currentMSecsSinceEpoch() / 1000).toStdString().c_str());
+//    createPairDeviceFile();
+//    qDebug() << Q_FUNC_INFO ;
+//    GKeyFile *key_file = nullptr;
+//    key_file = g_key_file_new();
+//    char *data;
+//    gsize length = 0;
+//    g_key_file_load_from_file(key_file,pair_device_file.toStdString().c_str(),G_KEY_FILE_NONE,NULL);
+//    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"Name",devName.toStdString().c_str());
+//    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"ConnectTime",QString::number(QDateTime::currentMSecsSinceEpoch() / 1000).toStdString().c_str());
 
 
-    data = g_key_file_to_data(key_file,&length,NULL);
-    g_file_set_contents(pair_device_file.toStdString().c_str(),data,length,NULL);
-    g_free(data);
+//    data = g_key_file_to_data(key_file,&length,NULL);
+//    g_file_set_contents(pair_device_file.toStdString().c_str(),data,length,NULL);
+//    g_free(data);
 
-    g_key_file_free(key_file);
+//    g_key_file_free(key_file);
+
+    QDBusMessage m = QDBusMessage::createMethodCall("com.bluetooth.systemdbus", "/", "com.bluetooth.interface", "writeKeyFile");
+    m << devAddress << devName;
+    QDBusMessage response = QDBusConnection::systemBus().call(m);
 }
 
 QStringList FeaturesWidget::getDeviceConnectTimeList()
 {
     QStringList pair_device_list;
     pair_device_list.clear();
-    if(!QFile::exists(pair_device_file))
+    if(!QFile::exists(LIST_PATH))
         return pair_device_list;
 
     QVector<int> pair_device_time_list;
     pair_device_time_list.clear();
     GKeyFile *key_file = nullptr;
     key_file = g_key_file_new();
-    g_key_file_load_from_file(key_file,pair_device_file.toStdString().c_str(),G_KEY_FILE_NONE,NULL);
+    g_key_file_load_from_file(key_file,QString(LIST_PATH).toStdString().c_str(),G_KEY_FILE_NONE,NULL);
     gchar **list;
     bool ok;
     list  = g_key_file_get_groups(key_file,NULL);

@@ -1,5 +1,5 @@
 #include "filereceivingpopupwidget.h"
-#include "xatom-helper.h"
+#include "../config/xatom-helper.h"
 
 FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString source, QString root):
     target_address(address),

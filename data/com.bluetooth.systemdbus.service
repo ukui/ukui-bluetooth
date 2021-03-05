@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.bluetooth.systemdbus
+Exec=/usr/bin/bluetoothService
+User=root

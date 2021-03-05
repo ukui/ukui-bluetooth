@@ -1,7 +1,7 @@
 #ifndef BLUETOOTHOBEXAGENT_H
 #define BLUETOOTHOBEXAGENT_H
 
-#include "../ukui-bluetooth-tray/filereceivingpopupwidget.h"
+#include "fileReceive/filereceivingpopupwidget.h"
 
 #include <QObject>
 

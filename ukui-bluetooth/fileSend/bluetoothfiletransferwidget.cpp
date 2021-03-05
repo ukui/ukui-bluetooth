@@ -1,5 +1,5 @@
 #include "bluetoothfiletransferwidget.h"
-#include "xatom-helper.h"
+#include "../config/xatom-helper.h"
 
 bool BluetoothFileTransferWidget::isShow = false;
 BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_address):
