@@ -604,6 +604,9 @@ void FeaturesWidget::Connect_the_last_connected_device()
         target_list << settings->get("finallyConnectTheDevice").toString();
         target_list += list;
     }
+
+    if(target_list.at(0) == "")
+        return;
     qDebug() << Q_FUNC_INFO << target_list.at(dev_callbak_flag);
 
     BluezQt::DevicePtr dev = m_adapter->deviceForAddress(target_list.at(dev_callbak_flag));
