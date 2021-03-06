@@ -16,7 +16,7 @@ int SysDbusRegister::exitService()
     return 0;
 }
 
-QString SysDbusRegister::writeKeyFile(QString devAddress, QString devName)
+QString SysDbusRegister::writeKeyFile(QString devAddress, QString devName, qint16 type)
 {
     if(devAddress.isNull())
         return QString("Address can not be empty ! ! !");
@@ -42,6 +42,7 @@ QString SysDbusRegister::writeKeyFile(QString devAddress, QString devName)
     gsize length = 0;
     g_key_file_load_from_file(key_file,QString(LIST_PATH).toStdString().c_str(),G_KEY_FILE_NONE,NULL);
     g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"Name",devName.toStdString().c_str());
+    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"Type",QString("%1").arg(type).toStdString().c_str());
     g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"ConnectTime",QString::number(QDateTime::currentMSecsSinceEpoch() / 1000).toStdString().c_str());
 
 

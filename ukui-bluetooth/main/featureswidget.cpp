@@ -398,6 +398,7 @@ void FeaturesWidget::Connect_device_by_address(QString address)
 void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
 {
     BluezQt::PendingCall *call = device->connectToDevice();
+    qDebug() << Q_FUNC_INFO << device->adapter()->name();
     device->setTrusted(true);
     qDebug() << Q_FUNC_INFO << call->error();
     connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
@@ -409,7 +410,7 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
             settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
             dev_disconnected_flag = true;
 
-            writeDeviceInfoToFile(device->address(),device->name());
+            writeDeviceInfoToFile(device->address(),device->name(),device->type());
         }else{
             qDebug() << Q_FUNC_INFO << q->errorText();
 //            QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
@@ -585,44 +586,96 @@ void FeaturesWidget::Monitor_sleep_signal()
 
 void FeaturesWidget::Connect_the_last_connected_device()
 {
-    qDebug() << Q_FUNC_INFO;
-    QStringList target_list;
-    target_list.clear();
-    target_list = getDeviceConnectTimeList();
+    qDebug() << Q_FUNC_INFO << "startDiscovery";
+    m_adapter->startDiscovery();
+    QList<BluezQt::DevicePtr> devlist = m_adapter->devices();
+    foreach (BluezQt::DevicePtr devptr, devlist) {
+        BluezQt::Device* dev = devptr.data();
+        if (dev->isPaired() && !dev->isConnected()
+                && (dev->type() == BluezQt::Device::Keyboard || dev->type() == BluezQt::Device::Mouse)) {
+            connect(dev, &BluezQt::Device::rssiChanged, this, [=] (qint16 value) {
+                qDebug() << Q_FUNC_INFO << "rssiChanged" << dev->name() << value;
 
-    QStringList list;
-    list.clear();
-    for (int i = 0; i < m_adapter->devices().length(); ++i) {
-        if(m_adapter->devices().at(i)->isPaired()){
-            list << m_adapter->devices().at(i)->address();
+                BluezQt::PendingCall *pp = dev->connectToDevice();
+                connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
+                    if(call->error() == 0){
+                        writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
+                    }else{
+                        qDebug() << Q_FUNC_INFO << "rssiChanged" << dev->name() << call->errorText();
+                    }
+                });
+
+                disconnect(dev, &BluezQt::Device::rssiChanged, nullptr, nullptr);
+            });
+        }
+    }
+    QStringList target_list = getDeviceConnectTimeList();
+    qDebug() << Q_FUNC_INFO << "getDeviceConnectTimeList" << target_list.size();
+    foreach (QString dev_address, target_list) {
+        BluezQt::Device* dev = m_adapter->deviceForAddress(dev_address).data();
+        qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
+        if (dev->isPaired() && !dev->isConnected()
+                 && (dev->type() == BluezQt::Device::Headset || dev->type() == BluezQt::Device::Headphones || dev->type() == BluezQt::Device::AudioVideo)) {
+            qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
+
+            BluezQt::PendingCall *pp = dev->connectToDevice();
+            connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
+                if(call->error() == 0){
+                    writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
+                }else{
+                    qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name() << call->errorText();
+                }
+            });
+
+            break;
         }
     }
 
-    if(target_list.length() == 1){
-        target_list += list;
-    }else if(target_list.length() == 0){
-        target_list << settings->get("finallyConnectTheDevice").toString();
-        target_list += list;
-    }
-
-    if(target_list.at(0) == "")
-        return;
-    qDebug() << Q_FUNC_INFO << target_list.at(dev_callbak_flag);
-
-    BluezQt::DevicePtr dev = m_adapter->deviceForAddress(target_list.at(dev_callbak_flag));
-    BluezQt::PendingCall *pp = dev->connectToDevice();
-    connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
-        if(call->error() == 0){
-            writeDeviceInfoToFile(dev->address(),dev->name());
-        }else{
-            if(dev_callbak_flag < target_list.length()-1){
-                dev_callbak_flag++;
-                Connect_the_last_connected_device();
-            }else{
-                return;
+    QTimer::singleShot(10000, [=] {
+        foreach (BluezQt::DevicePtr devptr, devlist) {
+            BluezQt::Device* dev = devptr.data();
+            if (dev->isPaired() && !dev->isConnected()
+                    && (dev->type() == BluezQt::Device::Keyboard || dev->type() == BluezQt::Device::Mouse)) {
+                disconnect(dev, &BluezQt::Device::rssiChanged, nullptr, nullptr);
             }
         }
+        m_adapter->stopDiscovery();
+        qDebug() << Q_FUNC_INFO << "stopDiscovery";
     });
+//    QStringList target_list;
+//    target_list.clear();
+//    target_list = getDeviceConnectTimeList();
+
+//    QStringList list;
+//    list.clear();
+//    for (int i = 0; i < m_adapter->devices().length(); ++i) {
+//        if(m_adapter->devices().at(i)->isPaired()){
+//            list << m_adapter->devices().at(i)->address();
+//        }
+//    }
+
+//    if(target_list.length() == 1){
+//        target_list += list;
+//    }else if(target_list.length() == 0){
+//        target_list << settings->get("finallyConnectTheDevice").toString();
+//        target_list += list;
+//    }
+//    qDebug() << Q_FUNC_INFO << target_list.at(dev_callbak_flag);
+
+//    BluezQt::DevicePtr dev = m_adapter->deviceForAddress(target_list.at(dev_callbak_flag));
+//    BluezQt::PendingCall *pp = dev->connectToDevice();
+//    connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
+//        if(call->error() == 0){
+//            writeDeviceInfoToFile(dev->address(),dev->name());
+//        }else{
+//            if(dev_callbak_flag < target_list.length()-1){
+//                dev_callbak_flag++;
+//                Connect_the_last_connected_device();
+//            }else{
+//                return;
+//            }
+//        }
+//    });
 }
 
 // ===================蓝牙管理器设备操作监听======（主要针对系统的休眠和增加新的蓝牙硬件）=======================
@@ -703,7 +756,7 @@ void FeaturesWidget::createPairDeviceFile()
 //    }
 }
 
-void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QString &devName)
+void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QString &devName, const BluezQt::Device::Type type)
 {
 //    createPairDeviceFile();
 //    qDebug() << Q_FUNC_INFO ;
@@ -723,7 +776,7 @@ void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QStr
 //    g_key_file_free(key_file);
 
     QDBusMessage m = QDBusMessage::createMethodCall("com.bluetooth.systemdbus", "/", "com.bluetooth.interface", "writeKeyFile");
-    m << devAddress << devName;
+    m << devAddress << devName << type;
     QDBusMessage response = QDBusConnection::systemBus().call(m);
 }
 

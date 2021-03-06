@@ -78,7 +78,7 @@ public:
     void Connect_the_last_connected_device();
     void adapterChangeFUN();
     void createPairDeviceFile();
-    void writeDeviceInfoToFile(const QString& devAddress,const QString& devName);
+    void writeDeviceInfoToFile(const QString& devAddress,const QString& devName, const BluezQt::Device::Type type);
     QStringList getDeviceConnectTimeList();
     bool exit_flag = false;
 signals:

@@ -25,7 +25,7 @@ private:
 
 public slots:
     Q_SCRIPTABLE int exitService();
-    Q_SCRIPTABLE QString writeKeyFile(QString,QString);
+    Q_SCRIPTABLE QString writeKeyFile(QString,QString,qint16);
     Q_SCRIPTABLE QString getKeyFilePath();
 };
 
