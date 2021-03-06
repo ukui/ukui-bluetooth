@@ -73,10 +73,10 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
         }
     }
 
-    if(!m_adapter->isDiscoverable()){
-        m_adapter->setDiscoverable(true);
-        m_adapter->setDiscoverableTimeout(0);
-    }
+//    if(!m_adapter->isDiscoverable()){
+//        m_adapter->setDiscoverable(true);
+//        m_adapter->setDiscoverableTimeout(0);
+//    }
 
     adapterChangeFUN();
     cur_adapter_address = m_adapter->address();
@@ -168,7 +168,9 @@ void FeaturesWidget::InitTrayMenu()
     bool noDev = true;
     tray_Menu->clear();
     QAction *switch_txt = new QAction(tray_Menu);
-    if(!flag){
+    qDebug() << Q_FUNC_INFO << flag << m_adapter->isPowered();
+//    if(!flag){
+    if(!m_adapter->isPowered()){
         switch_txt->setText(tr("Turn on bluetooth"));
         if(m_manager->isBluetoothBlocked()){
             switch_txt->setDisabled(true);
@@ -527,7 +529,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
             if(p->error() == 0){
                 flag = true;
-    //            qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+                qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
         });
@@ -536,7 +538,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
             if(p->error() == 0){
                 flag = false;
-    //            qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+                qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
         });
@@ -640,10 +642,10 @@ void FeaturesWidget::adapterChangeFUN()
             QTimer::singleShot(200,this,[=]{
                 if(!sleep_flag){
                     m_adapter = m_manager->adapterForAddress(adapter_list.at(0)).data();
-                    if(!m_adapter->isDiscoverable()){
-                        m_adapter->setDiscoverable(true);
-                        m_adapter->setDiscoverableTimeout(0);
-                    }
+//                    if(!m_adapter->isDiscoverable()){
+//                        m_adapter->setDiscoverable(true);
+//                        m_adapter->setDiscoverableTimeout(0);
+//                    }
                     connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
                 }
             });
@@ -663,7 +665,7 @@ void FeaturesWidget::adapterChangeFUN()
 
     connect(m_manager,&BluezQt::Manager::adapterChanged,this,[=](BluezQt::AdapterPtr adapter){
         qDebug() << Q_FUNC_INFO <<__LINE__;
-//        m_adapter = adapter.data();
+        m_adapter = adapter.data();
 //        connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
 //        if(m_adapter->address() == cur_adapter_address)
 //            QTimer::singleShot(1000,this,[=]{
@@ -781,10 +783,10 @@ void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
                 }else{
                     m_adapter = m_manager->adapterForAddress(adapter_list.at(0)).data();
                 }
-                if(!m_adapter->isDiscoverable()){
-                    m_adapter->setDiscoverable(true);
-                    m_adapter->setDiscoverableTimeout(0);
-                }
+//                if(!m_adapter->isDiscoverable()){
+//                    m_adapter->setDiscoverable(true);
+//                    m_adapter->setDiscoverableTimeout(0);
+//                }
             }else{
 
             }
@@ -801,7 +803,7 @@ void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
 
 void FeaturesWidget::adapterPoweredChanged(bool value)
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << value;
     settings->set("switch",QVariant::fromValue(value));
     flag = value;
     if (value == true) {//开启
@@ -941,10 +943,10 @@ void FeaturesWidget::GSettings_value_chanage(const QString &key)
         cur_adapter_address = m_adapter->address();
         connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
 
-        if(!m_adapter->isDiscoverable()){
-            m_adapter->setDiscoverable(true);
-            m_adapter->setDiscoverableTimeout(0);
-        }
+//        if(!m_adapter->isDiscoverable()){
+//            m_adapter->setDiscoverable(true);
+//            m_adapter->setDiscoverableTimeout(0);
+//        }
         if(m_adapter->isPowered())
             flag = true;
         else
@@ -955,6 +957,8 @@ void FeaturesWidget::GSettings_value_chanage(const QString &key)
 //org.ukui.bluetooth dbus蓝牙开关接口
 void FeaturesWidget::Dbus_bluetooth_switch(bool value)
 {
+    qDebug() << Q_FUNC_INFO << value << settings->get("switch").toBool();
+
     if(value != settings->get("switch").toBool()){
         Turn_on_or_off_bluetooth(value);
     }
