@@ -480,13 +480,15 @@ void FeaturesWidget::NotifyOnOff()
 
         connect(dev.data(),&BluezQt::Device::connectedChanged,this,[=](bool value){
             qDebug() << Q_FUNC_INFO << "connectedChanged" << value;
-            if(value) {
-                QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
-                SendNotifyMessage(text);
-            }
-            else {
-                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(dev->name()));
-                SendNotifyMessage(text);
+            if (dev.data()->isPaired()) {
+                if(value) {
+                    QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
+                    SendNotifyMessage(text);
+                }
+                else {
+                    QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(dev->name()));
+                    SendNotifyMessage(text);
+                }
             }
         });
     });
