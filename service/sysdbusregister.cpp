@@ -16,7 +16,7 @@ int SysDbusRegister::exitService()
     return 0;
 }
 
-QString SysDbusRegister::writeKeyFile(QString devAddress, QString devName, qint16 type)
+QString SysDbusRegister::writeKeyFile(QString devAddress, QString devName, qint32 type)
 {
     if(devAddress.isNull())
         return QString("Address can not be empty ! ! !");
@@ -53,6 +53,40 @@ QString SysDbusRegister::writeKeyFile(QString devAddress, QString devName, qint1
     g_key_file_free(key_file);
 
     return QString("Key write ok!!!");
+}
+
+QString SysDbusRegister::removeKeyFile(QString devAddress)
+{
+    if(devAddress.isNull())
+        return QString("Address can not be empty ! ! !");
+    if(devAddress.at(2) != ":" ||
+       devAddress.at(5) != ":" ||
+       devAddress.at(8) != ":" ||
+       devAddress.at(11) != ":" ||
+       devAddress.at(14) != ":")
+        return QString("arg0 is not an address ! ! !");
+
+    if(!QFile::exists(LIST_PATH)){
+        QFile file(LIST_PATH);
+        file.open(QIODevice::WriteOnly);
+        file.close();
+    }
+
+    GKeyFile *key_file = nullptr;
+    char *data;
+    gsize length = 0;
+    GError *error;
+    key_file = g_key_file_new();
+    g_key_file_load_from_file(key_file,QString(LIST_PATH).toStdString().c_str(),G_KEY_FILE_NONE,NULL);
+    if(g_key_file_has_group(key_file,devAddress.toStdString().c_str())){
+        g_key_file_remove_group(key_file,devAddress.toStdString().c_str(),&error);
+        data = g_key_file_to_data(key_file,&length,NULL);
+        g_file_set_contents(QString(LIST_PATH).toStdString().c_str(),data,length,NULL);
+        g_free(data);
+    }
+    g_key_file_free(key_file);
+
+    return QString("Key remove ok!!!");
 }
 
 QString SysDbusRegister::getKeyFilePath()
