@@ -79,6 +79,7 @@ public:
     void adapterChangeFUN();
     void createPairDeviceFile();
     void writeDeviceInfoToFile(const QString& devAddress,const QString& devName, const BluezQt::Device::Type type);
+    void removeDeviceInfoToFile(const QString& devAddress);
     QStringList getDeviceConnectTimeList();
     bool exit_flag = false;
 signals:

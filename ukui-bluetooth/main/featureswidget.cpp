@@ -339,19 +339,7 @@ void FeaturesWidget::Remove_device_by_address(QString address)
     BluezQt::PendingCall *call = m_adapter->removeDevice(device);
     connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
         if(q->error() == 0){
-            GKeyFile *key_file = nullptr;
-            char *data;
-            gsize length = 0;
-            GError *error;
-            key_file = g_key_file_new();
-            g_key_file_load_from_file(key_file,QString(LIST_PATH).toStdString().c_str(),G_KEY_FILE_NONE,NULL);
-            if(g_key_file_has_group(key_file,address.toStdString().c_str())){
-                g_key_file_remove_group(key_file,address.toStdString().c_str(),&error);
-                data = g_key_file_to_data(key_file,&length,NULL);
-                g_file_set_contents(QString(LIST_PATH).toStdString().c_str(),data,length,NULL);
-                g_free(data);
-            }
-            g_key_file_free(key_file);
+            removeDeviceInfoToFile(address);
         }else{
             qDebug() << Q_FUNC_INFO << "Device Remove failed!!!";
         }
@@ -615,21 +603,23 @@ void FeaturesWidget::Connect_the_last_connected_device()
     qDebug() << Q_FUNC_INFO << "getDeviceConnectTimeList" << target_list.size();
     foreach (QString dev_address, target_list) {
         BluezQt::Device* dev = m_adapter->deviceForAddress(dev_address).data();
-        qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
-        if (dev->isPaired() && !dev->isConnected()
-                 && (dev->type() == BluezQt::Device::Headset || dev->type() == BluezQt::Device::Headphones || dev->type() == BluezQt::Device::AudioVideo)) {
+        if (dev != nullptr) {
             qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
+            if (dev->isPaired() && !dev->isConnected()
+                     && (dev->type() == BluezQt::Device::Headset || dev->type() == BluezQt::Device::Headphones || dev->type() == BluezQt::Device::AudioVideo)) {
+                qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
 
-            BluezQt::PendingCall *pp = dev->connectToDevice();
-            connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
-                if(call->error() == 0){
-                    writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
-                }else{
-                    qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name() << call->errorText();
-                }
-            });
+                BluezQt::PendingCall *pp = dev->connectToDevice();
+                connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
+                    if(call->error() == 0){
+                        writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
+                    }else{
+                        qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name() << call->errorText();
+                    }
+                });
 
-            break;
+                break;
+            }
         }
     }
 
@@ -760,26 +750,18 @@ void FeaturesWidget::createPairDeviceFile()
 
 void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QString &devName, const BluezQt::Device::Type type)
 {
-//    createPairDeviceFile();
-//    qDebug() << Q_FUNC_INFO ;
-//    GKeyFile *key_file = nullptr;
-//    key_file = g_key_file_new();
-//    char *data;
-//    gsize length = 0;
-//    g_key_file_load_from_file(key_file,pair_device_file.toStdString().c_str(),G_KEY_FILE_NONE,NULL);
-//    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"Name",devName.toStdString().c_str());
-//    g_key_file_set_string(key_file,devAddress.toStdString().c_str(),"ConnectTime",QString::number(QDateTime::currentMSecsSinceEpoch() / 1000).toStdString().c_str());
-
-
-//    data = g_key_file_to_data(key_file,&length,NULL);
-//    g_file_set_contents(pair_device_file.toStdString().c_str(),data,length,NULL);
-//    g_free(data);
-
-//    g_key_file_free(key_file);
-
     QDBusMessage m = QDBusMessage::createMethodCall("com.bluetooth.systemdbus", "/", "com.bluetooth.interface", "writeKeyFile");
     m << devAddress << devName << type;
     QDBusMessage response = QDBusConnection::systemBus().call(m);
+    qDebug() << Q_FUNC_INFO << devAddress << devName << type << response.errorMessage();
+}
+
+void FeaturesWidget::removeDeviceInfoToFile(const QString &devAddress)
+{
+    QDBusMessage m = QDBusMessage::createMethodCall("com.bluetooth.systemdbus", "/", "com.bluetooth.interface", "removeKeyFile");
+    m << devAddress;
+    QDBusMessage response = QDBusConnection::systemBus().call(m);
+    qDebug() << Q_FUNC_INFO << devAddress << response.errorMessage();
 }
 
 QStringList FeaturesWidget::getDeviceConnectTimeList()
@@ -874,6 +856,7 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
 void FeaturesWidget::adapterDeviceRemove(BluezQt::DevicePtr ptr)
 {
     qDebug() << Q_FUNC_INFO << ptr.data()->address() << ptr.data()->name();
+    removeDeviceInfoToFile(ptr.data()->address());
 }
 
 void FeaturesWidget::TraySignalProcessing(QAction *action)

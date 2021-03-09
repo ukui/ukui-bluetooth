@@ -10,6 +10,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QDateTime>
+#include <QDebug>
 
 #define LIST_PATH "/etc/pairDevice.list"
 
@@ -25,7 +26,8 @@ private:
 
 public slots:
     Q_SCRIPTABLE int exitService();
-    Q_SCRIPTABLE QString writeKeyFile(QString,QString,qint16);
+    Q_SCRIPTABLE QString writeKeyFile(QString,QString,qint32);
+    Q_SCRIPTABLE QString removeKeyFile(QString);
     Q_SCRIPTABLE QString getKeyFilePath();
 };
 
