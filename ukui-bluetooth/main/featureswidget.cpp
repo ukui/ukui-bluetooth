@@ -172,9 +172,6 @@ void FeaturesWidget::InitTrayMenu()
 //    if(!flag){
     if(!m_adapter->isPowered()){
         switch_txt->setText(tr("Turn on bluetooth"));
-        if(m_manager->isBluetoothBlocked()){
-            switch_txt->setDisabled(true);
-        }
         tray_Menu->addAction(switch_txt);
         tray_Menu->addSeparator();
     }else{
@@ -516,6 +513,8 @@ void FeaturesWidget::Send_files_by_address(QString address)
 void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
 {
     if(f){
+        if (m_manager->isBluetoothBlocked())
+            m_manager->setBluetoothBlocked(false);
         BluezQt::PendingCall *call = m_adapter->setPowered(true);
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
             if(p->error() == 0){
