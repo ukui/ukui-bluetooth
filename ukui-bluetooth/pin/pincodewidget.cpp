@@ -1,9 +1,10 @@
 #include "pincodewidget.h"
 #include "../config/xatom-helper.h"
 
-PinCodeWidget::PinCodeWidget(QString name, QString pin)
+PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
    : dev_name(name),
-     PINCode(pin)
+     PINCode(pin),
+     show_flag(flag)
 {
     if(QGSettings::isSchemaInstalled("org.ukui.style")){
         settings = new QGSettings("org.ukui.style");
@@ -77,6 +78,14 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin)
     refuse_btn->setGeometry(290,255,120,36);
     connect(refuse_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_refuse_btn);
 
+    if(show_flag){
+        connect(accept_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_accept_btn);
+        connect(refuse_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_refuse_btn);
+    }else{
+        accept_btn->setVisible(false);
+        refuse_btn->setVisible(false);
+    }
+
     close_btn = new QPushButton(this);
     QIcon icon = QIcon::fromTheme("window-close-symbolic");
     close_btn->setIcon(icon);
@@ -107,7 +116,9 @@ void PinCodeWidget::Connection_timed_out()
 
 void PinCodeWidget::onClick_close_btn(bool)
 {
-    emit this->rejected();
+    if(show_flag)
+        emit this->rejected();
+
     this->close();
 }
 

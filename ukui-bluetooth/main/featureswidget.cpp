@@ -204,7 +204,7 @@ void FeaturesWidget::InitTrayMenu()
                 send->setStatusTip(device_list.at(i)->address());
                 remove->setStatusTip(device_list.at(i)->address());
                 if(device_list.at(i)->isConnected()){
-                    device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
+                    device_menu->setIcon(QIcon::fromTheme("ukui-dialog-success"));
                     status->setText(tr("Disconnection"));
 
                     BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
@@ -234,7 +234,7 @@ void FeaturesWidget::InitTrayMenu()
                 connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,device_menu,[=](bool value){
                     qDebug() << Q_FUNC_INFO;
                     if(value) {
-                        device_menu->setIcon(QIcon::fromTheme("software-installed-symbolic"));
+                        device_menu->setIcon(QIcon::fromTheme("ukui-dialog-success"));
                         status->setText(tr("Disconnection"));
                         device_menu->addAction(status);
                         device_menu->removeAction(remove);

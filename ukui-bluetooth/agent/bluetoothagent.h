@@ -67,7 +67,7 @@ private:
     // release
     bool m_releaseCalled;
 
-    PinCodeWidget *pincodewidget;
+    PinCodeWidget *pincodewidget=nullptr;
 };
 
 #endif // BLUETOOTHAGENT_H
