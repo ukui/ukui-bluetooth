@@ -65,6 +65,7 @@ public:
     void Disconnect_device_by_address(QString);
     void Remove_device_by_address(QString);
     void Connect_device_by_address(QString);
+    void Connect_device_audio(QString);
     void Send_files_by_address(QString);
     void Turn_on_or_off_bluetooth(bool);
     void Connect_device(BluezQt::DevicePtr);
