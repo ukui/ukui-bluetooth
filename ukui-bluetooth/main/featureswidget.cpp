@@ -188,7 +188,12 @@ void FeaturesWidget::InitTrayMenu()
                 QPalette palette;
                 palette.setBrush(QPalette::Base,QColor(Qt::black));
                 palette.setBrush(QPalette::Text,QColor(Qt::white));
-                QMenu *device_menu = new QMenu(/*QIcon::fromTheme("pan-end-symbolic-rtl"),*/device_list.at(i)->name());
+                QString devname = device_list.at(i)->name();
+                QFontMetrics fontMetrics(head->font());
+                devname = fontMetrics.elidedText(devname, Qt::ElideRight, 150);
+                QMenu *device_menu = new QMenu(devname);
+                device_menu->setToolTipsVisible(true);
+                device_menu->setToolTip(device_list.at(i)->name());
                 device_menu->setPalette(palette);
                 device_menu->setObjectName(device_list.at(i)->address());
                 device_menu->setMinimumWidth(160);
