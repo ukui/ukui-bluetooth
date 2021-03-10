@@ -219,7 +219,11 @@ void FeaturesWidget::InitTrayMenu()
                 }else{
                     device_menu->setIcon(icon_null);
 
-                    status->setText(tr("Connection"));
+                    if(device_list.at(i)->type()==BluezQt::Device::Headset || device_list.at(i)->type()==BluezQt::Device::Headphones || device_list.at(i)->type()==BluezQt::Device::AudioVideo)
+                        status->setText(tr("Connect audio"));
+                    else
+                        status->setText(tr("Connection"));
+
                     remove->setText(tr("Remove"));
                     device_menu->addAction(remove);
                 }
@@ -255,7 +259,12 @@ void FeaturesWidget::InitTrayMenu()
                     }
                     else {
                         device_menu->setIcon(icon_null);
-                        status->setText(tr("Connection"));
+
+                        if(device_list.at(i)->type()==BluezQt::Device::Headset || device_list.at(i)->type()==BluezQt::Device::Headphones || device_list.at(i)->type()==BluezQt::Device::AudioVideo)
+                            status->setText(tr("Connect audio"));
+                        else
+                            status->setText(tr("Connection"));
+
                         remove->setText(tr("Remove"));
                         device_menu->addAction(remove);
                         device_menu->addAction(status);
@@ -378,6 +387,42 @@ void FeaturesWidget::Connect_device_by_address(QString address)
             Connect_device(device);
         }
     }
+}
+
+void FeaturesWidget::Connect_device_audio(QString address)
+{
+    qDebug() << Q_FUNC_INFO << (m_adapter == nullptr);
+    BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
+    if(!device){
+        qDebug() << Q_FUNC_INFO << "The connected device does not exist !";
+    }
+    qDebug() << Q_FUNC_INFO << device->uuids();
+    connect(device.data(),&BluezQt::Device::connectedChanged,this,[=](bool connected){
+        if(!connected){
+            if(dev_disconnected_flag){
+                qDebug() << Q_FUNC_INFO;
+//                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device->name()));
+//                SendNotifyMessage(text);
+                dev_disconnected_flag = false;
+            }
+        }
+    });
+
+    QList<BluezQt::DevicePtr> devlist = m_adapter->devices();
+    foreach (BluezQt::DevicePtr dev, devlist) {
+        if (dev->isConnected()) {
+            if (dev->type()==BluezQt::Device::Headset || dev->type()==BluezQt::Device::Headphones || dev->type()==BluezQt::Device::AudioVideo) {
+                BluezQt::PendingCall *call = dev->disconnectFromDevice();
+                connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+                     if(q->error() == 0){
+                         Connect_device(device);
+                     }
+                });
+                return;
+            }
+        }
+    }
+    Connect_device(device);
 }
 
 void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
@@ -871,6 +916,8 @@ void FeaturesWidget::TraySignalProcessing(QAction *action)
         Disconnect_device_by_address(action->statusTip());
     }else if(action->text() == tr("Connection")){
         Connect_device_by_address(action->statusTip());
+    }else if(action->text() == tr("Connect audio")){
+        Connect_device_audio(action->statusTip());
     }else if(action->text() == tr("Send files")){
         Send_files_by_address(action->statusTip());
     }else if(action->text() == tr("Remove")){
