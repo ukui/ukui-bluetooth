@@ -19,7 +19,7 @@ class PinCodeWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PinCodeWidget(QString name = "", QString pin = "");
+    explicit PinCodeWidget(QString name = "", QString pin = "", bool flag = true);
     ~PinCodeWidget();
     void Connection_timed_out();
 
@@ -42,6 +42,7 @@ private:
 
     QString dev_name;
     QString PINCode;
+    bool show_flag;
 };
 
 #endif // PINCODEWIDGET_H
