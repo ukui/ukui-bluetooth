@@ -82,9 +82,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
         connect(accept_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_accept_btn);
         connect(refuse_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_refuse_btn);
     }else{
-        connect(accept_btn,&QPushButton::clicked,this,[=]{
-            this->close();
-        });
+        accept_btn->setVisible(false);
         refuse_btn->setVisible(false);
     }
 

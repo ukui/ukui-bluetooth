@@ -61,7 +61,23 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
     m_displayedPasskey = passkey;
     m_enteredPasskey = entered;
 
+    if(pincodewidget!=nullptr){
+        pincodewidget->close();
+        delete pincodewidget;
+        pincodewidget = nullptr;
+    }
+
     pincodewidget = new PinCodeWidget(device->name(),passkey,false);
+    connect(m_device.data(), &BluezQt::Device::pairedChanged, this, [=](bool st){
+        if (st) {
+            if (pincodewidget != nullptr)
+                pincodewidget->close();
+        }
+        return;
+    });
+    connect(pincodewidget, &PinCodeWidget::destroyed, this, [=] {
+        pincodewidget = nullptr;
+    });
 
     //保持在最前
     pincodewidget->show();
