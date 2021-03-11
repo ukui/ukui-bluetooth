@@ -305,7 +305,11 @@ void FeaturesWidget::Pair_device_by_address(QString address)
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
 
     if(device->isPaired()){
-        Connect_device_by_address(address);
+        if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
+            Connect_device_audio(address);
+        }else{
+            Connect_device_by_address(address);
+        }
     }else{
         if(device->type() == BluezQt::Device::Mouse || device->type() == BluezQt::Device::Keyboard){
             Connect_device_by_address(address);
@@ -314,7 +318,11 @@ void FeaturesWidget::Pair_device_by_address(QString address)
             BluezQt::PendingCall *call = device->pair();
             connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
                 if(q->error() == 0){
-                    Connect_device_by_address(address);
+                    if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
+                        Connect_device_audio(address);
+                    }else{
+                        Connect_device_by_address(address);
+                    }
                 }
                 else {
                     qDebug() << Q_FUNC_INFO << q->error();
@@ -441,9 +449,7 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
             qDebug() << Q_FUNC_INFO;
 //            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
 //            SendNotifyMessage(text);
-
             settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
-            dev_disconnected_flag = true;
 
             writeDeviceInfoToFile(device->address(),device->name(),device->type());
         }else{
