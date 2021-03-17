@@ -348,7 +348,6 @@ void FeaturesWidget::Disconnect_device_by_address(QString address)
 //            QString text = tr("Disconnect Error!!!");
 //            SendNotifyMessage(text);
         }
-        dev_disconnected_flag = false;
     });
 }
 
@@ -373,16 +372,6 @@ void FeaturesWidget::Connect_device_by_address(QString address)
         qDebug() << Q_FUNC_INFO << "The connected device does not exist !";
     }
     qDebug() << Q_FUNC_INFO << device->uuids();
-    connect(device.data(),&BluezQt::Device::connectedChanged,this,[=](bool connected){
-        if(!connected){
-            if(dev_disconnected_flag){
-                qDebug() << Q_FUNC_INFO;
-//                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device->name()));
-//                SendNotifyMessage(text);
-                dev_disconnected_flag = false;
-            }
-        }
-    });
 
     BluezQt::DevicePtr finally_device = m_adapter->deviceForAddress(settings->get("finally-connect-the-device").toString());
     if(finally_device.isNull() || address == settings->get("finally-connect-the-device").toString()){
@@ -410,19 +399,12 @@ void FeaturesWidget::Connect_device_audio(QString address)
         qDebug() << Q_FUNC_INFO << "The connected device does not exist !";
     }
     qDebug() << Q_FUNC_INFO << device->uuids();
-    connect(device.data(),&BluezQt::Device::connectedChanged,this,[=](bool connected){
-        if(!connected){
-            if(dev_disconnected_flag){
-                qDebug() << Q_FUNC_INFO;
-//                QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device->name()));
-//                SendNotifyMessage(text);
-                dev_disconnected_flag = false;
-            }
-        }
-    });
 
     QList<BluezQt::DevicePtr> devlist = m_adapter->devices();
     foreach (BluezQt::DevicePtr dev, devlist) {
+        if (dev->address() == address)
+            continue;
+
         if (dev->isConnected()) {
             if (dev->type()==BluezQt::Device::Headset || dev->type()==BluezQt::Device::Headphones || dev->type()==BluezQt::Device::AudioVideo) {
                 BluezQt::PendingCall *call = dev->disconnectFromDevice();
