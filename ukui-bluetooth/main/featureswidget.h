@@ -126,7 +126,6 @@ private:
     bool dev_remove_flag = false;
     bool sleep_flag = false;
     bool dev_connected_when_sleep = false;
-    bool dev_disconnected_flag = true;
     QString pair_device_file;
     int dev_callbak_flag = 0;
 } ;
