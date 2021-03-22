@@ -57,6 +57,9 @@ void BluetoothAgent::requestPasskey(BluezQt::DevicePtr device, const BluezQt::Re
 void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &passkey, const QString &entered)
 {
     qDebug() << Q_FUNC_INFO << passkey;
+    if(m_displayedPasskey == passkey)
+        return;
+
     m_device = device;
     m_displayedPasskey = passkey;
     m_enteredPasskey = entered;
