@@ -1,3 +1,9 @@
+ukui-bluetooth (1.0.0-1kylin1k34) v101; urgency=medium
+
+  * 修改蓝牙键盘配对时连接框翻译
+
+ -- tang guang <tangguang@kylinos.cn>  Mon, 22 Mar 2021 17:35:58 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k33) v101; urgency=medium
 
   * 解决控制面板在点击移除蓝牙键盘闪退(bug#43352/bug#43821)

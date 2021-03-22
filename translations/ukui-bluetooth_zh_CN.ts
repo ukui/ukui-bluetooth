@@ -271,32 +271,37 @@
         <translation>正在进行配对：</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="36"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="38"/>
         <source>Please make sure the number displayed on &quot;</source>
         <translation>请确定 &quot;</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="36"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="38"/>
         <source>&quot; matches the number below. Please do not enter this code on any other accessories.</source>
         <translation>&quot; 上显示的数字与下面的数字匹配。请不要在任何其他配件上输入此代码。</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="61"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="40"/>
+        <source>Please enter the following PIN code on the bluetooth device %1 and press enter to pair !</source>
+        <translation>请在蓝牙设备 %1 上输入以下PIN码后按回车键进行配对 !</translation>
+    </message>
+    <message>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="65"/>
         <source>Accept</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="71"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="75"/>
         <source>Refush</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="109"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="113"/>
         <source>Pair</source>
         <translation>配对</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="110"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="114"/>
         <source>Connection timed out !!!</source>
         <translation>连接超时 ！！！</translation>
     </message>
