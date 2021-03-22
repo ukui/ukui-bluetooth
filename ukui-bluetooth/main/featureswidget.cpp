@@ -303,6 +303,8 @@ void FeaturesWidget::Pair_device_by_address(QString address)
 {
     qDebug() << Q_FUNC_INFO << address;
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
+    if(device.isNull())
+        return;
 
     if(device->isPaired()){
         if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
@@ -311,25 +313,21 @@ void FeaturesWidget::Pair_device_by_address(QString address)
             Connect_device_by_address(address);
         }
     }else{
-        if(device->type() == BluezQt::Device::Mouse || device->type() == BluezQt::Device::Keyboard){
-            Connect_device_by_address(address);
-        }else{
-            qDebug() << Q_FUNC_INFO << device->name();
-            BluezQt::PendingCall *call = device->pair();
-            connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
-                if(q->error() == 0){
-                    if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
-                        Connect_device_audio(address);
-                    }else{
-                        Connect_device_by_address(address);
-                    }
+        qDebug() << Q_FUNC_INFO << device->name();
+        BluezQt::PendingCall *call = device->pair();
+        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+            if(q->error() == 0){
+                if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
+                    Connect_device_audio(address);
+                }else{
+                    Connect_device_by_address(address);
                 }
-                else {
-                    qDebug() << Q_FUNC_INFO << q->error();
-                    emit device.data()->pairedChanged(false);
-                }
-            });
-        }
+            }
+            else {
+                qDebug() << Q_FUNC_INFO << q->error();
+                emit device.data()->pairedChanged(false);
+            }
+        });
     }
 }
 
@@ -337,6 +335,9 @@ void FeaturesWidget::Disconnect_device_by_address(QString address)
 {
     qDebug() << Q_FUNC_INFO << address;
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
+    if(device.isNull())
+        return;
+
     BluezQt::PendingCall *call = device->disconnectFromDevice();
     connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
         if(q->error() == 0){
@@ -368,8 +369,9 @@ void FeaturesWidget::Connect_device_by_address(QString address)
 {
     qDebug() << Q_FUNC_INFO << (m_adapter == nullptr);
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
-    if(!device){
+    if(device.isNull()){
         qDebug() << Q_FUNC_INFO << "The connected device does not exist !";
+        return;
     }
     qDebug() << Q_FUNC_INFO << device->uuids();
 
@@ -395,8 +397,9 @@ void FeaturesWidget::Connect_device_audio(QString address)
 {
     qDebug() << Q_FUNC_INFO << (m_adapter == nullptr);
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
-    if(!device){
+    if(device.isNull()){
         qDebug() << Q_FUNC_INFO << "The connected device does not exist !";
+        return;
     }
     qDebug() << Q_FUNC_INFO << device->uuids();
 

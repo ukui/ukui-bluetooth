@@ -1,3 +1,85 @@
+ukui-bluetooth (1.0.0-1kylin1k33) v101; urgency=medium
+
+  * 解决控制面板在点击移除蓝牙键盘闪退(bug#43352/bug#43821)
+
+ -- tang guang <tangguang@kylinos.cn>  Mon, 22 Mar 2021 16:38:44 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k32) v101; urgency=medium
+
+  * 解决蓝牙配对连接过程中，出现先连接成功，然后断开连接，最终再连接成功的现象(bug#42997)
+
+ -- tang guang <tangguang@kylinos.cn>  Wed, 17 Mar 2021 22:03:25 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k31) v101; urgency=medium
+
+  * 添加控制面板对音频设备连接逻辑
+
+ -- tang guang <tangguang@kylinos.cn>  Thu, 11 Mar 2021 22:22:05 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k30) v101; urgency=medium
+
+  * 优化音频设备连接逻辑
+  * 托盘显示的设备名长度缩略
+
+ -- tang guang <tangguang@kylinos.cn>  Wed, 10 Mar 2021 22:50:10 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k29) v101; urgency=medium
+
+  * 修复蓝牙键盘不能连接问题
+  * 替换部分图标
+
+ -- tang guang <tangguang@kylinos.cn>  Wed, 10 Mar 2021 19:45:03 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k28) v101; urgency=medium
+
+  * 添加飞行模式下，可以开启蓝牙
+  * 解决蓝牙配置文件写失败问题
+
+ -- tang guang <tangguang@kylinos.cn>  Tue, 09 Mar 2021 20:11:10 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k27) v101; urgency=medium
+
+  * 解决蓝牙服务重启，托盘图标状态异常
+  * 修改回连机制为，只回连外设
+  * fix bug#41958
+
+ -- tang guang <tangguang@kylinos.cn>  Tue, 09 Mar 2021 10:26:29 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k26) v101; urgency=medium
+
+  * 文件目录调整
+  * 修复安装后必现错误
+
+ -- tang guang <tangguang@kylinos.cn>  Sat, 06 Mar 2021 10:04:37 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k25) v101; urgency=medium
+
+  * 修改配置文件位置
+
+ -- tang guang <tangguang@kylinos.cn>  Thu, 04 Mar 2021 17:31:45 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k24) v101; urgency=medium
+
+  * 修改监听主题切换方法
+  * 添加程序启动回连
+  * 添加被连接消息提示（吕晗）
+
+ -- tang guang <tangguang@kylinos.cn>  Thu, 04 Mar 2021 09:50:15 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k23) v101; urgency=medium
+
+  * 解决bug#40897，bug#31510
+  * 添加配对文件不存在，回连逻辑
+
+ -- tang guang <tangguang@kylinos.cn>  Wed, 03 Mar 2021 10:43:07 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k22) v101; urgency=medium
+
+  * 修复配对是否成功与配对界面无关(吕晗)
+  * 修复对方取消配对，配对界面仍可点击(吕晗)
+
+ -- tang guang <tangguang@kylinos.cn>  Sat, 27 Feb 2021 21:18:53 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k21) v101; urgency=medium
 
   * 修复bug#38600、bug#38599、bug#37905、bug#37921、bug#37945、bug#38597 (吕晗)
