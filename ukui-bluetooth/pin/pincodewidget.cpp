@@ -33,7 +33,11 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
     this->setPalette(palette);
 
     QString top_text = tr("Is it paired with:");
-    QString tip_text = tr("Please make sure the number displayed on \"")+dev_name+tr("\" matches the number below. Please do not enter this code on any other accessories.");
+    QString tip_text;
+    if(show_flag)
+        tip_text = tr("Please make sure the number displayed on \"")+dev_name+tr("\" matches the number below. Please do not enter this code on any other accessories.");
+    else
+        tip_text = QString(tr("Please enter the following PIN code on the bluetooth device %1 and press enter to pair !")).arg(dev_name);
     QLabel *top_label = new QLabel(top_text,this);
     top_label->setStyleSheet("QLabel{\
                              font-size: 18px;\
