@@ -41,7 +41,7 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     title_icon->setGeometry(16,10,20,20);
 
     title_text = new QLabel(tr("Bluetooth file transfer"),this);
-    title_text->setGeometry(44,10,200,20);
+    title_text->setGeometry(44,5,200,30);
 
     close_btn = new QPushButton(this);
     close_btn->setIcon(QIcon::fromTheme("window-close-symbolic"));
@@ -67,24 +67,26 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     Get_fie_type();
 
     target_frame = new QFrame(this);
-    target_frame->setGeometry(32,62,376,45);
+    target_frame->setGeometry(32,52,376,55);
 
     target_icon = new QLabel(target_frame);
     target_icon->setPixmap(file_icon.pixmap(40,40));
-    target_icon->setGeometry(0,2,60,40);
+    target_icon->setGeometry(0,7,60,40);
     target_icon->setAlignment(Qt::AlignCenter);
 
-    target_name = new QLabel(file_name.path().split("/").at(file_name.path().split("/").length()-1),target_frame);
+    target_size = new QLabel(file_size,target_frame);
+    target_size->setGeometry(75,27,200,20);
+
+    QFontMetrics fontMetrics(target_size->font());
+    QString fileName = fontMetrics.elidedText(file_name.path().split("/").at(file_name.path().split("/").length()-1), Qt::ElideMiddle, 280);
+    target_name = new QLabel(fileName,target_frame);
     target_name->setToolTip(file_name.path());
-    target_name->setGeometry(75,0,200,20);
+    target_name->setGeometry(75,0,290,35);
 
     m_progressbar = new QProgressBar(this);
     m_progressbar->setOrientation(Qt::Horizontal);
     m_progressbar->setGeometry(32,170,376,10);
     m_progressbar->setVisible(false);
-
-    target_size = new QLabel(file_size,target_frame);
-    target_size->setGeometry(75,22,200,20);
 
     dev_widget = new DeviceSeleterWidget(this,dev_address);
     dev_widget->resize(376,270);
@@ -296,9 +298,9 @@ void BluetoothFileTransferWidget::set_m_progressbar_value(quint64 value)
 
 void BluetoothFileTransferWidget::GSettingsChanges(const QString &key)
 {
-    QPalette palette;
     qDebug() << Q_FUNC_INFO << key;
     if(key == "styleName"){
+        QPalette palette;
         if(GSettings->get("style-name").toString() == "ukui-default"){
             palette.setColor(QPalette::Background,QColor(Qt::white));
             target_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::black));
@@ -308,8 +310,8 @@ void BluetoothFileTransferWidget::GSettingsChanges(const QString &key)
             target_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::white));
             target_icon->setProperty("useIconHighlightEffect", 0x10);
         }
+        this->setPalette(palette);
     }
-    this->setPalette(palette);
 }
 
 void BluetoothFileTransferWidget::onClicked_OK_Btn()
