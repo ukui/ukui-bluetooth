@@ -81,9 +81,11 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
     file_icon->setAlignment(Qt::AlignCenter);
     file_icon->setGeometry(28,95,65,42);
 
-    file_name = new QLabel(target_source,this);
+    QFontMetrics fontMetrics(file_source->font());
+    QString fileName = fontMetrics.elidedText(target_source, Qt::ElideMiddle, 280);
+    file_name = new QLabel(fileName,this);
     file_name->setToolTip(target_source);
-    file_name->setGeometry(101,97,293,40);
+    file_name->setGeometry(101,87,293,60);
     file_name->setAlignment(Qt::AlignVCenter|Qt::AlignLeft);
     file_name->setWordWrap(true);
 
@@ -155,6 +157,14 @@ bool FileReceivingPopupWidget::move_file()
 {
     QString s = QDir::homePath()+"/.cache/obexd/"+target_source;
     QString d = file_path+"/"+target_source;
+    if(!QFile::exists(file_path)){
+        int status;
+        status = mkdir(file_path.toStdString().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        qDebug() << Q_FUNC_INFO << status;
+        if(status == -1)
+            return -1;
+    }
+
     GError *error;
     GFile *source = g_file_new_for_path(s.toStdString().c_str());
     GFile *destination = g_file_new_for_path(d.toStdString().c_str());
@@ -272,14 +282,14 @@ void FileReceivingPopupWidget::GSettings_value_chanage(const QString &key)
 
 void FileReceivingPopupWidget::GSettingsChanges(const QString &key)
 {
-    QPalette palette;
     qDebug() << Q_FUNC_INFO << key;
     if(key == "styleName"){
+        QPalette palette;
         if(StyleSettings->get("style-name").toString() == "ukui-default"){
             palette.setColor(QPalette::Background,QColor(Qt::white));
         }else{
             palette.setColor(QPalette::Background,QColor(Qt::black));
         }
+        this->setPalette(palette);
     }
-    this->setPalette(palette);
 }

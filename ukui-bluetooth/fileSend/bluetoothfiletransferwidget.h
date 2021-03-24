@@ -33,6 +33,7 @@
 #include <QParallelAnimationGroup>
 #include <QProgressBar>
 #include <QGSettings>
+#include <QFontMetrics>
 
 class DeviceSeleterWidget;
 

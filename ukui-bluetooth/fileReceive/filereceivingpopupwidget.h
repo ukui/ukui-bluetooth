@@ -5,6 +5,8 @@
 #include <gio/gfile.h>
 #include <gio/gioerror.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <string>
 
 #include <KF5/BluezQt/bluezqt/adapter.h>
