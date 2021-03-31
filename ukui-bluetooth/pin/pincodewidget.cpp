@@ -118,6 +118,19 @@ void PinCodeWidget::Connection_timed_out()
     }
 }
 
+void PinCodeWidget::pairFailureShow()
+{
+    QMessageBox msgBox;
+    msgBox.setParent(this);
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setWindowTitle(tr("Pair"));
+    msgBox.setText(QString(tr("Failed to pair with %1 !!!").arg(dev_name)));
+    int ret = msgBox.exec();
+    if(ret){
+        this->close();
+    }
+}
+
 void PinCodeWidget::onClick_close_btn(bool)
 {
     if(show_flag)
