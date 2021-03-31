@@ -12,7 +12,7 @@ BluetoothAgent::BluetoothAgent(QObject *parent)
     qDebug() << Q_FUNC_INFO;
     if(daemonIsNotRunning()){
         QDBusConnection bus = QDBusConnection::systemBus();
-        // 在session bus上注册名为"com.kylin_user_guide.hotel"的service
+        // 在session bus上注册名为"org.bluez.Agent1"的service
 
         if (!bus.registerService("org.bluez.Agent1")) {  //注意命名规则-和_
                 qDebug() << bus.lastError().message();
@@ -64,7 +64,7 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
     m_displayedPasskey = passkey;
     m_enteredPasskey = entered;
 
-    if(pincodewidget!=nullptr){
+    if(pincodewidget != nullptr){
         pincodewidget->close();
         delete pincodewidget;
         pincodewidget = nullptr;
@@ -75,11 +75,16 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
         if (st) {
             if (pincodewidget != nullptr)
                 pincodewidget->close();
+        }else{
+            if(pincodewidget)
+                pincodewidget->pairFailureShow();
+            disconnect(m_device.data(), &BluezQt::Device::pairedChanged, nullptr, nullptr);
         }
         return;
     });
     connect(pincodewidget, &PinCodeWidget::destroyed, this, [=] {
         pincodewidget = nullptr;
+        disconnect(pincodewidget, &PinCodeWidget::destroyed, nullptr, nullptr);
     });
 
     //保持在最前
@@ -92,6 +97,12 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
     qDebug() << Q_FUNC_INFO << device->name() << passkey;
     m_device = device;
     m_requestedPasskey = passkey;
+
+    if(pincodewidget != nullptr){
+        pincodewidget->close();
+        delete pincodewidget;
+        pincodewidget = nullptr;
+    }
 
     pincodewidget = new PinCodeWidget(device->name(),passkey);
 

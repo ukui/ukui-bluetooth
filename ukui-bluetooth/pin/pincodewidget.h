@@ -22,7 +22,7 @@ public:
     explicit PinCodeWidget(QString name = "", QString pin = "", bool flag = true);
     ~PinCodeWidget();
     void Connection_timed_out();
-
+    void pairFailureShow();
 private slots:
     void onClick_close_btn(bool);
     void onClick_accept_btn(bool);

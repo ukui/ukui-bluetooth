@@ -561,6 +561,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
             if(p->error() == 0){
                 flag = true;
                 qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+                Connect_the_last_connected_device();
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
         });
@@ -617,7 +618,8 @@ void FeaturesWidget::Monitor_sleep_signal()
 void FeaturesWidget::Connect_the_last_connected_device()
 {
     qDebug() << Q_FUNC_INFO << "startDiscovery";
-    m_adapter->startDiscovery();
+    if(!m_adapter->isDiscovering())
+        m_adapter->startDiscovery();
     QList<BluezQt::DevicePtr> devlist = m_adapter->devices();
     foreach (BluezQt::DevicePtr devptr, devlist) {
         BluezQt::Device* dev = devptr.data();
@@ -674,40 +676,6 @@ void FeaturesWidget::Connect_the_last_connected_device()
         m_adapter->stopDiscovery();
         qDebug() << Q_FUNC_INFO << "stopDiscovery";
     });
-//    QStringList target_list;
-//    target_list.clear();
-//    target_list = getDeviceConnectTimeList();
-
-//    QStringList list;
-//    list.clear();
-//    for (int i = 0; i < m_adapter->devices().length(); ++i) {
-//        if(m_adapter->devices().at(i)->isPaired()){
-//            list << m_adapter->devices().at(i)->address();
-//        }
-//    }
-
-//    if(target_list.length() == 1){
-//        target_list += list;
-//    }else if(target_list.length() == 0){
-//        target_list << settings->get("finallyConnectTheDevice").toString();
-//        target_list += list;
-//    }
-//    qDebug() << Q_FUNC_INFO << target_list.at(dev_callbak_flag);
-
-//    BluezQt::DevicePtr dev = m_adapter->deviceForAddress(target_list.at(dev_callbak_flag));
-//    BluezQt::PendingCall *pp = dev->connectToDevice();
-//    connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
-//        if(call->error() == 0){
-//            writeDeviceInfoToFile(dev->address(),dev->name());
-//        }else{
-//            if(dev_callbak_flag < target_list.length()-1){
-//                dev_callbak_flag++;
-//                Connect_the_last_connected_device();
-//            }else{
-//                return;
-//            }
-//        }
-//    });
 }
 
 // ===================蓝牙管理器设备操作监听======（主要针对系统的休眠和增加新的蓝牙硬件）=======================
@@ -824,6 +792,7 @@ QStringList FeaturesWidget::getDeviceConnectTimeList()
         pair_device_time_list.append(QString::fromUtf8(g_key_file_get_string(key_file,list[i],"ConnectTime",NULL)).toInt(&ok,10));
     }
 
+    //*****************给从配置文件中得到的设备列表和设备对应的最后连接时间列表排序***********START**************
     for(int i = 0; i < pair_device_time_list.length(); i++){
         for(int j = 0; j < pair_device_time_list.length()-i-1; j++){
             if(pair_device_time_list.at(j) < pair_device_time_list.at(j+1)){
@@ -836,6 +805,7 @@ QStringList FeaturesWidget::getDeviceConnectTimeList()
             }
         }
     }
+    //************************************  END  ******************************************************
 
     g_key_file_free(key_file);
 
@@ -886,11 +856,13 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
     qDebug() << Q_FUNC_INFO << value;
     settings->set("switch",QVariant::fromValue(value));
     flag = value;
-    if (value == true) {//开启
-        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
-    }else {//关闭
-        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-disabled-symbolic"));
-    }
+//    if (value == true) {//开启
+//        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+//        bluetooth_tray_icon->show();
+//    }else {//关闭
+//        bluetooth_tray_icon->setIcon(QIcon::fromTheme("battery"));
+//        bluetooth_tray_icon->show();
+//    }
 }
 
 void FeaturesWidget::adapterDeviceRemove(BluezQt::DevicePtr ptr)

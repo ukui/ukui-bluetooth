@@ -1,47 +1,60 @@
+ukui-bluetooth (1.0.0-1kylin1k36) v101; urgency=medium
+
+  * 添加蓝牙配对蓝牙键盘输入PIN错误后提示对话框
+  * 添加蓝牙发送文件没有配对的设备时提示信息
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 31 Mar 2021 16:45:32 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k35) v101; urgency=medium
+
+  * 蓝牙界面字体显示不全(bug#43968)
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 24 Mar 2021 15:15:01 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k34) v101; urgency=medium
 
   * 修改蓝牙键盘配对时连接框翻译
 
- -- tang guang <tangguang@kylinos.cn>  Mon, 22 Mar 2021 17:35:58 +0800
+ -- guang tang <tangguang@kylinos.cn>  Mon, 22 Mar 2021 17:35:58 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k33) v101; urgency=medium
 
   * 解决控制面板在点击移除蓝牙键盘闪退(bug#43352/bug#43821)
 
- -- tang guang <tangguang@kylinos.cn>  Mon, 22 Mar 2021 16:38:44 +0800
+ -- guang tang <tangguang@kylinos.cn>  Mon, 22 Mar 2021 16:38:44 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k32) v101; urgency=medium
 
   * 解决蓝牙配对连接过程中，出现先连接成功，然后断开连接，最终再连接成功的现象(bug#42997)
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 17 Mar 2021 22:03:25 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 17 Mar 2021 22:03:25 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k31) v101; urgency=medium
 
   * 添加控制面板对音频设备连接逻辑
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 11 Mar 2021 22:22:05 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 11 Mar 2021 22:22:05 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k30) v101; urgency=medium
 
   * 优化音频设备连接逻辑
   * 托盘显示的设备名长度缩略
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 10 Mar 2021 22:50:10 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 10 Mar 2021 22:50:10 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k29) v101; urgency=medium
 
   * 修复蓝牙键盘不能连接问题
   * 替换部分图标
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 10 Mar 2021 19:45:03 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 10 Mar 2021 19:45:03 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k28) v101; urgency=medium
 
   * 添加飞行模式下，可以开启蓝牙
   * 解决蓝牙配置文件写失败问题
 
- -- tang guang <tangguang@kylinos.cn>  Tue, 09 Mar 2021 20:11:10 +0800
+ -- guang tang <tangguang@kylinos.cn>  Tue, 09 Mar 2021 20:11:10 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k27) v101; urgency=medium
 
@@ -49,20 +62,20 @@ ukui-bluetooth (1.0.0-1kylin1k27) v101; urgency=medium
   * 修改回连机制为，只回连外设
   * fix bug#41958
 
- -- tang guang <tangguang@kylinos.cn>  Tue, 09 Mar 2021 10:26:29 +0800
+ -- guang tang <tangguang@kylinos.cn>  Tue, 09 Mar 2021 10:26:29 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k26) v101; urgency=medium
 
   * 文件目录调整
   * 修复安装后必现错误
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 06 Mar 2021 10:04:37 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 06 Mar 2021 10:04:37 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k25) v101; urgency=medium
 
   * 修改配置文件位置
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 04 Mar 2021 17:31:45 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 04 Mar 2021 17:31:45 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k24) v101; urgency=medium
 
@@ -70,46 +83,46 @@ ukui-bluetooth (1.0.0-1kylin1k24) v101; urgency=medium
   * 添加程序启动回连
   * 添加被连接消息提示（吕晗）
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 04 Mar 2021 09:50:15 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 04 Mar 2021 09:50:15 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k23) v101; urgency=medium
 
   * 解决bug#40897，bug#31510
   * 添加配对文件不存在，回连逻辑
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 03 Mar 2021 10:43:07 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 03 Mar 2021 10:43:07 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k22) v101; urgency=medium
 
   * 修复配对是否成功与配对界面无关(吕晗)
   * 修复对方取消配对，配对界面仍可点击(吕晗)
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 27 Feb 2021 21:18:53 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 27 Feb 2021 21:18:53 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k21) v101; urgency=medium
 
   * 修复bug#38600、bug#38599、bug#37905、bug#37921、bug#37945、bug#38597 (吕晗)
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 26 Feb 2021 17:05:56 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 26 Feb 2021 17:05:56 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k20) v101; urgency=medium
 
   * 修改蓝牙设备回连机制 
 
- -- tang guang <tangguang@kylinos.cn>  Sun, 21 Feb 2021 10:53:46 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sun, 21 Feb 2021 10:53:46 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k19) v101; urgency=medium
 
   * 系统正在接收文件，点击取消或关闭，界面无法退出，一直弹出接收确认界面(bug#35566)
   * 蓝牙连接成功失败断开等通知信息，在侧边栏通知详情里显示蓝牙与蓝牙设备，无具体信息(bug#31532)
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 05 Feb 2021 16:08:17 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 05 Feb 2021 16:08:17 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k18) v101; urgency=medium
 
   * 断开蓝牙音响，测试机系统提示与蓝牙设备断开连接“X6”，建议改为：与蓝牙设备“X6”断开成功(bug#37195)
 
- -- tang guang <tangguang@kylinos.cn>  Tue, 02 Feb 2021 20:53:21 +0800
+ -- guang tang <tangguang@kylinos.cn>  Tue, 02 Feb 2021 20:53:21 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k17) v101; urgency=medium
 
@@ -117,13 +130,13 @@ ukui-bluetooth (1.0.0-1kylin1k17) v101; urgency=medium
     - 通过鼠标右键蓝牙发送文件，文件传输界面崩溃(bug#36787)
     - 测试机可以接收手机端发送的文件，但去个人路径下无法找到刚刚接收到的doc文件(bug#37157)
 
- -- tang guang <tangguang@kylinos.cn>  Mon, 01 Feb 2021 14:00:14 +0800
+ -- guang tang <tangguang@kylinos.cn>  Mon, 01 Feb 2021 14:00:14 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k16) v101; urgency=medium
 
   * 已配对连接蓝牙成功后，进行S3/S4操作，唤醒后登录，任务栏蓝牙图标已丢失(bug#36744)
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 30 Jan 2021 18:16:55 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 30 Jan 2021 18:16:55 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k15) v101; urgency=medium
 
@@ -132,39 +145,39 @@ ukui-bluetooth (1.0.0-1kylin1k15) v101; urgency=medium
     - 系统与手机蓝牙配对连接成功后，发送文件无任何提示，手机端也未收到接收请求(bug#31237)
     - 通过鼠标右键蓝牙发送文件，文件传输界面崩溃(bug#36787)
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 30 Jan 2021 11:19:28 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 30 Jan 2021 11:19:28 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k14) v101; urgency=medium
 
   * 由于可发现时间导致外设备无法扫描到设备信息(bug#32043)
   * 选择“从蓝牙发送文件到...”选项，弹出的界面窗口在任务栏无任务窗口图标显示(bug#33367)
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 29 Jan 2021 19:02:35 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 29 Jan 2021 19:02:35 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k13) v101; urgency=medium
 
   * 解决程序托盘首次点击事件为右键时出现一条黑线
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 28 Jan 2021 15:28:30 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 28 Jan 2021 15:28:30 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k12) v101; urgency=medium
 
   * 添加与飞行模式联调代码
 
- -- tang guang <tangguang@kylinos.cn>  Tue, 26 Jan 2021 17:13:12 +0800
+ -- guang tang <tangguang@kylinos.cn>  Tue, 26 Jan 2021 17:13:12 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k11) v101; urgency=medium
 
   * 解决对端手机蓝牙关闭，系统发送文件，导致蓝牙崩溃退出(bug#33575)
   * 系统接收完通过蓝牙的传输的文件，弹出的查看按钮点击无响应(bug#35564)
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 22 Jan 2021 19:32:26 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 22 Jan 2021 19:32:26 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k10) v101; urgency=medium
 
   * 添加文件管理器蓝牙插件安装依赖
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 21 Jan 2021 15:41:14 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 21 Jan 2021 15:41:14 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k9) v101; urgency=medium
 
@@ -173,37 +186,37 @@ ukui-bluetooth (1.0.0-1kylin1k9) v101; urgency=medium
   * 优化s3/s4的代码逻辑
   * 在控制面板将蓝牙关闭后，重启系统再次打开控制面板-设备-蓝牙，显示蓝牙打开状态(bug#31252)
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 20 Jan 2021 15:23:50 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 20 Jan 2021 15:23:50 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k8) v101; urgency=medium
 
   * 偶现控制面板开关蓝牙和任务栏图标开关蓝牙不一致，且互相不影响 (bug#32507)
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 14 Jan 2021 15:44:14 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 14 Jan 2021 15:44:14 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k7) v101; urgency=medium
 
   * 适应主题的深色模式 (bug#32981、bug#32969)
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 13 Jan 2021 17:35:30 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 13 Jan 2021 17:35:30 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k6) v101; urgency=medium
 
   * 修改传输文件对话框为非模态 (bug#33370)
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 13 Jan 2021 13:54:51 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 13 Jan 2021 13:54:51 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k5) v101; urgency=medium
 
   * 添加blueman包冲突，以解决系统升级后存在blueman (bug#33299)
 
- -- tang guang <tangguang@kylinos.cn>  Wed, 13 Jan 2021 11:31:48 +0800
+ -- guang tang <tangguang@kylinos.cn>  Wed, 13 Jan 2021 11:31:48 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k4) v101; urgency=medium
 
   * 去除Kwin的依赖，添加对bluez-obex的依赖
 
- -- tang guang <tangguang@kylinos.cn>  Tue, 12 Jan 2021 16:34:27 +0800
+ -- guang tang <tangguang@kylinos.cn>  Tue, 12 Jan 2021 16:34:27 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k3) v101; urgency=medium
 
@@ -212,7 +225,7 @@ ukui-bluetooth (1.0.0-1kylin1k3) v101; urgency=medium
   * 修改显示多条通知弹窗
   * 修改配对后不会自动连接
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 09 Jan 2021 14:55:18 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 09 Jan 2021 14:55:18 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k2) v101; urgency=medium
 
@@ -220,54 +233,54 @@ ukui-bluetooth (1.0.0-1kylin1k2) v101; urgency=medium
   * 添加所有弹窗窗口标题
   * 添加设备配对超时消息弹窗
 
- -- tang guang <tangguang@kylinos.cn>  Mon, 04 Jan 2021 09:41:55 +0800
+ -- guang tang <tangguang@kylinos.cn>  Mon, 04 Jan 2021 09:41:55 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k1) v101; urgency=medium
 
   * 配对界面使用窗管圆角
   * 弹窗按钮使用主题统一规格
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 19 Dec 2020 17:14:50 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 19 Dec 2020 17:14:50 +0800
 
 ukui-bluetooth (1.0.0-1) v101; urgency=medium
 
   * 上传v101正式版本ppa
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 04 Dec 2020 11:59:40 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 04 Dec 2020 11:59:40 +0800
 
 ukui-bluetooth (1.0.0-1~rc9) v101; urgency=medium
 
   * 解决系统挂起后，再唤醒，程序退出问题
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 04 Dec 2020 11:11:09 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 04 Dec 2020 11:11:09 +0800
 
 ukui-bluetooth (1.0.0-1~rc8) v101; urgency=medium
 
   * 添加托盘菜单没有配对设备提示信息
   * 添加对系统挂起休眠信号的监听
 
- -- tang guang <tangguang@kylinos.cn>  Thu, 03 Dec 2020 15:03:27 +0800
+ -- guang tang <tangguang@kylinos.cn>  Thu, 03 Dec 2020 15:03:27 +0800
 
 ukui-bluetooth (1.0.0-1~rc7) v101; urgency=medium
 
   * 添加窗管圆角特性
 
- -- tang guang <tangguang@kylinos.cn>  Mon, 30 Nov 2020 18:46:44 +0800
+ -- guang tang <tangguang@kylinos.cn>  Mon, 30 Nov 2020 18:46:44 +0800
 
 ukui-bluetooth (1.0.0-1~rc3) v101; urgency=medium
 
   * add .desktop files
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 28 Nov 2020 16:13:21 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 28 Nov 2020 16:13:21 +0800
 
 ukui-bluetooth (1.0.0-1~rc2) v101; urgency=medium
 
   * fix deps
 
- -- tang guang <tangguang@kylinos.cn>  Sat, 28 Nov 2020 14:57:00 +0800
+ -- guang tang <tangguang@kylinos.cn>  Sat, 28 Nov 2020 14:57:00 +0800
 
 ukui-bluetooth (1.0.0-1~rc1) v101; urgency=medium
 
   * Initial release
 
- -- tang guang <tangguang@kylinos.cn>  Fri, 27 Nov 2020 13:47:23 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 27 Nov 2020 13:47:23 +0800
