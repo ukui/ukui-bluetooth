@@ -1,3 +1,9 @@
+ukui-bluetooth (1.0.0-1kylin1k37) v101; urgency=medium
+
+  * 添加根据蓝牙状态改变托盘图标
+
+ -- guang tang <tangguang@kylinos.cn>  Thu, 15 Apr 2021 16:16:39 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k36) v101; urgency=medium
 
   * 添加蓝牙配对蓝牙键盘输入PIN错误后提示对话框

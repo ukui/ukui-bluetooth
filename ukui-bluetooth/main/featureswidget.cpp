@@ -470,7 +470,8 @@ void FeaturesWidget::SendNotifyMessage(QString message)
         <<QStringList()
         <<QVariantMap()
         <<(int)-1;
-    iface.callWithArgumentList(QDBus::AutoDetect,"Notify",args);
+    QDBusMessage msg = iface.callWithArgumentList(QDBus::AutoDetect,"Notify",args);
+    qDebug() << Q_FUNC_INFO << msg.errorMessage();
 }
 
 void FeaturesWidget::NotifyOnOff()
@@ -673,7 +674,8 @@ void FeaturesWidget::Connect_the_last_connected_device()
                 disconnect(dev, &BluezQt::Device::rssiChanged, nullptr, nullptr);
             }
         }
-        m_adapter->stopDiscovery();
+        if(m_adapter->isDiscovering())
+            m_adapter->stopDiscovery();
         qDebug() << Q_FUNC_INFO << "stopDiscovery";
     });
 }
@@ -856,13 +858,16 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
     qDebug() << Q_FUNC_INFO << value;
     settings->set("switch",QVariant::fromValue(value));
     flag = value;
-//    if (value == true) {//开启
-//        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
-//        bluetooth_tray_icon->show();
-//    }else {//关闭
-//        bluetooth_tray_icon->setIcon(QIcon::fromTheme("battery"));
-//        bluetooth_tray_icon->show();
-//    }
+    if (value == true) {//开启
+        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+        bluetooth_tray_icon->show();
+    }else {//关闭
+        if(QIcon::hasThemeIcon("bluetooth-error"))
+            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
+        else
+            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+        bluetooth_tray_icon->show();
+    }
 }
 
 void FeaturesWidget::adapterDeviceRemove(BluezQt::DevicePtr ptr)
