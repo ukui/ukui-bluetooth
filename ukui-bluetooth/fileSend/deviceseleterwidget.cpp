@@ -111,7 +111,16 @@ void DeviceSeleterWidget::InitUI()
             }
         }
     }
-    device_list_layout->addStretch();
+
+    if(toolbutton_list.size() == 0){
+        QLabel *tip_label = new QLabel();
+        tip_label->setFixedSize(this->width()-16,60);
+        tip_label->setAlignment(Qt::AlignCenter);
+        tip_label->setText(tr("No device currently available \n Please go to pair the device"));
+        device_list_layout->addWidget(tip_label,Qt::AlignCenter);
+    }else{
+        device_list_layout->addStretch();
+    }
 }
 
 QString DeviceSeleterWidget::get_seleter_device()
