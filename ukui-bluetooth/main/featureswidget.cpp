@@ -126,14 +126,17 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
     //Create taskbar tray icon and connect to signal slot
     //创建任务栏托盘图标，并连接信号槽
-    bluetooth_tray_icon = new QSystemTrayIcon(QIcon::fromTheme("bluetooth-active-symbolic"),this);
+    bluetooth_tray_icon = new QSystemTrayIcon(this);
     bluetooth_tray_icon->setContextMenu(tray_Menu);
     bluetooth_tray_icon->setToolTip(tr("Bluetooth"));
     bluetooth_tray_icon->show();
     bluetooth_tray_icon->setVisible(settings->get("tray-show").toBool());
 
     if(settings->get("switch").toString() == "false"){
-        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-disabled-symbolic"));
+        if(QIcon::hasThemeIcon("bluetooth-error"))
+            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
+        else
+            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
     }else{
         bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
     }

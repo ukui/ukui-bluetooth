@@ -8,9 +8,12 @@
 #include <QStyleFactory>
 #include <QTextCodec>
 #include <QDebug>
+#include <ukui-log4qt.h>
 
 int main(int argc, char *argv[])
 {
+    initUkuiLog4qt("ukui-bluetooth");
+
     QApplication app(argc, argv);
 //    QApplication::setStyle(QStyleFactory::create("ukui-default"));
     QApplication::setQuitOnLastWindowClosed(false);

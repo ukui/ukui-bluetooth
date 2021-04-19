@@ -1,3 +1,11 @@
+ukui-bluetooth (1.0.0-1kylin1k38) v101; urgency=medium
+
+  * Feat : 
+    - 接入日志框架
+    - 添加软件描述
+
+ -- guang tang <tangguang@kylinos.cn>  Mon, 19 Apr 2021 06:42:32 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k37) v101; urgency=medium
 
   * 添加根据蓝牙状态改变托盘图标
