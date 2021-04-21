@@ -1,3 +1,9 @@
+ukui-bluetooth (1.0.0-1kylin1k39) v101; urgency=medium
+
+  * Fixed : bug#48323
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 21 Apr 2021 11:30:40 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k38) v101; urgency=medium
 
   * Feat : 
