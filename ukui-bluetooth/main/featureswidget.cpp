@@ -119,7 +119,11 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     QPalette palette;
     palette.setBrush(QPalette::Base,QColor(Qt::black));
     palette.setBrush(QPalette::Text,QColor(Qt::white));
+    palette.setBrush(QPalette::WindowText, QColor(Qt::white));
+    palette.setBrush(QPalette::ButtonText, QColor(Qt::white));
     tray_Menu = new QMenu(this);
+//    tray_Menu = new NewMenu();
+    tray_Menu->setProperty("setIconHighlightEffectDefaultColor", tray_Menu->palette().color(QPalette::Active, QPalette::Base));
     tray_Menu->setPalette(palette);
     tray_Menu->setMinimumWidth(160);
     connect(tray_Menu,&QMenu::triggered,this,&FeaturesWidget::TraySignalProcessing);
@@ -172,7 +176,6 @@ void FeaturesWidget::InitTrayMenu()
     tray_Menu->clear();
     QAction *switch_txt = new QAction(tray_Menu);
     qDebug() << Q_FUNC_INFO << flag << m_adapter->isPowered();
-//    if(!flag){
     if(!m_adapter->isPowered()){
         switch_txt->setText(tr("Turn on bluetooth"));
         tray_Menu->addAction(switch_txt);
@@ -194,25 +197,27 @@ void FeaturesWidget::InitTrayMenu()
                 QString devname = device_list.at(i)->name();
                 QFontMetrics fontMetrics(head->font());
                 devname = fontMetrics.elidedText(devname, Qt::ElideRight, 150);
-                QMenu *device_menu = new QMenu(devname);
-                device_menu->setToolTipsVisible(true);
-                device_menu->setToolTip(device_list.at(i)->name());
+                QAction *device_action = new QAction(devname,tray_Menu);
+                device_action->setCheckable(true);
+                QMenu *device_menu = new QMenu();
+//                device_menu->setToolTipsVisible(true);
+                device_action->setToolTip(device_list.at(i)->name());
                 device_menu->setPalette(palette);
-                device_menu->setObjectName(device_list.at(i)->address());
-                device_menu->setMinimumWidth(160);
-                QIcon icon_null = device_menu->icon();
+                device_action->setObjectName(device_list.at(i)->address());
+//                device_menu->setMinimumWidth(160);
+
 
                 QAction *status = new QAction(tray_Menu);
                 QAction *send   = new QAction(tray_Menu);
                 QAction *remove = new QAction(tray_Menu);
                 if(!flag){
-                    device_menu->setDisabled(true);
+                    device_action->setChecked(true);
                 }
                 status->setStatusTip(device_list.at(i)->address());
                 send->setStatusTip(device_list.at(i)->address());
                 remove->setStatusTip(device_list.at(i)->address());
                 if(device_list.at(i)->isConnected()){
-                    device_menu->setIcon(QIcon::fromTheme("ukui-dialog-success"));
+                    device_action->setChecked(true);
                     status->setText(tr("Disconnection"));
 
                     BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
@@ -225,7 +230,7 @@ void FeaturesWidget::InitTrayMenu()
                        device_menu->addAction(battery);
                     }
                 }else{
-                    device_menu->setIcon(icon_null);
+                    device_action->setChecked(false);
 
                     if(device_list.at(i)->type()==BluezQt::Device::Headset || device_list.at(i)->type()==BluezQt::Device::Headphones || device_list.at(i)->type()==BluezQt::Device::AudioVideo)
                         status->setText(tr("Connect audio"));
@@ -242,17 +247,17 @@ void FeaturesWidget::InitTrayMenu()
                     device_menu->addAction(send);
 
                 qDebug() << Q_FUNC_INFO << device_menu->size();
-                disconnect(device_list.at(i).data(), &BluezQt::Device::connectedChanged, device_menu, nullptr);
-                connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,device_menu,[=](bool value){
-                    qDebug() << Q_FUNC_INFO;
+                disconnect(device_list.at(i).data(), &BluezQt::Device::connectedChanged, device_action, nullptr);
+                connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,device_action,[=](bool value){
+                    qDebug() << Q_FUNC_INFO << value << __LINE__;
                     if(value) {
-                        device_menu->setIcon(QIcon::fromTheme("ukui-dialog-success"));
+//                        device_menu->setIcon(QIcon::fromTheme("ukui-dialog-success"));
+                        device_action->setChecked(true);
                         status->setText(tr("Disconnection"));
                         device_menu->addAction(status);
                         device_menu->removeAction(remove);
 
                         BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
-                        qDebug() << Q_FUNC_INFO << __LINE__ << dev_battery.isNull();
                         if(!dev_battery.isNull()){
                            QAction *battery = new QAction();
                            battery->setDisabled(true);
@@ -266,7 +271,7 @@ void FeaturesWidget::InitTrayMenu()
                             device_menu->addAction(send);
                     }
                     else {
-                        device_menu->setIcon(icon_null);
+                        device_action->setChecked(false);
 
                         if(device_list.at(i)->type()==BluezQt::Device::Headset || device_list.at(i)->type()==BluezQt::Device::Headphones || device_list.at(i)->type()==BluezQt::Device::AudioVideo)
                             status->setText(tr("Connect audio"));
@@ -283,7 +288,9 @@ void FeaturesWidget::InitTrayMenu()
                     }
                 });
 
-                tray_Menu->addMenu(device_menu);
+                tray_Menu->addAction(device_action);
+                device_action->setMenu(device_menu);
+
 
     //            connect(device_menu,&QMenu::triggered,this,&FeaturesWidget::TrayItemSignalProcessing);
             }
