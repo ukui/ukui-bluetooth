@@ -229,19 +229,18 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
 
 //        bool x= QFile::rename(QDir::homePath()+"/.cache/obexd/"+target_source,file_path+"/"+target_source);
         bool x = move_file();
-        view_btn->setVisible(true);
+//        view_btn->setVisible(true);
         qDebug() << Q_FUNC_INFO << __LINE__ << x;
         if(x){
-            connect(view_btn,&QPushButton::clicked,this,[=]{
-                qDebug() << Q_FUNC_INFO << __LINE__;
+//            connect(view_btn,&QPushButton::clicked,this,[=]{
                 QProcess *process = new QProcess(this);
                 QString cmd = "peony";
                 QStringList arg;
                 qDebug() << Q_FUNC_INFO;
-                arg << file_path;
+                arg <<  "--show-items" <<file_path+"/"+target_source;
                 process->startDetached(cmd,arg);
                 this->close();
-            });
+//            });
         }
 
     }else if(status == BluezQt::ObexTransfer::Error){

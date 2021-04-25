@@ -125,7 +125,7 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 //    tray_Menu = new NewMenu();
     tray_Menu->setProperty("setIconHighlightEffectDefaultColor", tray_Menu->palette().color(QPalette::Active, QPalette::Base));
     tray_Menu->setPalette(palette);
-    tray_Menu->setMinimumWidth(160);
+    tray_Menu->setMinimumWidth(240);
     connect(tray_Menu,&QMenu::triggered,this,&FeaturesWidget::TraySignalProcessing);
 
     //Create taskbar tray icon and connect to signal slot
@@ -218,7 +218,12 @@ void FeaturesWidget::InitTrayMenu()
                 remove->setStatusTip(device_list.at(i)->address());
                 if(device_list.at(i)->isConnected()){
                     device_action->setChecked(true);
-                    status->setText(tr("Disconnection"));
+
+                    if (device_list.at(i)->type() == BluezQt::Device::Mouse || device_list.at(i)->type() == BluezQt::Device::Keyboard) {
+                        remove->setText(tr("Remove"));
+                    } else {
+                        status->setText(tr("Disconnection"));
+                    }
 
                     BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
                     qDebug() << Q_FUNC_INFO << __LINE__ << dev_battery.isNull();
@@ -241,7 +246,12 @@ void FeaturesWidget::InitTrayMenu()
                     device_menu->addAction(remove);
                 }
 
-                device_menu->addAction(status);
+                if (device_list.at(i)->type() == BluezQt::Device::Mouse || device_list.at(i)->type() == BluezQt::Device::Keyboard) {
+                    device_menu->addAction(remove);
+                } else {
+                    device_menu->addAction(status);
+                }
+
                 send->setText(tr("Send files"));
                 if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
                     device_menu->addAction(send);
@@ -253,9 +263,15 @@ void FeaturesWidget::InitTrayMenu()
                     if(value) {
 //                        device_menu->setIcon(QIcon::fromTheme("ukui-dialog-success"));
                         device_action->setChecked(true);
-                        status->setText(tr("Disconnection"));
-                        device_menu->addAction(status);
-                        device_menu->removeAction(remove);
+
+
+                        if (device_list.at(i)->type() == BluezQt::Device::Mouse || device_list.at(i)->type() == BluezQt::Device::Keyboard) {
+                            device_menu->removeAction(status);
+                        } else {
+                            status->setText(tr("Disconnection"));
+                            device_menu->addAction(status);
+                            device_menu->removeAction(remove);
+                        }
 
                         BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
                         if(!dev_battery.isNull()){
@@ -279,12 +295,17 @@ void FeaturesWidget::InitTrayMenu()
                             status->setText(tr("Connection"));
 
                         remove->setText(tr("Remove"));
+                        device_menu->clear();
                         device_menu->addAction(remove);
                         device_menu->addAction(status);
 
                         send->setText(tr("Send files"));
                         if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
                             device_menu->addAction(send);
+
+                        if (device_list.at(i)->type() == BluezQt::Device::Mouse || device_list.at(i)->type() == BluezQt::Device::Keyboard){
+                            device_menu->removeAction(status);
+                        }
                     }
                 });
 

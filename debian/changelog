@@ -1,3 +1,11 @@
+ukui-bluetooth (1.0.0-1kylin1k41) v101; urgency=medium
+
+  * Bug  : bug#50765
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Sun, 25 Apr 2021 16:35:45 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k40) v101; urgency=medium
 
   * bug  : 
