@@ -1,3 +1,11 @@
+ukui-bluetooth (1.0.0-1kylin1k42) v101; urgency=medium
+
+  * Bug  : bug#50759：设备标题描述和下方设备进行颜色区分
+  * Task :
+  * Other:
+
+ -- deng tuo <dengtuo@kylinos.cn>  Wed, 28 Apr 2021 16:35:45 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k41) v101; urgency=medium
 
   * Bug  : bug#50765

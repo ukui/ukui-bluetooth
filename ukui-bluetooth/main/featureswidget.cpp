@@ -118,7 +118,8 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
     QPalette palette;
     palette.setBrush(QPalette::Base,QColor(Qt::black));
-    palette.setBrush(QPalette::Text,QColor(Qt::white));
+    palette.setBrush(QPalette::Active, QPalette::Text,QColor(Qt::white));
+    palette.setBrush(QPalette::Disabled, QPalette::Text,QColor(Qt::darkGray));
     palette.setBrush(QPalette::WindowText, QColor(Qt::white));
     palette.setBrush(QPalette::ButtonText, QColor(Qt::white));
     tray_Menu = new QMenu(this);
