@@ -142,8 +142,11 @@ void BluetoothFileTransferWidget::Get_fie_type()
     GFileInfo *file_info = g_file_query_info(file,"*",G_FILE_QUERY_INFO_NONE,NULL,&error);
     qDebug() << Q_FUNC_INFO  << g_file_info_get_size(file_info) << g_file_info_get_content_type(file_info);
 
-    QFileInfo qinfo(file_name.path());
-    Get_file_size(float(qinfo.size()));
+//    qDebug() << Q_FUNC_INFO << g_format_size_full(g_file_info_get_size(file_info),G_FORMAT_SIZE_IEC_UNITS);
+    file_size = g_format_size_full(g_file_info_get_size(file_info),G_FORMAT_SIZE_IEC_UNITS);
+//    QFileInfo qinfo(file_name.path());
+//    Get_file_size(float(qinfo.size()));
+
 
     QString str = g_file_info_get_content_type(file_info);
     if(str.split("/").at(0) == "image")

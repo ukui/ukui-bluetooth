@@ -13,7 +13,7 @@ PKGCONFIG += gsettings-qt gio-2.0
 LIBS +=-lpthread
 LIBS +=-lX11 -lXrandr -lXinerama -lXi -lXcursor
 
-LIBS += -L /usr/lib/x86_64-linux-gnu -l KF5BluezQt -lgio-2.0 -lglib-2.0
+LIBS += -L /usr/lib/x86_64-linux-gnu -l KF5BluezQt -lgio-2.0 -lglib-2.0 -lukui-log4qt
 
 inst1.files += ../data/org.bluez.Agent1.conf
 inst1.path = /etc/dbus-1/system.d/
