@@ -22,7 +22,7 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     // ===========================================================
 
     qDebug() << Q_FUNC_INFO << __LINE__;
-    this->setFixedSize(440,510);
+    this->setFixedSize(440,498);
 //    this->setWindowFlags(Qt::Dialog/*|Qt::FramelessWindowHint*/);
     this->setWindowIcon(QIcon::fromTheme("bluetooth"));
     this->setWindowTitle(tr("Bluetooth file transfer"));
@@ -36,23 +36,38 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     }
     this->setPalette(palette);
 
+
+    main_layout = new QVBoxLayout(this);
+    main_layout->setSpacing(0);
+    main_layout->setContentsMargins(8,4,4,0);
+
+    QHBoxLayout *title_layout = new QHBoxLayout();
+    title_layout->setSpacing(8);
+    title_layout->setContentsMargins(0,0,0,0);
+
     title_icon = new QLabel(this);
     title_icon->setPixmap(QIcon::fromTheme("preferences-system-bluetooth").pixmap(20,20));
-    title_icon->setGeometry(16,10,20,20);
+    title_icon->resize(20,20);
+    title_layout->addWidget(title_icon);
 
     title_text = new QLabel(tr("Bluetooth file transfer"),this);
-    title_text->setGeometry(44,5,200,30);
+    title_text->resize(200,30);
+    title_layout->addWidget(title_text);
+    title_layout->addStretch(1);
 
     close_btn = new QPushButton(this);
     close_btn->setIcon(QIcon::fromTheme("window-close-symbolic"));
     close_btn->setProperty("isWindowButton", 0x2);
     close_btn->setProperty("useIconHighlightEffect", 0x8);
     close_btn->setFlat(true);
-    close_btn->setGeometry(406,4,30,30);
+    close_btn->setFixedSize(30,30);
     connect(close_btn,&QPushButton::clicked,this,[=]{
         emit this->close_the_pre_session();
         this->close();
     });
+    title_layout->addWidget(close_btn,1,Qt::AlignRight);
+    main_layout->addLayout(title_layout);
+    main_layout->addStretch(10);
 
     tip_text = new QLabel(tr("Transferring to \"")+dev_name+"\"",this);
     tip_text->setStyleSheet("QLabel{\
@@ -67,25 +82,42 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     Get_fie_type();
 
     target_frame = new QFrame(this);
-    target_frame->setGeometry(32,52,376,55);
+    target_frame->setGeometry(32,42,376,70);
+//    target_frame->setStyleSheet("background:red;");
+    QHBoxLayout *target_layout = new QHBoxLayout(target_frame);
+    target_layout->setSpacing(10);
+    target_layout->setContentsMargins(0,0,0,0);
+    QVBoxLayout *info_layout = new QVBoxLayout();
+    info_layout->setSpacing(0);
+    info_layout->setContentsMargins(0,0,0,0);
 
     target_icon = new QLabel(target_frame);
     target_icon->setPixmap(file_icon.pixmap(40,40));
-    target_icon->setGeometry(0,7,60,40);
+    target_icon->resize(60,40);
     target_icon->setAlignment(Qt::AlignCenter);
+    target_layout->addWidget(target_icon);
 
     target_size = new QLabel(file_size,target_frame);
-    target_size->setGeometry(75,27,200,20);
+    target_size->setAlignment(Qt::AlignTop);
+    target_size->resize(200,20);
 
     QFontMetrics fontMetrics(target_size->font());
     QString fileName = fontMetrics.elidedText(file_name.path().split("/").at(file_name.path().split("/").length()-1), Qt::ElideMiddle, 280);
     target_name = new QLabel(fileName,target_frame);
+    target_name->setAlignment(Qt::AlignBottom);
     target_name->setToolTip(file_name.path());
-    target_name->setGeometry(75,0,290,35);
+    target_name->resize(290,35);
+
+    info_layout->addStretch();
+    info_layout->addWidget(target_name,Qt::AlignCenter);
+    info_layout->addWidget(target_size,Qt::AlignCenter);
+    info_layout->addStretch();
+    target_layout->addLayout(info_layout);
+    target_layout->addStretch(1);
 
     m_progressbar = new QProgressBar(this);
     m_progressbar->setOrientation(Qt::Horizontal);
-    m_progressbar->setGeometry(32,170,376,10);
+    m_progressbar->setGeometry(32,175,376,10);
     m_progressbar->setVisible(false);
 
     dev_widget = new DeviceSeleterWidget(this,dev_address);

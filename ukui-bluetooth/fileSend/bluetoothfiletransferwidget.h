@@ -17,6 +17,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QByteArray>
 #include <QLabel>
 #include <QPushButton>
@@ -68,6 +69,8 @@ public slots:
     void GSettingsChanges(const QString &key);
 private:
     QGSettings *GSettings;
+
+    QVBoxLayout *main_layout = nullptr;
 
     QLabel *tip_text;
 
