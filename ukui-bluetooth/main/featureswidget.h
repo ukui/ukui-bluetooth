@@ -5,6 +5,7 @@
 #include "../agent/bluetoothagent.h"
 #include "daemon/bluetoothdbus.h"
 #include "../agent/bluetoothobexagent.h"
+#include "../component/switchaction.h"
 
 #include <string>
 #include <glib.h>
@@ -46,6 +47,7 @@
 #include <QDir>
 #include <QFile>
 #include <QDateTime>
+#include <QWidgetAction>
 #include <QDBusMessage>
 
 #define LIST_PATH "/etc/pairDevice.list"
@@ -99,6 +101,9 @@ public slots:
 private:
     QSystemTrayIcon *bluetooth_tray_icon;
     QMenu *tray_Menu;
+
+    SwitchAction *m_action = nullptr;
+
     QGSettings *settings;
 
     QStringList paired_device_address;
