@@ -48,6 +48,8 @@ unix {
 }
 
 SOURCES += \
+    component/switchaction.cpp \
+    component/switchbutton.cpp \
     fileSend/bluetoothfiletransferwidget.cpp \
     fileReceive/filereceivingpopupwidget.cpp \
     main/main.cpp \
@@ -60,6 +62,8 @@ SOURCES += \
     agent/bluetoothagent.cpp
 
 HEADERS += \
+    component/switchaction.h \
+    component/switchbutton.h \
     fileSend/bluetoothfiletransferwidget.h \
     main/featureswidget.h \
     fileReceive/filereceivingpopupwidget.h \

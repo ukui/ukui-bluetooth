@@ -1,3 +1,12 @@
+ukui-bluetooth (1.0.0-1kylin1k43) v101; urgency=medium
+
+  * Bug  :
+    - bug#50581: 蓝牙-托盘窗口界面优化
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Thu, 06 May 2021 15:58:31 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k42) v101; urgency=medium
 
   * Bug  : 

@@ -175,14 +175,20 @@ void FeaturesWidget::InitTrayMenu()
 {
     bool noDev = true;
     tray_Menu->clear();
-    QAction *switch_txt = new QAction(tray_Menu);
+
+    m_action = new SwitchAction(this);
+    m_action->setBtnStatus(m_adapter->isPowered());
+    connect(m_action,&SwitchAction::sendBtnStatus,this,[=](bool value){
+        Turn_on_or_off_bluetooth(value);
+    });
+    QWidgetAction *switch_txt = new QWidgetAction(tray_Menu);
+    switch_txt->setDefaultWidget(m_action);
+
     qDebug() << Q_FUNC_INFO << flag << m_adapter->isPowered();
     if(!m_adapter->isPowered()){
-        switch_txt->setText(tr("Turn on bluetooth"));
         tray_Menu->addAction(switch_txt);
         tray_Menu->addSeparator();
     }else{
-        switch_txt->setText(tr("Turn off bluetooth"));
         tray_Menu->addAction(switch_txt);
         tray_Menu->addSeparator();
         QList<BluezQt::DevicePtr> device_list = m_adapter->devices();
@@ -325,7 +331,9 @@ void FeaturesWidget::InitTrayMenu()
         }
     }
     tray_Menu->addSeparator();
-    tray_Menu->addAction(tr("Bluetooth settings"));
+    QAction *settins_action = new QAction(tr("Bluetooth settings"),tray_Menu);
+    settins_action->setCheckable(true);
+    tray_Menu->addAction(settins_action);
     tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
     tray_Menu->exec();
 
@@ -911,11 +919,7 @@ void FeaturesWidget::adapterDeviceRemove(BluezQt::DevicePtr ptr)
 void FeaturesWidget::TraySignalProcessing(QAction *action)
 {
     qDebug() << Q_FUNC_INFO << action->text() ;
-    if(action->text() == tr("Turn on bluetooth")){
-        Turn_on_or_off_bluetooth(true);
-    }else if(action->text() == tr("Turn off bluetooth")){
-        Turn_on_or_off_bluetooth(false);
-    }else if(action->text() == tr("Bluetooth settings")){
+    if(action->text() == tr("Bluetooth settings")){
         Open_bluetooth_settings();
     }else if(action->text() == tr("Disconnection")){
         Disconnect_device_by_address(action->statusTip());
