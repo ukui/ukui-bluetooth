@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     FeaturesWidget *w = new FeaturesWidget();
     if( w->exit_flag ){
-        return -1;
+        return 0;
     }
     return app.exec();
 }

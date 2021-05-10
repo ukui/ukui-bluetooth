@@ -1,3 +1,13 @@
+ukui-bluetooth (1.0.0-1kylin1k44) v101; urgency=medium
+
+  * Bug  :
+    - bug#52807 :没有蓝牙功能的机器，蓝牙被会话管理器拉起，并异常退出返回退出码255
+  * Task :
+  * Other:
+    - 关闭蓝牙时更新rfkill的状态
+
+ -- guang tang <tangguang@kylinos.cn>  Sat, 08 May 2021 14:06:27 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k43) v101; urgency=medium
 
   * Bug  :
