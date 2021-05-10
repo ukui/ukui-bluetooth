@@ -27,7 +27,6 @@ Depends: libkf5bluezqt6,
 	 bluez (>= 5), 
          bluez-obexd, 
          peony-bluetooth,
-         libukui-log4qt-dev,
          ${shlibs:Depends}, ${misc:Depends}
 Recommends: pulseaudio-module-bluetooth
 Conflicts: blueman

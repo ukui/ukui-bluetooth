@@ -612,6 +612,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
             if(p->error() == 0){
                 flag = false;
                 qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+                m_manager->setBluetoothBlocked(true);
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
         });
@@ -901,6 +902,7 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
     if (value == true) {//开启
         bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
         bluetooth_tray_icon->show();
+//        Connect_the_last_connected_device();
     }else {//关闭
         if(QIcon::hasThemeIcon("bluetooth-error"))
             bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
