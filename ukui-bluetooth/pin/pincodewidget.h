@@ -2,6 +2,8 @@
 #define PINCODEWIDGET_H
 
 #include <QWidget>
+#include <QGuiApplication>
+#include <QList>
 #include <QLabel>
 #include <QIcon>
 #include <QDebug>
@@ -14,6 +16,7 @@
 #include <QAbstractButton>
 #include <QPalette>
 #include <QGSettings>
+#include <QScreen>
 
 class PinCodeWidget : public QWidget
 {

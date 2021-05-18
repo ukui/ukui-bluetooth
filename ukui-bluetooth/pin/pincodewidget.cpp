@@ -24,6 +24,9 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
     this->setWindowTitle(tr("Bluetooth pairing"));
     this->setAttribute(Qt::WA_DeleteOnClose);
 
+    QList<QScreen *> list = QGuiApplication::screens();
+    this->move(list.at(0)->size().width()/2-this->width()/2,list.at(0)->size().height()/2-this->height()/2);
+
     QPalette palette;
     if(settings->get("style-name").toString() == "ukui-default"){
         palette.setColor(QPalette::Background,QColor(Qt::white));
