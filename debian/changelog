@@ -1,3 +1,13 @@
+ukui-bluetooth (1.0.0-1kylin1k45) v101; urgency=medium
+
+  * Bug  ：
+    - bug#53893: 连接蓝牙键盘时弹出的窗口没有居中显示
+    - bug#53345: 开关pc蓝牙开关或者重启PC，蓝牙耳机不回连
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Tue, 18 May 2021 10:14:03 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k44) v101; urgency=medium
 
   * Bug  :

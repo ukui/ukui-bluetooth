@@ -602,7 +602,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
             if(p->error() == 0){
                 flag = true;
                 qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
-                Connect_the_last_connected_device();
+//                Connect_the_last_connected_device();
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
         });
@@ -783,22 +783,6 @@ void FeaturesWidget::adapterChangeFUN()
 }
 // ===========================================END========================================================
 
-void FeaturesWidget::createPairDeviceFile()
-{
-//    qDebug() << Q_FUNC_INFO ;
-//    if(pair_device_file.isNull())
-//        pair_device_file = QDir::homePath() + "/.config/pairDevice.list";
-
-//    qDebug() << Q_FUNC_INFO << QFile::exists(pair_device_file);
-//    if(!QFile::exists(pair_device_file)){
-//        QFile file(pair_device_file);
-//        file.open(QIODevice::WriteOnly);
-//        file.close();
-//    }else{
-//        return;
-//    }
-}
-
 void FeaturesWidget::writeDeviceInfoToFile(const QString &devAddress, const QString &devName, const BluezQt::Device::Type type)
 {
     QDBusMessage m = QDBusMessage::createMethodCall("com.bluetooth.systemdbus", "/", "com.bluetooth.interface", "writeKeyFile");
@@ -902,7 +886,7 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
     if (value == true) {//开启
         bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
         bluetooth_tray_icon->show();
-//        Connect_the_last_connected_device();
+        Connect_the_last_connected_device();
     }else {//关闭
         if(QIcon::hasThemeIcon("bluetooth-error"))
             bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
