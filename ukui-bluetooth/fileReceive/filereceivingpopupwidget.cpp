@@ -257,9 +257,7 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
         warn_layout->setContentsMargins(0,0,0,0);
 
         QLabel *warn_icon = new QLabel(this);
-        warn_icon->setPixmap(QIcon::fromTheme("emblem-important-symbolic").pixmap(30,30));
-        warn_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(248, 206, 83));
-        warn_icon->setProperty("useIconHighlightEffect", 0x10);
+        warn_icon->setPixmap(QIcon::fromTheme("dialog-warning").pixmap(30,30));
 
         QLabel *warn_text = new QLabel(tr("Sender canceled or transmission error"),this);
         warn_text->setAlignment(Qt::AlignVCenter);

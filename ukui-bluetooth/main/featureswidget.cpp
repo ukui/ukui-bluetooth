@@ -173,7 +173,6 @@ FeaturesWidget::~FeaturesWidget()
 
 void FeaturesWidget::InitTrayMenu()
 {
-    bool noDev = true;
     tray_Menu->clear();
 
     m_action = new SwitchAction(this);
@@ -183,22 +182,21 @@ void FeaturesWidget::InitTrayMenu()
     });
     QWidgetAction *switch_txt = new QWidgetAction(tray_Menu);
     switch_txt->setDefaultWidget(m_action);
+    tray_Menu->addAction(switch_txt);
+    tray_Menu->addSeparator();
 
     qDebug() << Q_FUNC_INFO << flag << m_adapter->isPowered();
-    if(!m_adapter->isPowered()){
-        tray_Menu->addAction(switch_txt);
-        tray_Menu->addSeparator();
-    }else{
-        tray_Menu->addAction(switch_txt);
-        tray_Menu->addSeparator();
+    if(m_adapter->isPowered()){
         QList<BluezQt::DevicePtr> device_list = m_adapter->devices();
-        QAction *head = new QAction(tr("Devices"));
+        qDebug() << Q_FUNC_INFO << device_list.size();
+        QAction *head = new QAction(tr("My Devices"));
         head->setDisabled(true);
         tray_Menu->addAction(head);
+        bool head_rm = true;
         for(int i=0; i < device_list.size(); i++){
             if(device_list.at(i)->isPaired()){
-                noDev = false;
                 QPalette palette;
+                head_rm = false;
                 palette.setBrush(QPalette::Base,QColor(Qt::black));
                 palette.setBrush(QPalette::Text,QColor(Qt::white));
                 QString devname = device_list.at(i)->name();
@@ -207,12 +205,9 @@ void FeaturesWidget::InitTrayMenu()
                 QAction *device_action = new QAction(devname,tray_Menu);
                 device_action->setCheckable(true);
                 QMenu *device_menu = new QMenu();
-//                device_menu->setToolTipsVisible(true);
                 device_action->setToolTip(device_list.at(i)->name());
                 device_menu->setPalette(palette);
                 device_action->setObjectName(device_list.at(i)->address());
-//                device_menu->setMinimumWidth(160);
-
 
                 QAction *status = new QAction(tray_Menu);
                 QAction *send   = new QAction(tray_Menu);
@@ -321,13 +316,10 @@ void FeaturesWidget::InitTrayMenu()
 
 
     //            connect(device_menu,&QMenu::triggered,this,&FeaturesWidget::TrayItemSignalProcessing);
-            }
+                }
         }
-
-        if(noDev){
-            QAction *text = new QAction(tr("No paired devices"));
-            text->setDisabled(true);
-            tray_Menu->addAction(text);
+        if (head_rm) {
+            tray_Menu->removeAction(head);
         }
     }
     tray_Menu->addSeparator();
