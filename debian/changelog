@@ -1,8 +1,20 @@
+ukui-bluetooth (1.0.0-1kylin1k46) v101; urgency=medium
+
+  * Bug  :
+    - bug#55733 :深色模式下，文件发送失败提示“传输失败”没有显示
+  * Task :
+  * Other:
+    - 优化文件传输的文件类型图标
+    - 去除任务栏托盘的提示信息
+
+ -- guang tang <tangguang@kylinos.cn>  Fri, 28 May 2021 10:47:15 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k45) v101; urgency=medium
 
   * Bug  ：
     - bug#53893: 连接蓝牙键盘时弹出的窗口没有居中显示
     - bug#53345: 开关pc蓝牙开关或者重启PC，蓝牙耳机不回连
+    - bug#53893: 连接蓝牙键盘时弹出的窗口没有居中显示
   * Task :
   * Other:
 

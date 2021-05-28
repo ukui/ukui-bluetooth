@@ -157,8 +157,7 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     tranfer_status_text->setStyleSheet("QLabel{\
                                        font-size: 14px;\
                                        font-family: PingFangSC-Regular, PingFang SC;\
-                                       font-weight: 400;\
-                                       color: rgba(0, 0, 0, 0.85);}");
+                                       font-weight: 400;}");
 }
 
 BluetoothFileTransferWidget::~BluetoothFileTransferWidget()
@@ -174,48 +173,26 @@ void BluetoothFileTransferWidget::Get_fie_type()
     GFileInfo *file_info = g_file_query_info(file,"*",G_FILE_QUERY_INFO_NONE,NULL,&error);
     qDebug() << Q_FUNC_INFO  << g_file_info_get_size(file_info) << g_file_info_get_content_type(file_info);
 
-//    qDebug() << Q_FUNC_INFO << g_format_size_full(g_file_info_get_size(file_info),G_FORMAT_SIZE_IEC_UNITS);
     file_size = g_format_size_full(g_file_info_get_size(file_info),G_FORMAT_SIZE_IEC_UNITS);
-//    QFileInfo qinfo(file_name.path());
-//    Get_file_size(float(qinfo.size()));
-
 
     QString str = g_file_info_get_content_type(file_info);
-    if(str.split("/").at(0) == "image")
-        file_icon = QIcon::fromTheme("folder-pictures-symbolic");
-    else if(str.split("/").at(0) == "video")
-        file_icon = QIcon::fromTheme("video-x-generic-symbolic");
-    else if(str.split("/").at(0) == "audio")
-        file_icon = QIcon::fromTheme("folder-music-symbolic");
-    else if(str.split("/").at(0) == "text")
-        file_icon = QIcon::fromTheme("folder-documents-symbolic");
-    else
-        file_icon = QIcon::fromTheme("folder-documents-symbolic");
-}
-
-void BluetoothFileTransferWidget::Get_file_size(float t)
-{
-    QString flag;
-    float s = t;
-    for(int j = 0; j < 4; j++){
-        if(j == 0)
-            flag = " KB";
-        else if (j == 1)
-            flag = " MB";
-        else if (j == 2)
-            flag = " GB";
-        else if (j == 3)
-            flag = " TB";
-
-        s = s / 1024;
-        file_size = QString::number(s,'f',1);
-        file_size = file_size + flag;
-//        qDebug() << file_size << flag;
-        if(s < 1024){
-            break;
+    if (str.split("/").at(0) == "image"){
+        file_icon = QIcon(file_name.path());
+        if (file_icon.isNull()) {
+            file_icon = QIcon::fromTheme("folder-documents-symbolic");
         }
-
-    }
+    }else if (str.split("/").at(0) == "video")
+        file_icon = QIcon::fromTheme("video-x-generic-symbolic");
+    else if (str.split("/").at(0) == "audio" ||
+             str.split("/").at(0) == "application" ||
+             str.split("/").at(0) == "text"){
+        if (QIcon::hasThemeIcon(str.split("/").join("-"))) {
+            file_icon = QIcon::fromTheme(str.split("/").join("-"));
+        } else {
+            file_icon = QIcon::fromTheme("folder-documents-symbolic");
+        }
+    }else
+        file_icon = QIcon::fromTheme("folder-documents-symbolic");
 }
 
 void BluetoothFileTransferWidget::Initialize_and_start_animation()
@@ -286,9 +263,7 @@ void BluetoothFileTransferWidget::get_transfer_status(QString status)
         target_frame->setVisible(false);
         m_progressbar->setVisible(false);
 
-        tranfer_status_icon->setPixmap(QIcon::fromTheme("software-installed-symbolic").pixmap(64,64));
-        tranfer_status_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(Qt::green));
-        tranfer_status_icon->setProperty("useIconHighlightEffect", 0x10);
+        tranfer_status_icon->setPixmap(QIcon::fromTheme("ukui-dialog-success").pixmap(64,64));
         tranfer_status_icon->setVisible(true);
         tranfer_status_text->setText(tr("Successfully transmitted!"));
         tranfer_status_text->setVisible(true);
@@ -314,9 +289,7 @@ void BluetoothFileTransferWidget::tranfer_error()
     target_frame->setVisible(false);
     m_progressbar->setVisible(false);
 
-    tranfer_status_icon->setPixmap(QIcon::fromTheme("edit-clear-all-symbolic").pixmap(64,64));
-    tranfer_status_icon->setProperty("setIconHighlightEffectDefaultColor", QColor(248, 206, 83));
-    tranfer_status_icon->setProperty("useIconHighlightEffect", 0x10);
+    tranfer_status_icon->setPixmap(QIcon::fromTheme("dialog-error").pixmap(64,64));
     tranfer_status_icon->setVisible(true);
     tranfer_status_text->setText(tr("Transmission failed!"));
     tranfer_status_text->setVisible(true);
