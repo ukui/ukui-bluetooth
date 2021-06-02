@@ -41,6 +41,8 @@
 #include <QVariant>
 #include <QPalette>
 #include <QTextCodec>
+#include <QFileSystemWatcher>
+#include <QStandardPaths>
 #include <QRect>
 #include <QUrl>
 #include <QProcess>
@@ -51,6 +53,7 @@
 #include <QDBusMessage>
 
 #define LIST_PATH "/etc/pairDevice.list"
+#define RFKILL_DEV "/dev/rfkill"
 
 using namespace std;
 class BluetoothDbus;

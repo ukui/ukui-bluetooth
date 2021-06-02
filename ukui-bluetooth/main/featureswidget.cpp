@@ -87,10 +87,11 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     qDebug() << m_adapter->isPowered();
 
     if(settings->get("switch").toString() == "false"){
-        m_adapter->setPowered(false);
+        if (!m_manager->isBluetoothBlocked())
+            m_manager->setBluetoothBlocked(true);
     }else{
-        if(!m_adapter->isPowered()){
-            m_adapter->setPowered(true);
+        if(m_manager->isBluetoothBlocked()){
+            m_manager->setBluetoothBlocked(false);
         }
     }
 
@@ -413,7 +414,7 @@ void FeaturesWidget::Connect_device_by_address(QString address)
         Connect_device(device);
     }else{
         if(finally_device->isConnected()){
-               BluezQt::PendingCall *call = device->disconnectFromDevice();
+               BluezQt::PendingCall *call = finally_device->disconnectFromDevice();
                connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
                     if(q->error() == 0){
                         Connect_device(device);
