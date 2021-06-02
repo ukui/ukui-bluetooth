@@ -2,7 +2,7 @@
 #include "../config/xatom-helper.h"
 
 bool BluetoothFileTransferWidget::isShow = false;
-BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_address):
+BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString dev_address):
 //    QWidget(parent),
     file_name(name)
 {
@@ -102,10 +102,10 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QUrl name, QString dev_
     target_size->resize(200,20);
 
     QFontMetrics fontMetrics(target_size->font());
-    QString fileName = fontMetrics.elidedText(file_name.path().split("/").at(file_name.path().split("/").length()-1), Qt::ElideMiddle, 280);
+    QString fileName = fontMetrics.elidedText(file_name.split("/").at(file_name.split("/").length()-1), Qt::ElideMiddle, 280);
     target_name = new QLabel(fileName,target_frame);
     target_name->setAlignment(Qt::AlignBottom);
-    target_name->setToolTip(file_name.path());
+    target_name->setToolTip(file_name);
     target_name->resize(290,35);
 
     info_layout->addStretch();
@@ -168,8 +168,8 @@ BluetoothFileTransferWidget::~BluetoothFileTransferWidget()
 void BluetoothFileTransferWidget::Get_fie_type()
 {
     GError *error;
-    qDebug() << Q_FUNC_INFO << file_name.path();
-    GFile *file = g_file_new_for_path(file_name.path().toStdString().c_str());
+    qDebug() << Q_FUNC_INFO << file_name;
+    GFile *file = g_file_new_for_path(file_name.toStdString().c_str());
     GFileInfo *file_info = g_file_query_info(file,"*",G_FILE_QUERY_INFO_NONE,NULL,&error);
     qDebug() << Q_FUNC_INFO  << g_file_info_get_size(file_info) << g_file_info_get_content_type(file_info);
 
@@ -177,7 +177,7 @@ void BluetoothFileTransferWidget::Get_fie_type()
 
     QString str = g_file_info_get_content_type(file_info);
     if (str.split("/").at(0) == "image"){
-        file_icon = QIcon(file_name.path());
+        file_icon = QIcon(file_name);
         if (file_icon.isNull()) {
             file_icon = QIcon::fromTheme("folder-documents-symbolic");
         }

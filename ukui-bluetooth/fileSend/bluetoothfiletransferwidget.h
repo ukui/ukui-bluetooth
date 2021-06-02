@@ -49,7 +49,7 @@ class BluetoothFileTransferWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BluetoothFileTransferWidget(QUrl name,QString dev_address = "");
+    explicit BluetoothFileTransferWidget(QString name,QString dev_address = "");
     ~BluetoothFileTransferWidget();
 
     static bool isShow;
@@ -97,7 +97,7 @@ private:
     QPushButton *cancel_btn;
     QPushButton *ok_btn;
 
-    QUrl file_name;
+    QString file_name;
     QString file_size;
     QString dev_name;
 };

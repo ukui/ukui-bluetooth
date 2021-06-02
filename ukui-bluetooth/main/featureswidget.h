@@ -75,7 +75,7 @@ public:
     void SendNotifyMessage(QString);
     void NotifyOnOff();
 
-    void Dbus_file_transfer(QUrl);
+    void Dbus_file_transfer(QString);
     void Monitor_sleep_signal();
 
     void Connect_the_last_connected_device();
@@ -112,7 +112,7 @@ private:
     QString File_save_path;
     QString cur_adapter_address;
     QStringList adapter_list;
-    QUrl selected_file;
+    QString selected_file;
     quint64 transfer_file_size = 0;
     bool flag = true;
 
