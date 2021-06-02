@@ -569,8 +569,8 @@ void FeaturesWidget::Send_files_by_address(QString address)
     QTextCodec::setCodecForLocale(codec);
     selected_file = QFileDialog::getOpenFileName(0,
         tr("Select the file to be sent"), getenv("HOME"), tr("All Files (*)"));
-    qDebug() << "Select file:" << selected_file.path();
-    if(!selected_file.path().isNull()){
+    qDebug() << "Select file:" << selected_file;
+    if(!selected_file.isNull()){
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
             connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
@@ -611,7 +611,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
     }
 }
 
-void FeaturesWidget::Dbus_file_transfer(QUrl file_path)
+void FeaturesWidget::Dbus_file_transfer(QString file_path)
 {
     if(!obex_manager->isOperational()){
         BluezQt::PendingCall *call = obex_manager->startService();
@@ -622,9 +622,9 @@ void FeaturesWidget::Dbus_file_transfer(QUrl file_path)
         });
     }
 
-    qDebug() << "Select file:" << file_path.path();
+    qDebug() << "Select file:" << file_path;
     selected_file = file_path;
-    if(!selected_file.path().isNull()){
+    if(!selected_file.isNull()){
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
             connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
@@ -943,7 +943,7 @@ void FeaturesWidget::file_transfer_creator(QString dev)
 
         pre_session = session;
         opp = new BluezQt::ObexObjectPush(session);
-        BluezQt::PendingCall *transfer = opp->sendFile(selected_file.path());
+        BluezQt::PendingCall *transfer = opp->sendFile(selected_file);
         qDebug() << Q_FUNC_INFO << transfer->error() << transfer->errorText();
         connect(transfer,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
             qDebug() << Q_FUNC_INFO << __LINE__;
