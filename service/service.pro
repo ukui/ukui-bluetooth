@@ -15,6 +15,8 @@ PKGCONFIG += gio-2.0
 
 LIBS += -lglib-2.0
 
+QMAKE_LFLAGS += -D_FORTIFY_SOURCE=2 -O2
+
 ins1.files += ../data/com.bluetooth.systemdbus.conf
 ins1.path  = /etc/dbus-1/system.d/
 ins2.files += ../data/com.bluetooth.systemdbus.service
