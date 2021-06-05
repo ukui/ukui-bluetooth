@@ -4,13 +4,4 @@ set -e
 
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
-if [ ! -e /etc/systemd/system/rc-local.service];then
-	ln -s /lib/systemd/system/rc-local.service /etc/systemd/system/rc-local.service
-fi
-
-echo -e '[Install]\nWantedBy=multi-user.target\nAlias=rc-local.service' >> /etc/systemd/system/rc-local.service
-
-echo -e '#!/bin/sh -e\nrfkill block bluetooth\nexit 0' >> /etc/rc.local
-
-chmod +x /etc/rc.local
 #DEBHELPER#

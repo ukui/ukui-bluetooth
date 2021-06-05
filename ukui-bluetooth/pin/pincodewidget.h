@@ -26,6 +26,7 @@ public:
     ~PinCodeWidget();
     void Connection_timed_out();
     void pairFailureShow();
+    void updateUIInfo(const QString &name,const QString &pin);
 private slots:
     void onClick_close_btn(bool);
     void onClick_accept_btn(bool);
@@ -35,13 +36,16 @@ signals:
     void accepted();
     void rejected();
 private:
-    QGSettings *settings;
+    QGSettings *settings     = nullptr;
 
-    QVBoxLayout *main_layout;
+    QLabel *PIN_label        = nullptr;
+    QLabel *tip_label        = nullptr;
 
-    QPushButton *close_btn;
-    QPushButton *accept_btn;
-    QPushButton *refuse_btn;
+    QVBoxLayout *main_layout = nullptr;
+
+    QPushButton *close_btn   = nullptr;
+    QPushButton *accept_btn  = nullptr;
+    QPushButton *refuse_btn  = nullptr;
 
     QString dev_name;
     QString PINCode;

@@ -17,6 +17,7 @@
 #include <QtDBus/QDBusReply>
 #include <QtDBus/QDBusConnectionInterface>
 #include <QMessageBox>
+#include <QTimer>
 
 class PinCodeWidget;
 
@@ -67,7 +68,8 @@ private:
     // release
     bool m_releaseCalled;
 
-    PinCodeWidget *pincodewidget=nullptr;
+    PinCodeWidget *pincodewidget = nullptr;
+    PinCodeWidget *Keypincodewidget = nullptr;
 };
 
 #endif // BLUETOOTHAGENT_H

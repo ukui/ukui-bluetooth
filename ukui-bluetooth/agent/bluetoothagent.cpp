@@ -56,7 +56,7 @@ void BluetoothAgent::requestPasskey(BluezQt::DevicePtr device, const BluezQt::Re
 
 void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &passkey, const QString &entered)
 {
-    qDebug() << Q_FUNC_INFO << passkey;
+    qDebug() << Q_FUNC_INFO << ( m_device.isNull() ? "NULL" : m_device.data()->address() ) << entered << passkey;
     if(m_displayedPasskey == passkey)
         return;
 
@@ -64,32 +64,36 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
     m_displayedPasskey = passkey;
     m_enteredPasskey = entered;
 
-    if(pincodewidget != nullptr){
-        pincodewidget->close();
-        delete pincodewidget;
-        pincodewidget = nullptr;
+    connect(device.data(), &BluezQt::Device::pairedChanged, this, [=](bool st){
+        qDebug() << Q_FUNC_INFO << st << __LINE__;
+        if (st) {
+            if (Keypincodewidget)
+                Keypincodewidget->setHidden(true);
+        }else{
+            if(Keypincodewidget){}
+//                Keypincodewidget->close();
+                QTimer::singleShot(1000,this,[=]{
+                    qDebug() << Q_FUNC_INFO << device.data()->isConnected() << __LINE__;
+                    if (!device.data()->isConnected())
+                        Keypincodewidget->pairFailureShow();
+                });
+            disconnect(device.data(), &BluezQt::Device::pairedChanged, nullptr, nullptr);
+        }
+    });
+
+    if(Keypincodewidget != nullptr){
+        if (Keypincodewidget) {
+            Keypincodewidget->updateUIInfo(device.data()->name(),passkey);
+            return;
+        }
     }
 
-    pincodewidget = new PinCodeWidget(device->name(),passkey,false);
-    connect(m_device.data(), &BluezQt::Device::pairedChanged, this, [=](bool st){
-        if (st) {
-            if (pincodewidget != nullptr)
-                pincodewidget->close();
-        }else{
-            if(pincodewidget)
-                pincodewidget->pairFailureShow();
-            disconnect(m_device.data(), &BluezQt::Device::pairedChanged, nullptr, nullptr);
-        }
-        return;
-    });
-    connect(pincodewidget, &PinCodeWidget::destroyed, this, [=] {
-        pincodewidget = nullptr;
-        disconnect(pincodewidget, &PinCodeWidget::destroyed, nullptr, nullptr);
-    });
+    Keypincodewidget = new PinCodeWidget(device->name(),passkey,false);
 
     //保持在最前
-    pincodewidget->show();
-    pincodewidget->activateWindow();
+    Keypincodewidget->show();
+    Keypincodewidget->activateWindow();
+
 }
 
 void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QString &passkey, const BluezQt::Request<> &request)

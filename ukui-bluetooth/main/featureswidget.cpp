@@ -84,7 +84,7 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     bluetoothAgent = new BluetoothAgent(this);
     bluetoothObexAgent = new BluetoothObexAgent(this);
     qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
-    qDebug() << m_adapter->isPowered();
+    qDebug() << m_adapter->isPowered() << "===========" << m_manager->isBluetoothBlocked();
 
     if(settings->get("switch").toString() == "false"){
         if (!m_manager->isBluetoothBlocked())
@@ -162,9 +162,12 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
             });
 
     Monitor_sleep_signal();
-    QTimer::singleShot(500,this,[=]{
-        Connect_the_last_connected_device();
-    });
+
+    if(!m_manager->isBluetoothBlocked() && m_adapter->isPowered()){
+        QTimer::singleShot(500,this,[=]{
+            Connect_the_last_connected_device();
+        });
+    }
 }
 
 FeaturesWidget::~FeaturesWidget()
@@ -349,7 +352,9 @@ void FeaturesWidget::Pair_device_by_address(QString address)
         qDebug() << Q_FUNC_INFO << device->name();
         BluezQt::PendingCall *call = device->pair();
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+            qDebug() << Q_FUNC_INFO << __LINE__ <<q->error() << q->errorText();
             if(q->error() == 0){
+                emit device.data()->pairedChanged(true);
                 if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
                     Connect_device_audio(address);
                 }else{
@@ -414,7 +419,7 @@ void FeaturesWidget::Connect_device_by_address(QString address)
         Connect_device(device);
     }else{
         if(finally_device->isConnected()){
-               BluezQt::PendingCall *call = finally_device->disconnectFromDevice();
+               BluezQt::PendingCall *call = device->disconnectFromDevice();
                connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
                     if(q->error() == 0){
                         Connect_device(device);

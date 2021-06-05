@@ -49,7 +49,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
                              line-height: 25px;}");
     top_label->setGeometry(32,48,334,25);
 
-    QLabel *tip_label = new QLabel(tip_text,this);
+    tip_label = new QLabel(tip_text,this);
     tip_label->setStyleSheet("QLabel{\
                              font-size: 14px;\
                              font-family: PingFangSC-Regular, PingFang SC;\
@@ -58,7 +58,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
     tip_label->setGeometry(32,89,359,60);
     tip_label->setWordWrap(true);
 
-    QLabel *PIN_label = new QLabel(PINCode,this);
+    PIN_label = new QLabel(PINCode,this);
     PIN_label->setStyleSheet("QLabel{\
                              font-size: 36px;\
                              font-family: ArialMT;\
@@ -117,12 +117,16 @@ void PinCodeWidget::Connection_timed_out()
     msgBox.setText(tr("Connection timed out !!!"));
     int ret = msgBox.exec();
     if(ret){
-        this->close();
+        if (show_flag)
+            this->close();
+        else
+            this->setHidden(true);
     }
 }
 
 void PinCodeWidget::pairFailureShow()
 {
+    qDebug() << Q_FUNC_INFO << __LINE__;
     QMessageBox msgBox;
     msgBox.setParent(this);
     msgBox.setIcon(QMessageBox::Warning);
@@ -130,16 +134,34 @@ void PinCodeWidget::pairFailureShow()
     msgBox.setText(QString(tr("Failed to pair with %1 !!!").arg(dev_name)));
     int ret = msgBox.exec();
     if(ret){
-        this->close();
+        qDebug() << Q_FUNC_INFO << this << __LINE__;
+        if (show_flag)
+            this->close();
+        else
+            this->setHidden(true);
     }
+}
+
+void PinCodeWidget::updateUIInfo(const QString &name, const QString &pin)
+{
+    qDebug() << Q_FUNC_INFO  << this->isActiveWindow() << __LINE__;
+    PINCode = pin;
+    PIN_label->setText(pin);
+    PIN_label->update();
+
+    if (!this->isActiveWindow())
+        this->setHidden(false);
 }
 
 void PinCodeWidget::onClick_close_btn(bool)
 {
-    if(show_flag)
+    qDebug() << Q_FUNC_INFO << __LINE__;
+    if (show_flag) {
         emit this->rejected();
-
-    this->close();
+        this->close();
+    } else {
+        this->setHidden(true);
+    }
 }
 
 void PinCodeWidget::onClick_accept_btn(bool)
