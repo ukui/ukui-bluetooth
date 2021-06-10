@@ -417,16 +417,26 @@ void FeaturesWidget::Connect_device_by_address(QString address)
     if(finally_device.isNull() || address == settings->get("finally-connect-the-device").toString()){
         qDebug() << Q_FUNC_INFO << finally_device.isNull() << address << settings->get("finally-connect-the-device").toString();
         Connect_device(device);
-    }else{
-        if(finally_device->isConnected()){
-               BluezQt::PendingCall *call = device->disconnectFromDevice();
-               connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
-                    if(q->error() == 0){
-                        Connect_device(device);
-                    }
-               });
-        }else{
+    }else
+    {
+        if (device->type()==BluezQt::Device::Mouse)
+        {
             Connect_device(device);
+        }
+        else
+        {
+            if(finally_device->isConnected()){
+                   BluezQt::PendingCall *call = device->disconnectFromDevice();
+                   connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+                        if(q->error() == 0){
+                            Connect_device(device);
+                        }
+                   });
+            }
+            else
+            {
+                Connect_device(device);
+            }
         }
     }
 }
