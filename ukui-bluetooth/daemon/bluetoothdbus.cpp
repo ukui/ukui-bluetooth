@@ -59,7 +59,7 @@ QString BluetoothDbus::getDevcieByAddress(QString)
 
 }
 
-void BluetoothDbus::file_transfer(QString file)
+void BluetoothDbus::file_transfer(QStringList file)
 {
     qDebug() << Q_FUNC_INFO << file;
     emit this->sendTransferMesg(file);

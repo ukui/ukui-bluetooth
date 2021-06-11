@@ -78,7 +78,7 @@ public:
     void SendNotifyMessage(QString);
     void NotifyOnOff();
 
-    void Dbus_file_transfer(QString);
+    void Dbus_file_transfer(QStringList);
     void Monitor_sleep_signal();
 
     void Connect_the_last_connected_device();

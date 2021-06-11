@@ -627,7 +627,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
     }
 }
 
-void FeaturesWidget::Dbus_file_transfer(QString file_path)
+void FeaturesWidget::Dbus_file_transfer(QStringList file_path)
 {
     if(!obex_manager->isOperational()){
         BluezQt::PendingCall *call = obex_manager->startService();
@@ -639,7 +639,7 @@ void FeaturesWidget::Dbus_file_transfer(QString file_path)
     }
 
     qDebug() << "Select file:" << file_path;
-    selected_file = file_path;
+    selected_file = file_path.first().split(":").at(1);
     if(!selected_file.isNull()){
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,"");

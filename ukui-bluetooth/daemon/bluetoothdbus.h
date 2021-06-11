@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QDBusObjectPath>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusAbstractAdaptor>
@@ -25,7 +26,7 @@ signals:
     void ConnectTheSendingDevice(QString);
     void RemoveTheSendingDevice(QString);
     void DisconnectTheSendingDevice(QString);
-    void sendTransferMesg(QString);
+    void sendTransferMesg(QStringList);
     void switch_signals(bool);
 public slots:
     void connectToDevice(QString);
@@ -33,7 +34,7 @@ public slots:
     void removeDevice(QString);
     QStringList getPairedDevice();
     QString getDevcieByAddress(QString);
-    void file_transfer(QString);
+    void file_transfer(QStringList);
     void Bluetooth_switch(bool);
 };
 
