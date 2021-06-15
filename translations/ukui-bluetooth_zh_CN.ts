@@ -145,11 +145,11 @@
         <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="532"/>
         <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="541"/>
         <source>The connection with the Bluetooth device “%1” is successful!</source>
-        <translation>与蓝牙设备“%1”的连接成功！</translation>
+        <translation>与蓝牙设备“%1”连接成功！</translation>
     </message>
     <message>
         <source>The connection with the Bluetooth device “%1” is failed!</source>
-        <translation type="vanished">与蓝牙设备“%1”的连接失败！</translation>
+        <translation type="vanished">与蓝牙设备“%1”连接失败！</translation>
     </message>
     <message>
         <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="494"/>
