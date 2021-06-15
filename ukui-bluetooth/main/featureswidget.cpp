@@ -610,7 +610,7 @@ void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
             if(p->error() == 0){
                 flag = true;
                 qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
-//                Connect_the_last_connected_device();
+                Connect_the_last_connected_device();
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
         });
@@ -668,8 +668,8 @@ void FeaturesWidget::Monitor_sleep_signal()
 void FeaturesWidget::Connect_the_last_connected_device()
 {
     qDebug() << Q_FUNC_INFO << "startDiscovery";
-    if(!m_adapter->isDiscovering())
-        m_adapter->startDiscovery();
+    //if(!m_adapter->isDiscovering())
+    //    m_adapter->startDiscovery();
     QList<BluezQt::DevicePtr> devlist = m_adapter->devices();
     foreach (BluezQt::DevicePtr devptr, devlist) {
         BluezQt::Device* dev = devptr.data();
@@ -723,8 +723,8 @@ void FeaturesWidget::Connect_the_last_connected_device()
                 disconnect(dev, &BluezQt::Device::rssiChanged, nullptr, nullptr);
             }
         }
-        if(m_adapter->isDiscovering())
-            m_adapter->stopDiscovery();
+        //if(m_adapter->isDiscovering())
+        //    m_adapter->stopDiscovery();
         qDebug() << Q_FUNC_INFO << "stopDiscovery";
     });
 }
