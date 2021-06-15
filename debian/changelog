@@ -1,11 +1,12 @@
-ukui-bluetooth (1.0.0-1kylin1k48) v101; urgency=medium
+ukui-bluetooth (1.0.0-1kylin1k49) v101; urgency=medium
   
   * Bug  :
-    - bug#59337 【通知】连接成功的语句不通顺，需去掉“的”
+    - bug#59337 【通知】连接成功的语句不通顺，需去掉“的” (lizhuoheng)
+    - bug#59653  CPM蓝牙关开，鼠标回连需要12s (dengtuo)
   * Task :
   * Other:
 
- -- lizhuoheng <lizhuoheng@kylinos.cn>  Tue, 15 Jun 2021 14:03:33 +0800
+ -- guang tang <tangguang@kylinos.cn>  Tue, 15 Jun 2021 14:03:33 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k48) v101; urgency=medium
 
