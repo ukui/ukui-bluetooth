@@ -1,4 +1,13 @@
 ukui-bluetooth (1.0.0-1kylin1k48) v101; urgency=medium
+  
+  * Bug  :
+    - bug#59337 【通知】连接成功的语句不通顺，需去掉“的”
+  * Task :
+  * Other:
+
+ -- lizhuoheng <lizhuoheng@kylinos.cn>  Tue, 15 Jun 2021 14:03:33 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k48) v101; urgency=medium
 
   * Bug  :
     - bug#60919 右键发送文件只蓝牙窗口，文件类型图标不对+6407
