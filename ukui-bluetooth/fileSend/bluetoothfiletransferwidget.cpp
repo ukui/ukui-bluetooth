@@ -7,6 +7,7 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString d
     file_name(name)
 {
     isShow = true;
+    send_state = _SEND_NONE;
 
     if(QGSettings::isSchemaInstalled("org.ukui.style")){
         GSettings = new QGSettings("org.ukui.style");
@@ -269,10 +270,15 @@ void BluetoothFileTransferWidget::get_transfer_status(QString status)
         tranfer_status_text->setVisible(true);
 
         cancel_btn->setText(tr("Close"));
+        this->send_state = _SEND_COMPLETE ;
     }else if(status == "active"){
+        this->send_state = _SENDING ;
 
     }else if(status == "error"){
         tranfer_error();
+        this->send_state = _SEND_FAILURE ;
+
+
     }
 }
 
@@ -296,6 +302,11 @@ void BluetoothFileTransferWidget::tranfer_error()
 
     cancel_btn->setText(tr("Close"));
     emit this->close_the_pre_session();
+}
+
+int BluetoothFileTransferWidget::get_send_data_state()
+{
+    return this->send_state;
 }
 
 void BluetoothFileTransferWidget::set_m_progressbar_value(quint64 value)

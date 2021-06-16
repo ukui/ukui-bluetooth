@@ -52,6 +52,15 @@ public:
     explicit BluetoothFileTransferWidget(QString name,QString dev_address = "");
     ~BluetoothFileTransferWidget();
 
+    typedef enum _SEND_DATA_STATE
+    {
+        _SEND_NONE = 0,
+        _SEND_COMPLETE,
+        _SENDING,
+        _SEND_FAILURE
+
+    }SEND_DATA_STATE;
+
     static bool isShow;
 
     void Get_fie_type();
@@ -60,6 +69,9 @@ public:
     void init_m_progressbar_value(quint64);
     void get_transfer_status(QString);
     void tranfer_error();
+
+    int  get_send_data_state();
+
 signals:
     void sender_dev_name(QString);
     void close_the_pre_session();
@@ -100,6 +112,9 @@ private:
     QString file_name;
     QString file_size;
     QString dev_name;
+
+    SEND_DATA_STATE send_state = _SEND_NONE;
+
 };
 
 #endif // BLUETOOTHFILETRANSFERWIDGET_H

@@ -587,13 +587,27 @@ void FeaturesWidget::Send_files_by_address(QString address)
         tr("Select the file to be sent"), getenv("HOME"), tr("All Files (*)"));
     qDebug() << "Select file:" << selected_file;
     if(!selected_file.isNull()){
+
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
             connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
             connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
             transfer_widget->show();
         }
-        else {
+        else
+        {
+            qDebug() << Q_FUNC_INFO << transfer_widget->get_send_data_state() << __LINE__;
+
+            if (BluetoothFileTransferWidget::_SEND_FAILURE == transfer_widget->get_send_data_state()   ||
+                BluetoothFileTransferWidget::_SEND_COMPLETE == transfer_widget->get_send_data_state()  )
+            {
+                transfer_widget->close();
+                delete transfer_widget;
+                transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
+                connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
+                connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
+                transfer_widget->show();
+            }
 //            QMessageBox::warning(NULL, tr("bluetooth"), tr("A transfer is in progress..."),
 //                                     QMessageBox::Ok,QMessageBox::Ok);
         }
@@ -647,7 +661,8 @@ void FeaturesWidget::Dbus_file_transfer(QStringList file_path)
             connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
             transfer_widget->show();
         }
-        else {
+        else
+        {
 //            QMessageBox::warning(NULL, tr("bluetooth"), tr("A transfer is in progress..."),
 //                                     QMessageBox::Ok,QMessageBox::Ok);
         }
@@ -680,9 +695,12 @@ void FeaturesWidget::Connect_the_last_connected_device()
 
                 BluezQt::PendingCall *pp = dev->connectToDevice();
                 connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
-                    if(call->error() == 0){
+                    if(call->error() == 0)
+                    {
                         writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
-                    }else{
+                    }
+                    else
+                    {
                         qDebug() << Q_FUNC_INFO << "rssiChanged" << dev->name() << call->errorText();
                     }
                 });
@@ -967,6 +985,8 @@ void FeaturesWidget::file_transfer_creator(QString dev)
             filePtr = v.value<BluezQt::ObexTransferPtr>();
             if(filePtr){
                 transfer_file_size = filePtr->size();
+                qDebug() << Q_FUNC_INFO << "Sending file size:" << transfer_file_size << __LINE__;
+
 //                connect(ptr.get(),&BluezQt::ObexTransfer::transferredChanged,this,[=](quint64 vl){
 //                    qDebug() << Q_FUNC_INFO << vl << __LINE__;
 //                });
