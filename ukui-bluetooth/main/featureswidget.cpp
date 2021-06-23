@@ -663,6 +663,17 @@ void FeaturesWidget::Dbus_file_transfer(QStringList file_path)
         }
         else
         {
+
+            if (BluetoothFileTransferWidget::_SEND_FAILURE == transfer_widget->get_send_data_state()   ||
+                BluetoothFileTransferWidget::_SEND_COMPLETE == transfer_widget->get_send_data_state()  )
+            {
+                transfer_widget->close();
+                delete transfer_widget;
+                transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
+                connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
+                connect(transfer_widget,&BluetoothFileTransferWidget::close_the_pre_session,this,&FeaturesWidget::close_session);
+                transfer_widget->show();
+            }
 //            QMessageBox::warning(NULL, tr("bluetooth"), tr("A transfer is in progress..."),
 //                                     QMessageBox::Ok,QMessageBox::Ok);
         }
