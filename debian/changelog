@@ -1,3 +1,13 @@
+ukui-bluetooth (1.0.0-1kylin1k50) v101; urgency=medium
+
+  * Bug  :
+    -  bug#59301 传输成功小窗未关闭，无法进行再一次传输(dengtuo)
+    -  bug#63109 控制面板、托盘处蓝牙的状态与任务栏显示的状态不一致
+  * Task :
+  * Other: 
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 23 Jun 2021 09:44:36 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k49) v101; urgency=medium
   
   * Bug  :

@@ -93,6 +93,7 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
         if(m_manager->isBluetoothBlocked()){
             m_manager->setBluetoothBlocked(false);
         }
+        Turn_on_or_off_bluetooth(true);
     }
 
     if(File_save_path.isEmpty()){
@@ -653,7 +654,7 @@ void FeaturesWidget::Dbus_file_transfer(QStringList file_path)
     }
 
     qDebug() << "Select file:" << file_path;
-    selected_file = file_path.first().split(":").at(1);
+    selected_file = QUrl(file_path.first()).path();
     if(!selected_file.isNull()){
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
