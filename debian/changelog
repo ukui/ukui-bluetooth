@@ -1,3 +1,15 @@
+ukui-bluetooth (1.0.0-1kylin1k51) v101; urgency=medium
+
+  * Bug  :
+    - bug#63127 深色主题下，文件传输界面wps文件图标未反白
+    - bug#63068 发送的文件名称中存在空格时，在传输界面显示“%20”
+    - bug#62801 以蓝牙开启状态重启后，蓝牙为关闭状态，任务栏蓝牙图标为开启
+    - bug#59301 传输成功小窗未关闭，无法进行再一次传输(dengtuo)
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Thu, 24 Jun 2021 11:16:31 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k50) v101; urgency=medium
 
   * Bug  :
