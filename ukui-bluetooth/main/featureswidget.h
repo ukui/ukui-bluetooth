@@ -137,5 +137,6 @@ private:
     bool dev_connected_when_sleep = false;
     QString pair_device_file;
     int dev_callbak_flag = 0;
+    bool pair_flag = true;
 } ;
 #endif // FEATURESWIDGET_H

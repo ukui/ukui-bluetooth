@@ -578,7 +578,11 @@ void FeaturesWidget::NotifyOnOff()
         qDebug() << Q_FUNC_INFO << dev.data()->name();
         connect(dev.data(),&BluezQt::Device::pairedChanged,this,[=](bool value){
             qDebug() << Q_FUNC_INFO << "pairedChanged" << value;
-            if(value) {
+            if(value && pair_flag) {
+                pair_flag = false;
+                QTimer::singleShot(500,this,[=]{
+                    pair_flag = true;
+                });
                 QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
                 SendNotifyMessage(text);
             }
