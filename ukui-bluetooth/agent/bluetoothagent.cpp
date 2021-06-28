@@ -117,6 +117,8 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
 
     connect(pincodewidget,&PinCodeWidget::rejected,this,[=]{
         request.reject();
+        sleep(0);
+        emit agentRemoveDevice(device);
         return;
     });
 

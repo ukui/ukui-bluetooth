@@ -3,6 +3,7 @@
 
 #include "pin/pincodewidget.h"
 
+#include <unistd.h>
 #include <QObject>
 #include <KF5/BluezQt/bluezqt/agent.h>
 #include <KF5/BluezQt/bluezqt/adapter.h>
@@ -45,6 +46,7 @@ public:
 signals:
     void requestAccept();
     void requestReject();
+    void agentRemoveDevice(BluezQt::DevicePtr);
 private:
 
     BluezQt::DevicePtr m_device;

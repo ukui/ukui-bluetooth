@@ -100,6 +100,7 @@ public slots:
     void Monitor_sleep_Slot(bool);
     void adapterPoweredChanged(bool value);
     void adapterDeviceRemove(BluezQt::DevicePtr ptr);
+    void Remove_device_by_devicePtr(BluezQt::DevicePtr ptr);
 private:
     QSystemTrayIcon *bluetooth_tray_icon;
     QMenu *tray_Menu;
