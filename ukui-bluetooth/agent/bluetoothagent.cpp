@@ -101,12 +101,12 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
 void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QString &passkey, const BluezQt::Request<> &request)
 {
     qDebug() << Q_FUNC_INFO << device->name() << passkey;
-    m_device = device;
-    m_requestedPasskey = passkey;
 
     if(pincodewidget != nullptr){
         return;
     }
+    m_device = device;
+    m_requestedPasskey = passkey;
 
     pincodewidget = new PinCodeWidget(device->name(),passkey);
 
