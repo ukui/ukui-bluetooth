@@ -180,7 +180,7 @@ void BluetoothFileTransferWidget::Get_fie_type()
     if (str.split("/").at(0) == "image"){
         file_icon = QIcon(file_name);
         if (file_icon.isNull()) {
-            file_icon = QIcon::fromTheme("folder-documents-symbolic");
+            file_icon = QIcon::fromTheme("text");
         }
     }else if (str.split("/").at(0) == "video")
         file_icon = QIcon::fromTheme("video-x-generic-symbolic");
@@ -190,10 +190,10 @@ void BluetoothFileTransferWidget::Get_fie_type()
         if (QIcon::hasThemeIcon(str.split("/").join("-"))) {
             file_icon = QIcon::fromTheme(str.split("/").join("-"));
         } else {
-            file_icon = QIcon::fromTheme("folder-documents-symbolic");
+            file_icon = QIcon::fromTheme("text");
         }
     }else
-        file_icon = QIcon::fromTheme("folder-documents-symbolic");
+        file_icon = QIcon::fromTheme("text");
 }
 
 void BluetoothFileTransferWidget::Initialize_and_start_animation()

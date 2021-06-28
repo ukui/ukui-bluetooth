@@ -1,3 +1,13 @@
+ukui-bluetooth (1.0.0-1kylin1k52) v101; urgency=medium
+
+  * Bug  :
+    - bug#63015/bug#62800 已连接过的蓝牙鼠标，移除后再次连接时会弹出两个连接成功的通知
+    - bug#63851 深色主题下，文件传输界面文本.log、视频文件图标未反白 
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Mon, 28 Jun 2021 16:34:26 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k51) v101; urgency=medium
 
   * Bug  :
