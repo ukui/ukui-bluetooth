@@ -4,40 +4,40 @@
 <context>
     <name>BluetoothFileTransferWidget</name>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="28"/>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="53"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="29"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="54"/>
         <source>Bluetooth file transfer</source>
         <translation>蓝牙文件传输</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="72"/>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="201"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="73"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="202"/>
         <source>Transferring to &quot;</source>
         <translation>正在传输至 &quot;</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="127"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="128"/>
         <source>OK</source>
         <translation>确定</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="138"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="139"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="268"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="269"/>
         <source>Successfully transmitted!</source>
         <translation>文件传输成功！</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="271"/>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="297"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="272"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="303"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="294"/>
+        <location filename="../ukui-bluetooth/fileSend/bluetoothfiletransferwidget.cpp" line="300"/>
         <source>Transmission failed!</source>
         <translation>传输失败！</translation>
     </message>
@@ -60,7 +60,7 @@
 <context>
     <name>FeaturesWidget</name>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="136"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="142"/>
         <source>Bluetooth</source>
         <translation>蓝牙</translation>
     </message>
@@ -73,50 +73,65 @@
         <translation type="vanished">设备</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="226"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="272"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="899"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="236"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="282"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="991"/>
         <source>Disconnection</source>
         <translation>断开连接</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="235"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="282"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="245"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="292"/>
         <source>Power </source>
         <translation>电量 </translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="242"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="294"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="903"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="252"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="304"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="995"/>
         <source>Connect audio</source>
         <translation>连接音频</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="244"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="296"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="901"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="254"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="306"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="993"/>
         <source>Connection</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="224"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="246"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="298"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="907"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="799"/>
+        <source>bluetooth</source>
+        <translation>蓝牙</translation>
+    </message>
+    <message>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="799"/>
+        <source>Bluetooth Adapter Abnormal!!!</source>
+        <translation>蓝牙适配器异常！！！</translation>
+    </message>
+    <message>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="234"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="256"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="308"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="999"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="193"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="62"/>
+        <source>no bluetooth adapter!</source>
+        <translation>没有蓝牙适配器！</translation>
+    </message>
+    <message>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="201"/>
         <source>My Devices</source>
         <translation>我的设备</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="256"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="286"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="303"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="905"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="266"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="296"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="313"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="997"/>
         <source>Send files</source>
         <translation>发送文件</translation>
     </message>
@@ -125,8 +140,8 @@
         <translation type="vanished">没有已配对设备</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="323"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="897"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="335"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="989"/>
         <source>Bluetooth settings</source>
         <translation>蓝牙设置</translation>
     </message>
@@ -135,15 +150,15 @@
         <translation type="vanished">蓝牙设备“%1”断开连接成功</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="520"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="545"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="567"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="592"/>
         <source>Bluetooth device “%1” disconnected!</source>
         <translation>蓝牙设备“%1”失去连接！</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="516"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="532"/>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="541"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="563"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="579"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="588"/>
         <source>The connection with the Bluetooth device “%1” is successful!</source>
         <translation>与蓝牙设备“%1”连接成功！</translation>
     </message>
@@ -152,12 +167,12 @@
         <translation type="vanished">与蓝牙设备“%1”连接失败！</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="494"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="541"/>
         <source>ukui-bluetooth</source>
         <translation>蓝牙</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="497"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="544"/>
         <source>Bluetooth message</source>
         <translation>蓝牙消息</translation>
     </message>
@@ -210,12 +225,12 @@
         <translation type="vanished">&quot; 连接失败！</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="568"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="615"/>
         <source>Select the file to be sent</source>
         <translation>选择要发送的文件</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="568"/>
+        <location filename="../ukui-bluetooth/main/featureswidget.cpp" line="615"/>
         <source>All Files (*)</source>
         <translation>所有文件 (*)</translation>
     </message>
@@ -304,7 +319,7 @@
     </message>
     <message>
         <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="116"/>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="129"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="133"/>
         <source>Pair</source>
         <translation>配对</translation>
     </message>
@@ -314,7 +329,7 @@
         <translation>连接超时 ！！！</translation>
     </message>
     <message>
-        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="130"/>
+        <location filename="../ukui-bluetooth/pin/pincodewidget.cpp" line="134"/>
         <source>Failed to pair with %1 !!!</source>
         <translation>和 %1 配对失败 !!!</translation>
     </message>

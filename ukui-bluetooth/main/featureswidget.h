@@ -51,6 +51,7 @@
 #include <QDateTime>
 #include <QWidgetAction>
 #include <QDBusMessage>
+#include <QMessageBox>
 
 #define LIST_PATH "/etc/pairDevice.list"
 #define RFKILL_DEV "/dev/rfkill"

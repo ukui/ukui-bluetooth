@@ -59,6 +59,8 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
     if(m_manager->adapters().size() == 0){
         qDebug() << "no bluetooth adapter !!!";
+        QString text = QString(tr("no bluetooth adapter!"));
+        SendNotifyMessage(text);
         qDebug() << "Program exit !!!";
         exit_flag = true;
         return;
@@ -77,8 +79,9 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 //        m_adapter->setDiscoverable(true);
 //        m_adapter->setDiscoverableTimeout(0);
 //    }
-
+    bluetooth_tray_icon = new QSystemTrayIcon(this);
     adapterChangeFUN();
+
     cur_adapter_address = m_adapter->address();
 
     bluetoothAgent = new BluetoothAgent(this);
@@ -468,24 +471,54 @@ void FeaturesWidget::Connect_device_audio(QString address)
 
 void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
 {
-    BluezQt::PendingCall *call = device->connectToDevice();
-    qDebug() << Q_FUNC_INFO << device->adapter()->name();
-    device->setTrusted(true);
-    qDebug() << Q_FUNC_INFO << call->error();
-    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
-        if(q->error() == 0){
-            qDebug() << Q_FUNC_INFO;
-//            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
-//            SendNotifyMessage(text);
-            settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
+    if (!device->isPaired())
+    {
+        BluezQt::PendingCall *pair_call = device->pair();
+        connect(pair_call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *pair_q){
 
-            writeDeviceInfoToFile(device->address(),device->name(),device->type());
-        }else{
-            qDebug() << Q_FUNC_INFO << q->errorText();
-//            QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
-//            SendNotifyMessage(text);
-        }
-    });
+            if(pair_q->error() == 0)
+                qDebug() << Q_FUNC_INFO << "pair successful" << __LINE__;
+            else
+                qDebug() << Q_FUNC_INFO << "pair failure" << __LINE__;
+
+            device->setTrusted(true);
+
+            BluezQt::PendingCall *conn_call = device->connectToDevice();
+            connect(conn_call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *conn_q){
+                if(conn_q->error() == 0)
+                {
+                    qDebug() << Q_FUNC_INFO << "connect successful" << __LINE__;
+                    settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
+                    writeDeviceInfoToFile(device->address(),device->name(),device->type());
+                }
+                else
+                {
+                    qDebug() << Q_FUNC_INFO << "connect failure" << conn_q->errorText();
+                }
+            });
+        });
+    }
+    else
+    {
+        BluezQt::PendingCall *call = device->connectToDevice();
+        qDebug() << Q_FUNC_INFO << device->adapter()->name();
+        device->setTrusted(true);
+        qDebug() << Q_FUNC_INFO << call->error();
+        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+            if(q->error() == 0){
+                qDebug() << Q_FUNC_INFO;
+        //            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
+        //            SendNotifyMessage(text);
+                settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
+
+                writeDeviceInfoToFile(device->address(),device->name(),device->type());
+            }else{
+                qDebug() << Q_FUNC_INFO << q->errorText();
+        //            QString text = QString(tr("The connection with the Bluetooth device “%1” is failed!").arg(device->name()));
+        //            SendNotifyMessage(text);
+            }
+        });
+    }
 }
 
 void FeaturesWidget::Open_bluetooth_settings()
@@ -761,6 +794,10 @@ void FeaturesWidget::adapterChangeFUN()
 
     connect(m_manager,&BluezQt::Manager::adapterRemoved,this,[=](BluezQt::AdapterPtr adapter){
         qDebug() << Q_FUNC_INFO << adapter->address() << adapter->name() <<__LINE__;
+        if(adapter_list.size() == 1)
+        {
+            QMessageBox::warning(NULL,tr("bluetooth"),tr("Bluetooth Adapter Abnormal!!!"),QMessageBox::Yes,QMessageBox::Yes);
+        }
 
         adapter_list.removeAll(adapter->address());
         settings->set("adapter-address-list",QVariant::fromValue(adapter_list));
