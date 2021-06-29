@@ -83,6 +83,7 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
     bluetoothAgent = new BluetoothAgent(this);
     bluetoothObexAgent = new BluetoothObexAgent(this);
+    connect(bluetoothAgent, &BluetoothAgent::agentRemoveDevice, this, &FeaturesWidget::Remove_device_by_devicePtr);
     qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
     qDebug() << m_adapter->isPowered() << "===========" << m_manager->isBluetoothBlocked();
 
@@ -394,14 +395,7 @@ void FeaturesWidget::Disconnect_device_by_address(QString address)
 void FeaturesWidget::Remove_device_by_address(QString address)
 {
     BluezQt::DevicePtr device = m_adapter->deviceForAddress(address);
-    BluezQt::PendingCall *call = m_adapter->removeDevice(device);
-    connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
-        if(q->error() == 0){
-            removeDeviceInfoToFile(address);
-        }else{
-            qDebug() << Q_FUNC_INFO << "Device Remove failed!!!";
-        }
-    });
+    Remove_device_by_devicePtr(device);
 }
 
 void FeaturesWidget::Connect_device_by_address(QString address)
@@ -932,6 +926,18 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
             bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
         bluetooth_tray_icon->show();
     }
+}
+
+void FeaturesWidget::Remove_device_by_devicePtr(BluezQt::DevicePtr ptr)
+{
+    qDebug() << Q_FUNC_INFO;
+    BluezQt::PendingCall *call = m_adapter->removeDevice(ptr);
+    connect(call, &BluezQt::PendingCall::finished, this, [=](BluezQt::PendingCall *q) {
+        if (q->error() == 0)
+            removeDeviceInfoToFile(ptr.data()->address());
+        else
+            qDebug() << Q_FUNC_INFO << "Agent Device Remove Failed!!!";
+    });
 }
 
 void FeaturesWidget::adapterDeviceRemove(BluezQt::DevicePtr ptr)

@@ -70,6 +70,8 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
             if (Keypincodewidget)
                 Keypincodewidget->setHidden(true);
         }else{
+            sleep(0);
+            emit agentRemoveDevice(device);
             if(Keypincodewidget){}
 //                Keypincodewidget->close();
                 QTimer::singleShot(1000,this,[=]{
@@ -99,14 +101,12 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
 void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QString &passkey, const BluezQt::Request<> &request)
 {
     qDebug() << Q_FUNC_INFO << device->name() << passkey;
-    m_device = device;
-    m_requestedPasskey = passkey;
 
     if(pincodewidget != nullptr){
-        pincodewidget->close();
-        delete pincodewidget;
-        pincodewidget = nullptr;
+        return;
     }
+    m_device = device;
+    m_requestedPasskey = passkey;
 
     pincodewidget = new PinCodeWidget(device->name(),passkey);
 
@@ -117,6 +117,10 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
 
     connect(pincodewidget,&PinCodeWidget::rejected,this,[=]{
         request.reject();
+        if (device.data()->isPaired()) {
+            sleep(0);
+            emit agentRemoveDevice(device);
+        }
         return;
     });
 
@@ -130,6 +134,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
     });
     connect(pincodewidget, &PinCodeWidget::destroyed, this, [=] {
         pincodewidget = nullptr;
+        m_cancelCalled = false;
     });
 
     //保持在最前
@@ -160,9 +165,12 @@ void BluetoothAgent::authorizeService(BluezQt::DevicePtr device, const QString &
 void BluetoothAgent::cancel()
 {
     qDebug() << Q_FUNC_INFO;
-    m_cancelCalled = true;
-
-    pincodewidget->Connection_timed_out();
+    if (m_cancelCalled)
+        return;
+    if (pincodewidget != nullptr) {
+        m_cancelCalled = true;
+        pincodewidget->Connection_timed_out();
+    }
 }
 
 void BluetoothAgent::release()
