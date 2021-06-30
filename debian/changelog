@@ -1,3 +1,13 @@
+ukui-bluetooth (1.0.0-1kylin1k53) v101; urgency=medium
+
+  * Bug  :
+    - bug#63674 手机与系统蓝牙配对超时后，1分钟之后点击确认，ukui-bluetooth会出现段错误(lixiang)
+    - bug#63675 手机与系统蓝牙配对，点击取消配对后，手机的蓝牙未从配对列表移除(lixiang)
+  * Task :
+  * Other: 
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 30 Jun 2021 08:37:51 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k52) v101; urgency=medium
 
   * Bug  :
