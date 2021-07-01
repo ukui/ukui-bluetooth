@@ -70,6 +70,8 @@ private:
     // release
     bool m_releaseCalled;
 
+    bool m_hasClosePinCode;
+
     PinCodeWidget *pincodewidget = nullptr;
     PinCodeWidget *Keypincodewidget = nullptr;
 };

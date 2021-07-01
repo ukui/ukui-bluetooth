@@ -8,6 +8,7 @@ BluetoothAgent::BluetoothAgent(QObject *parent)
     , m_authorizationRequested(false)
     , m_cancelCalled(false)
     , m_releaseCalled(false)
+    , m_hasClosePinCode(false)
 {
     qDebug() << Q_FUNC_INFO;
     if(daemonIsNotRunning()){
@@ -109,6 +110,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
     m_requestedPasskey = passkey;
 
     pincodewidget = new PinCodeWidget(device->name(),passkey);
+    m_hasClosePinCode = true;
 
     connect(pincodewidget,&PinCodeWidget::accepted,this,[=]{
         request.accept();
@@ -127,8 +129,10 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
     connect(m_device.data(), &BluezQt::Device::pairedChanged, this, [=](bool st){
         if (st == false) {
             request.reject();
-            if (pincodewidget != nullptr)
+            if (pincodewidget != nullptr && m_hasClosePinCode != false) {
+                m_hasClosePinCode = false;
                 pincodewidget->close();
+            }
         }
         return;
     });
@@ -167,8 +171,9 @@ void BluetoothAgent::cancel()
     qDebug() << Q_FUNC_INFO;
     if (m_cancelCalled)
         return;
-    if (pincodewidget != nullptr) {
+    if (pincodewidget != nullptr && m_hasClosePinCode != false) {
         m_cancelCalled = true;
+        m_hasClosePinCode = false;
         pincodewidget->Connection_timed_out();
     }
 }
