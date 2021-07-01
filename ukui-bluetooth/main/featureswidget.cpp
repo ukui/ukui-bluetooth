@@ -90,15 +90,18 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
     qDebug() << m_adapter->isPowered() << "===========" << m_manager->isBluetoothBlocked();
 
-    if(settings->get("switch").toString() == "false"){
-        if (!m_manager->isBluetoothBlocked())
-            m_manager->setBluetoothBlocked(true);
-    }else{
-        if(m_manager->isBluetoothBlocked()){
-            m_manager->setBluetoothBlocked(false);
-        }
-        Turn_on_or_off_bluetooth(true);
-    }
+
+    Turn_on_or_off_bluetooth(settings->get("switch").toBool());
+//    if (value = settings->get("switch").toBool() )
+//    if(settings->get("switch").toString() == "false"){
+//        if (!m_manager->isBluetoothBlocked())
+//            m_manager->setBluetoothBlocked(true);
+//    }else{
+//        if(m_manager->isBluetoothBlocked()){
+//            m_manager->setBluetoothBlocked(false);
+//        }
+//        Turn_on_or_off_bluetooth(true);
+//    }
 
     if(File_save_path.isEmpty()){
         settings->set("file-save-path",QVariant::fromValue(QDir::homePath()));
