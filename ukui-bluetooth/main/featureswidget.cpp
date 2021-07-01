@@ -90,11 +90,9 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
     qDebug() << m_adapter->isPowered() << "===========" << m_manager->isBluetoothBlocked();
 
-    bool value;
-    if(value != settings->get("switch").toBool()){
-        Turn_on_or_off_bluetooth(value);
-    }
-    if (value = settings->get("switch").toBool() )
+
+    Turn_on_or_off_bluetooth(settings->get("switch").toBool());
+//    if (value = settings->get("switch").toBool() )
 //    if(settings->get("switch").toString() == "false"){
 //        if (!m_manager->isBluetoothBlocked())
 //            m_manager->setBluetoothBlocked(true);
