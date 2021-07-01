@@ -134,7 +134,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
             if (pincodewidget != nullptr && m_hasClosePinCode != false) {
                 m_hasClosePinCode = false;
                 pincodewidget->close();
-                emitRemoveSignal(BluezQt::DevicePtr device);
+                emitRemoveSignal(device);
             }
         }
         return;
