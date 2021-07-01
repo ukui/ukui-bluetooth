@@ -71,8 +71,6 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
             if (Keypincodewidget)
                 Keypincodewidget->setHidden(true);
         }else{
-            sleep(0);
-            emit agentRemoveDevice(device);
             if(Keypincodewidget){}
 //                Keypincodewidget->close();
                 QTimer::singleShot(1000,this,[=]{
@@ -120,7 +118,6 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
     connect(pincodewidget,&PinCodeWidget::rejected,this,[=]{
         request.reject();
         if (device.data()->isPaired()) {
-            sleep(0);
             emit agentRemoveDevice(device);
         }
         return;
