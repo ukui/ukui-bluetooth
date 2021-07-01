@@ -42,6 +42,7 @@ public:
     void cancel() override;
     void release() override;
     int daemonIsNotRunning();
+    void emitRemoveSignal(BluezQt::DevicePtr device);
 
 signals:
     void requestAccept();

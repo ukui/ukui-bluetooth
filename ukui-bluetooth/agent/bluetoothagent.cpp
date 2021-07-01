@@ -24,6 +24,13 @@ BluetoothAgent::BluetoothAgent(QObject *parent)
     }
 }
 
+void BluetoothAgent::emitRemoveSignal(BluezQt::DevicePtr device) {
+    if (device.data()->isPaired()) {
+        sleep(1);
+        emit agentRemoveDevice(device);
+    }
+}
+
 QDBusObjectPath BluetoothAgent::objectPath() const
 {
     return QDBusObjectPath(QStringLiteral("/BluetoothAgent"));
@@ -117,9 +124,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
 
     connect(pincodewidget,&PinCodeWidget::rejected,this,[=]{
         request.reject();
-        if (device.data()->isPaired()) {
-            emit agentRemoveDevice(device);
-        }
+        emitRemoveSignal(BluezQt::DevicePtr device);
         return;
     });
 
@@ -129,6 +134,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
             if (pincodewidget != nullptr && m_hasClosePinCode != false) {
                 m_hasClosePinCode = false;
                 pincodewidget->close();
+                emitRemoveSignal(BluezQt::DevicePtr device);
             }
         }
         return;
@@ -172,6 +178,7 @@ void BluetoothAgent::cancel()
         m_cancelCalled = true;
         m_hasClosePinCode = false;
         pincodewidget->Connection_timed_out();
+        emitRemoveSignal(m_device);
     }
 }
 
