@@ -1,4 +1,4 @@
-ukui-bluetooth (1.0.0-1kylin1k54) v101; urgency=medium
+ukui-bluetooth (1.0.0-1kylin1k55) v101; urgency=medium
 
   * Bug  :
     - bug#55777 发送文件-选择文件窗口，窗口右边没有显示插入系统的U盘
@@ -6,7 +6,19 @@ ukui-bluetooth (1.0.0-1kylin1k54) v101; urgency=medium
   * Task :
   * Other:
 
- -- guang tang <tangguang@kylinos.cn>  Fri, 02 Jul 2021 19:38:45 +0800
+ -- guang tang <tangguang@kylinos.cn>  Fri, 02 Jul 2021 20:22:56 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k54) v101; urgency=medium
+
+  * Bug  :
+  * Task :
+  * Other:
+    - 0630未通关bug的修改
+    - bug#63674 手机与系统蓝牙配对超时后，1分钟之后点击确认，ukui-bluetooth会出现段错误(Li Xiang)
+    - bug#63675 手机与系统蓝牙配对，点击取消配对后，手机的蓝牙未从配对列表移除(Li Xiang)
+    - bug#63708 【蓝牙】使用rfkill重启软连接之后，重启系统蓝牙核心转储(Deng Tuo)
+
+ -- 李享 <lixiang1@kylinos.cn>  Thu, 01 Jul 2021 21:10:34 +0800
 
 ukui-bluetooth (1.0.0-1kylin1k53) v101; urgency=medium
 
