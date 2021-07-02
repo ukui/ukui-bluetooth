@@ -66,22 +66,10 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
     PIN_label->setGeometry(151,166,160,40);
 
     accept_btn = new QPushButton(tr("Accept"),this);
-//    accept_btn->setStyleSheet("QPushButton{\
-//                              background: #E7E7E7;\
-//                              border-radius: 6px;\
-//                              border: 0px solid #979797;}\
-//                              QPushButton:hover{background:rgba(67,127,240,1);\
-//                              border-radius:6px;color:white;border: 0px solid #979797;}");
     accept_btn->setGeometry(160,255,120,36);
     connect(accept_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_accept_btn);
 
     refuse_btn = new QPushButton(tr("Refush"),this);
-//    refuse_btn->setStyleSheet("QPushButton{\
-//                              background: #E7E7E7;\
-//                              border-radius: 6px;\
-//                              border: 0px solid #979797;}\
-//                              QPushButton:hover{background:rgba(67,127,240,1);\
-//                              border-radius:6px;color:white;border: 0px solid #979797;}");
     refuse_btn->setGeometry(290,255,120,36);
     connect(refuse_btn,&QPushButton::clicked,this,&PinCodeWidget::onClick_refuse_btn);
 
@@ -114,7 +102,7 @@ void PinCodeWidget::Connection_timed_out()
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setWindowTitle(tr("Pair"));
-    msgBox.setText(tr("Connection timed out !!!"));
+    msgBox.setText(tr("Connection error !!!"));
     int ret = msgBox.exec();
     if(ret){
         if (show_flag)

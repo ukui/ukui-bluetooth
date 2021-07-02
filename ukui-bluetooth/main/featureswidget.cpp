@@ -615,12 +615,59 @@ void FeaturesWidget::Send_files_by_address(QString address)
         });
     }
 
-    qDebug() << Q_FUNC_INFO << address;
-    QTextCodec* codec =QTextCodec::codecForName("utf8");
-    QTextCodec::setCodecForLocale(codec);
-    selected_file = QFileDialog::getOpenFileName(0,
-        tr("Select the file to be sent"), getenv("HOME"), tr("All Files (*)"));
-    qDebug() << "Select file:" << selected_file;
+    QFileDialog fd;
+
+    QList<QUrl> list = fd.sidebarUrls();
+    int sidebarNum = 8;//最大添加U盘数，可以自己定义
+    QString home = QDir::homePath().section("/", -1, -1);
+    QString mnt = "/media/" + home + "/";
+    QDir mntDir(mnt);
+    mntDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+    QFileInfoList filist = mntDir.entryInfoList();
+    QList<QUrl> mntUrlList;
+    for (int i = 0; i < sidebarNum && i < filist.size(); ++i) {
+        QFileInfo fi = filist.at(i);
+        //华为990、9a0需要屏蔽最小系统挂载的目录
+        if (fi.fileName() == "2691-6AB8")
+             continue;
+        mntUrlList << QUrl("file://" + fi.filePath());
+    }
+
+    QFileSystemWatcher fsw(&fd);
+    fsw.addPath("/media/" + home + "/");
+    connect(&fsw, &QFileSystemWatcher::directoryChanged, &fd,
+    [=, &sidebarNum, &mntUrlList, &list, &fd](const QString path) {
+        QDir wmntDir(path);
+        wmntDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+        QFileInfoList wfilist = wmntDir.entryInfoList();
+        mntUrlList.clear();
+        for (int i = 0; i < sidebarNum && i < wfilist.size(); ++i) {
+                       QFileInfo fi = wfilist.at(i);
+                 //华为990、9a0需要屏蔽最小系统挂载的目录
+                  if (fi.fileName() == "2691-6AB8")
+                       continue;
+                 mntUrlList << QUrl("file://" + fi.filePath());
+             }
+             fd.setSidebarUrls(list + mntUrlList);
+             fd.update();
+        });
+
+        connect(&fd, &QFileDialog::finished, &fd, [=, &list, &fd]() {
+            fd.setSidebarUrls(list);
+        });
+
+    //自己QFileDialog的用法，这里只是列子
+    fd.setNameFilter(QLatin1String("All Files (*)"));
+
+    fd.setDirectory(QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).at(0));
+
+    //这行要添加，设置左侧导航
+    fd.setSidebarUrls(list + mntUrlList);
+    if (fd.exec() == QDialog::Accepted) {
+        qDebug()<<fd.selectedFiles()<<fd.filter()<<fd.selectedNameFilter() << fd.selectedUrls();
+        selected_file = fd.selectedUrls().first().path();
+    }
+
     if(!selected_file.isNull()){
 
         if (BluetoothFileTransferWidget::isShow == false) {

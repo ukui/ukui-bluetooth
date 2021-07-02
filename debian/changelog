@@ -1,3 +1,13 @@
+ukui-bluetooth (1.0.0-1kylin1k54) v101; urgency=medium
+
+  * Bug  :
+    - bug#55777 发送文件-选择文件窗口，窗口右边没有显示插入系统的U盘
+    - bug#61036 电脑开启蓝牙，使用手机连接此蓝牙，弹出pin码后，手机端点击取消，电脑端提示“连接超时”
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Fri, 02 Jul 2021 19:38:45 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k53) v101; urgency=medium
 
   * Bug  :

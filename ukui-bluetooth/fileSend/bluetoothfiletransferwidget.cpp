@@ -183,7 +183,7 @@ void BluetoothFileTransferWidget::Get_fie_type()
             file_icon = QIcon::fromTheme("text");
         }
     }else if (str.split("/").at(0) == "video")
-        file_icon = QIcon::fromTheme("video-x-generic-symbolic");
+        file_icon = QIcon::fromTheme("video-x-generic");
     else if (str.split("/").at(0) == "audio" ||
              str.split("/").at(0) == "application" ||
              str.split("/").at(0) == "text"){
