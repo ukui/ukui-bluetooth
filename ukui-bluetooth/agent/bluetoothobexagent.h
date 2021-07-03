@@ -36,6 +36,9 @@ public:
     void release ();
 
     int daemonIsNotRunning();
+    void receiveDisConnectSignal(QString address);
+
+
 };
 
 #endif // BLUETOOTHOBEXAGENT_H
