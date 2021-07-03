@@ -29,6 +29,9 @@ void BluetoothObexAgent::authorizePush(BluezQt::ObexTransferPtr transfer, BluezQ
             connect(transfer.data(),&BluezQt::ObexTransfer::statusChanged,receiving_widget,&FileReceivingPopupWidget::file_transfer_completed);
             connect(receiving_widget,&FileReceivingPopupWidget::cancel,this,[=]{
                 transfer->cancel();
+                qDebug() << Q_FUNC_INFO << "cancel" <<  __LINE__;
+                receiveDisConnectSignal(session->destination());
+
             });
         });
 
@@ -65,4 +68,15 @@ int BluetoothObexAgent::daemonIsNotRunning()
 
     QDBusReply<QString> reply = conn.interface()->call("GetNameOwner", "org.bluez.obex.Agent1");
     return reply.value() == "";
+}
+
+void BluetoothObexAgent::receiveDisConnectSignal(QString address)
+{
+    qDebug() << Q_FUNC_INFO << address << __LINE__;
+
+    QDBusMessage m = QDBusMessage::createMethodCall("org.ukui.bluetooth","/org/ukui/bluetooth","org.ukui.bluetooth","disConnectToDevice");
+    m << address;
+    qDebug() << Q_FUNC_INFO << m.arguments().at(0).value<QString>() <<__LINE__;
+    // 发送Message
+    QDBusMessage response = QDBusConnection::sessionBus().call(m);
 }
