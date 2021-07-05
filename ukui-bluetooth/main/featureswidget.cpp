@@ -362,7 +362,7 @@ void FeaturesWidget::Pair_device_by_address(QString address)
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
             qDebug() << Q_FUNC_INFO << __LINE__ <<q->error() << q->errorText();
             if(q->error() == 0){
-                emit device.data()->pairedChanged(true);
+                //emit device.data()->pairedChanged(true);
                 if(device->type()==BluezQt::Device::Headset || device->type()==BluezQt::Device::Headphones || device->type()==BluezQt::Device::AudioVideo){
                     Connect_device_audio(address);
                 }else{
@@ -496,7 +496,7 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
                 }
                 else
                 {
-                    qDebug() << Q_FUNC_INFO << "connect failure" << conn_q->errorText();
+                    qDebug() << Q_FUNC_INFO << "connect failure" << conn_q->errorText() << __LINE__;
                 }
             });
         });
@@ -506,10 +506,10 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
         BluezQt::PendingCall *call = device->connectToDevice();
         qDebug() << Q_FUNC_INFO << device->adapter()->name();
         device->setTrusted(true);
-        qDebug() << Q_FUNC_INFO << call->error();
+        qDebug() << Q_FUNC_INFO << call->error() << __LINE__;
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
             if(q->error() == 0){
-                qDebug() << Q_FUNC_INFO;
+                qDebug() << Q_FUNC_INFO << __LINE__;
         //            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
         //            SendNotifyMessage(text);
                 settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
@@ -878,8 +878,21 @@ void FeaturesWidget::adapterChangeFUN()
         qDebug() << Q_FUNC_INFO << adapter->address() << adapter->name() <<__LINE__;
         adapter_list.append(adapter->address());
         if(adapter_list.size() != 0){
-            if(!bluetooth_tray_icon->isVisible()){
+            if(!bluetooth_tray_icon->isVisible())
+            {
                 bluetooth_tray_icon->setVisible(true);
+                if(settings->get("switch").toString() == "false")
+                {
+                    if(QIcon::hasThemeIcon("bluetooth-error"))
+                        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
+                    else
+                        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+                }
+                else
+                {
+                    bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+                }
+
             }
         }
         settings->set("adapter-address-list",QVariant::fromValue(adapter_list));
