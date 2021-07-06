@@ -18,7 +18,7 @@ BluetoothObexAgent::BluetoothObexAgent(QObject *parent):ObexAgent(parent)
 void BluetoothObexAgent::authorizePush(BluezQt::ObexTransferPtr transfer, BluezQt::ObexSessionPtr session, const BluezQt::Request<QString> &request)
 {
 //    qDebug() << Q_FUNC_INFO << transfer->status() << transfer->fileName() << transfer->name() <<transfer->objectPath().path() << transfer->transferred();
-    if(transfer->status() == BluezQt::ObexTransfer::Queued || transfer->status() == BluezQt::ObexTransfer::Complete){
+    if(transfer->status() == BluezQt::ObexTransfer::Queued ){//|| transfer->status() == BluezQt::ObexTransfer::Complete
         FileReceivingPopupWidget *receiving_widget = new FileReceivingPopupWidget(session->destination(),transfer->name(),session->source());
         qDebug() << Q_FUNC_INFO << __LINE__;
 
