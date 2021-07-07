@@ -41,7 +41,7 @@ PinCodeWidget::PinCodeWidget(QString name, QString pin, bool flag)
         tip_text = tr("Please make sure the number displayed on \"")+dev_name+tr("\" matches the number below. Please do not enter this code on any other accessories.");
     else
         tip_text = QString(tr("Please enter the following PIN code on the bluetooth device %1 and press enter to pair !")).arg(dev_name);
-    QLabel *top_label = new QLabel(top_text,this);
+    top_label = new QLabel(top_text,this);
     top_label->setStyleSheet("QLabel{\
                              font-size: 18px;\
                              font-family: PingFangSC-Medium, PingFang SC;\
@@ -136,6 +136,14 @@ void PinCodeWidget::updateUIInfo(const QString &name, const QString &pin)
     PINCode = pin;
     PIN_label->setText(pin);
     PIN_label->update();
+
+    QString tip_text;
+    if(show_flag)
+        tip_text = tr("Please make sure the number displayed on \"")+name+tr("\" matches the number below. Please do not enter this code on any other accessories.");
+    else
+        tip_text = QString(tr("Please enter the following PIN code on the bluetooth device %1 and press enter to pair !")).arg(name);
+    tip_label->setText(tip_text);
+    tip_label->update();
 
     if (!this->isActiveWindow())
         this->setHidden(false);

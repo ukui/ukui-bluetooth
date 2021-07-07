@@ -1,3 +1,14 @@
+ukui-bluetooth (1.0.0-1kylin1k56) v101; urgency=medium
+
+  * Bug  :
+    - bug#63109 控制面板、托盘处蓝牙的状态与任务栏显示的状态不一致
+  * Task :
+  * Other:
+    - 解决重启蓝牙服务后连接设备不弹框问题
+    - 解决重启蓝牙服务后agent断开问题
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 07 Jul 2021 11:22:52 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k55) v101; urgency=medium
 
   * Bug  :

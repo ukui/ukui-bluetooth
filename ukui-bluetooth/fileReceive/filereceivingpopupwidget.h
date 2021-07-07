@@ -58,29 +58,26 @@ signals:
     void rejected();
     void accepted();
 private:
-    QGSettings *StyleSettings;
+    QGSettings   *StyleSettings = nullptr;
+    QGSettings   *settings      = nullptr;
 
-    QRect desktop;
+    QPushButton  *close_btn     = nullptr;
+    QPushButton  *cancel_btn    = nullptr;
+    QPushButton  *accept_btn    = nullptr;
+    QPushButton  *view_btn      = nullptr;
 
+    QLabel       *icon_label    = nullptr;
+    QLabel       *file_source   = nullptr;
+    QLabel       *file_name     = nullptr;
+    QLabel       *file_icon     = nullptr;
+    QProgressBar *transfer_progress = nullptr;
+
+    QRect   desktop;
     QString target_address;
     QString target_name;
     QString target_source;
     QString root_address;
-
-    QGSettings *settings;
     QString file_path;
-
-    QPushButton *close_btn;
-    QPushButton *cancel_btn;
-    QPushButton *accept_btn;
-    QPushButton *view_btn;
-
-    QLabel *icon_label;
-    QLabel *file_source;
-    QLabel *file_name;
-    QLabel *file_icon;
-
-    QProgressBar *transfer_progress;
 };
 
 #endif // FILERECEIVINGPOPUPWIDGET_H

@@ -80,39 +80,30 @@ public slots:
     void set_m_progressbar_value(quint64);
     void GSettingsChanges(const QString &key);
 private:
-    QGSettings *GSettings;
+    QGSettings *GSettings     = nullptr;
+    QVBoxLayout *main_layout  = nullptr;
+    QLabel      *tip_text     = nullptr;
+    QLabel      *title_icon   = nullptr;
+    QLabel      *title_text   = nullptr;
+    QFrame      *target_frame = nullptr;
+    QLabel      *target_icon  = nullptr;
+    QLabel      *target_name  = nullptr;
+    QLabel      *target_size  = nullptr ;
 
-    QVBoxLayout *main_layout = nullptr;
+    QLabel                  *tranfer_status_icon  = nullptr;
+    QLabel                  *tranfer_status_text  = nullptr;
+    DeviceSeleterWidget     *dev_widget           = nullptr;
+    QParallelAnimationGroup *main_animation_group = nullptr;
+    QProgressBar            *m_progressbar        = nullptr;
+    QPushButton             *close_btn            = nullptr;
+    QPushButton             *cancel_btn           = nullptr;
+    QPushButton             *ok_btn               = nullptr;
 
-    QLabel *tip_text;
-
-    QLabel *title_icon;
-    QLabel *title_text;
-
-    QFrame *target_frame;
-    QLabel *target_icon;
-    QLabel *target_name;
-    QLabel *target_size;
-
-    QLabel *tranfer_status_icon;
-    QLabel *tranfer_status_text;
-
-    QIcon file_icon;
-
-    int active_flag = 2;
-
-    DeviceSeleterWidget *dev_widget;
-    QParallelAnimationGroup *main_animation_group;
-    QProgressBar *m_progressbar;
-
-    QPushButton *close_btn;
-    QPushButton *cancel_btn;
-    QPushButton *ok_btn;
-
+    QIcon   file_icon;
+    int     active_flag = 2;
     QString file_name;
     QString file_size;
     QString dev_name;
-
     SEND_DATA_STATE send_state = _SEND_NONE;
 
 };

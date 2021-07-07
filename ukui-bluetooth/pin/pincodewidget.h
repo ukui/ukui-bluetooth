@@ -36,10 +36,11 @@ signals:
     void accepted();
     void rejected();
 private:
-    QGSettings *settings     = nullptr;
+    QGSettings  *settings    = nullptr;
 
-    QLabel *PIN_label        = nullptr;
-    QLabel *tip_label        = nullptr;
+    QLabel      *PIN_label   = nullptr;
+    QLabel      *tip_label   = nullptr;
+    QLabel      *top_label   = nullptr;
 
     QVBoxLayout *main_layout = nullptr;
 
@@ -49,7 +50,7 @@ private:
 
     QString dev_name;
     QString PINCode;
-    bool show_flag;
+    bool    show_flag;
 };
 
 #endif // PINCODEWIDGET_H

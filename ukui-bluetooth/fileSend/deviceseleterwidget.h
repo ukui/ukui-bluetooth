@@ -41,21 +41,20 @@ private slots:
     void itemToolbuttonClicked();
     void GSettingsChanges(const QString &key);
 private:
-    QGSettings *GSettings;
-    QGSettings *settings;
+    QGSettings *GSettings = nullptr;
+    QGSettings *settings  = nullptr;
 private:
-    BluezQt::Manager *m_manager;
+    BluezQt::Manager *m_manager = nullptr;
     QString select_dev;
     QString select_name = "";
+    bool    flag = false;
 
     QList<QToolButton*> toolbutton_list;
-    QToolButton *btn = nullptr;
-    bool flag = false;
-
-    QLabel *Tiptop;
-    QScrollArea *m_scroll;
-    QWidget *dev_widget;
-    QVBoxLayout *device_list_layout;
+    QToolButton *btn                = nullptr;
+    QLabel      *Tiptop             = nullptr;
+    QScrollArea *m_scroll           = nullptr;
+    QWidget     *dev_widget         = nullptr;
+    QVBoxLayout *device_list_layout = nullptr;
 };
 
 #endif // DEVICESELETERWIDGET_H

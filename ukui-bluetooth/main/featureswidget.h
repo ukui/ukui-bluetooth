@@ -67,6 +67,9 @@ public:
     FeaturesWidget(QWidget *parent = nullptr);
     ~FeaturesWidget();
     void InitTrayMenu();
+    void InitAgentAndDbus();
+    void M_registerAgent();
+
     void Pair_device_by_address(QString);
     void Disconnect_device_by_address(QString);
     void Remove_device_by_address(QString);
@@ -103,40 +106,39 @@ public slots:
     void adapterDeviceRemove(BluezQt::DevicePtr ptr);
     void Remove_device_by_devicePtr(BluezQt::DevicePtr ptr);
 private:
-    QSystemTrayIcon *bluetooth_tray_icon;
-    QMenu *tray_Menu;
-
-    SwitchAction *m_action = nullptr;
-
-    QGSettings *settings;
+    QSystemTrayIcon *bluetooth_tray_icon = nullptr;
+    QMenu           *tray_Menu           = nullptr;
+    SwitchAction    *m_action            = nullptr;
+    QGSettings      *settings            = nullptr;
 
     QStringList paired_device_address;
     QStringList paired_device;
-    QString finally_connect_the_device;
-    QString Default_Adapter;
-    QString File_save_path;
-    QString cur_adapter_address;
+    QString     finally_connect_the_device;
+    QString     Default_Adapter;
+    QString     File_save_path;
+    QString     cur_adapter_address;
     QStringList adapter_list;
-    QString selected_file;
-    quint64 transfer_file_size = 0;
-    bool flag = true;
+    QString     selected_file;
+    quint64     transfer_file_size = 0;
+    bool        flag               = true;
 
-    BluetoothDbus *session_dbus;
-    BluetoothFileTransferWidget *transfer_widget;
+    BluetoothDbus               *session_dbus       = nullptr;
+    BluetoothFileTransferWidget *transfer_widget    = nullptr;
 
-    BluezQt::Manager *m_manager = nullptr;
-    BluezQt::Adapter *m_adapter = nullptr;
-    BluezQt::ObexManager *obex_manager = nullptr;
-    BluetoothAgent *bluetoothAgent = nullptr;
-    BluetoothObexAgent *bluetoothObexAgent = nullptr;
-    BluezQt::ObexObjectPush *opp = nullptr;
-    BluezQt::ObexTransferPtr filePtr = nullptr;
+    BluezQt::Manager            *m_manager          = nullptr;
+    BluezQt::Adapter            *m_adapter          = nullptr;
+    BluezQt::ObexManager        *obex_manager       = nullptr;
+    BluetoothAgent              *bluetoothAgent     = nullptr;
+    BluetoothObexAgent          *bluetoothObexAgent = nullptr;
+    BluezQt::ObexObjectPush     *opp                = nullptr;
+    BluezQt::ObexTransferPtr    filePtr             = nullptr;
+
     QDBusObjectPath pre_session;
-    bool dev_remove_flag = false;
-    bool sleep_flag = false;
-    bool dev_connected_when_sleep = false;
-    QString pair_device_file;
-    int dev_callbak_flag = 0;
-    bool pair_flag = true;
+    bool            dev_remove_flag = false;
+    bool            sleep_flag      = false;
+    bool            dev_connected_when_sleep = false;
+    QString         pair_device_file;
+    int             dev_callbak_flag = 0;
+    bool            pair_flag = true;
 } ;
 #endif // FEATURESWIDGET_H
