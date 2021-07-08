@@ -664,6 +664,7 @@ void FeaturesWidget::Send_files_by_address(QString address)
             if (BluetoothFileTransferWidget::_SEND_FAILURE == transfer_widget->get_send_data_state()   ||
                 BluetoothFileTransferWidget::_SEND_COMPLETE == transfer_widget->get_send_data_state()  )
             {
+                emit transfer_widget->close_the_pre_session();
                 transfer_widget->close();
                 delete transfer_widget;
                 transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
@@ -730,6 +731,7 @@ void FeaturesWidget::Dbus_file_transfer(QStringList file_path)
             if (BluetoothFileTransferWidget::_SEND_FAILURE == transfer_widget->get_send_data_state()   ||
                 BluetoothFileTransferWidget::_SEND_COMPLETE == transfer_widget->get_send_data_state()  )
             {
+                emit transfer_widget->close_the_pre_session();
                 transfer_widget->close();
                 delete transfer_widget;
                 transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
