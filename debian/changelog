@@ -1,3 +1,12 @@
+ukui-bluetooth (1.0.0-1kylin1k60) v101; urgency=medium
+
+  * Bug  :
+     - 解决程序在重启蓝牙服务时崩溃问题
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Thu, 08 Jul 2021 20:23:08 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k59) v101; urgency=medium
 
   * Bug  :

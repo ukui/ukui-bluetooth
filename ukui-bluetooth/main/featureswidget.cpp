@@ -899,8 +899,10 @@ void FeaturesWidget::adapterChangeFUN()
 
     connect(m_manager,&BluezQt::Manager::operationalChanged,this,[=](bool status){
         qDebug() <<  Q_FUNC_INFO << status;
-        NotifyOnOff();
-        M_registerAgent();
+        if (status) {
+            NotifyOnOff();
+            M_registerAgent();
+        }
     });
 }
 // ===========================================END========================================================
