@@ -1,7 +1,42 @@
+ukui-bluetooth (1.0.0-1kylin1k59) v101; urgency=medium
+
+  * Bug  :
+    - bug#65530/65567 蓝牙配对成功后，通知中弹出两条同样的信息
+    - bug#65558 蓝牙传输文件不弹文件接收窗口
+    - bug#65770/65763 蓝牙传输文件后不关闭蓝牙文件传输成功的界面；直接再次通过蓝牙传输文件失败
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Thu, 08 Jul 2021 16:15:15 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k58) v101; urgency=medium
+
+  * Bug  :
+    - bug#63109 控制面板、托盘处蓝牙的状态与任务栏显示的状态不一致
+  * Task :
+  * Other:
+    - 解决重启蓝牙服务后连接设备不弹框问题
+    - 解决重启蓝牙服务后agent断开问题
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 07 Jul 2021 15:05:26 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k57) v101; urgency=medium
+
+  * Bug  :
+  * Task :
+  * Other:
+    - Rebuild
+
+ -- guang tang <tangguang@kylinos.cn>  Wed, 07 Jul 2021 11:22:52 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k56) v101; urgency=medium
 
   * Bug  :
     - bug#63109 控制面板、托盘处蓝牙的状态与任务栏显示的状态不一致
+    - bug#62739 【cpm】【L1】9：01：40左右蓝牙传输文件不弹文件接收窗口
+    - bug#65064 蓝牙配对成功后，通知中弹出两条同样的信息
+    - bug#64471 蓝牙设备连接成功后出现两条连接成功消息
+    - bug#62724 蓝牙文件接收过程中取消，多次弹出确认窗口
   * Task :
   * Other:
     - 解决重启蓝牙服务后连接设备不弹框问题
