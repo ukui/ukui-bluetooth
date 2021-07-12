@@ -234,7 +234,11 @@ void FeaturesWidget::InitTrayMenu()
 
                 send->setText(tr("Send files"));
                 if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
-                    device_menu->addAction(send);
+                {
+                    if (qgetenv("DESKTOP_SESSION") == "ukui")
+                        device_menu->addAction(send);
+
+                }
 
                 qDebug() << Q_FUNC_INFO << device_menu->size();
                 disconnect(device_list.at(i).data(), &BluezQt::Device::connectedChanged, device_action, nullptr);
@@ -264,7 +268,11 @@ void FeaturesWidget::InitTrayMenu()
 
                         send->setText(tr("Send files"));
                         if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
-                            device_menu->addAction(send);
+                        {
+                            if (qgetenv("DESKTOP_SESSION") == "ukui")
+                                device_menu->addAction(send);
+
+                        }
                     }
                     else {
                         device_action->setChecked(false);
@@ -281,7 +289,11 @@ void FeaturesWidget::InitTrayMenu()
 
                         send->setText(tr("Send files"));
                         if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
-                            device_menu->addAction(send);
+                        {
+                            if (qgetenv("DESKTOP_SESSION") == "ukui")
+                                device_menu->addAction(send);
+
+                        }
 
                         if (device_list.at(i)->type() == BluezQt::Device::Mouse || device_list.at(i)->type() == BluezQt::Device::Keyboard){
                             device_menu->removeAction(status);
