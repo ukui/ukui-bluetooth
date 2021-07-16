@@ -244,6 +244,8 @@ void FileReceivingPopupWidget::file_transfer_completed(BluezQt::ObexTransfer::St
         }
 
     }else if(status == BluezQt::ObexTransfer::Error){
+        accept_btn->setVisible(false);
+
         close_btn->disconnect();
         close_btn->connect(close_btn,&QPushButton::clicked,this,[=]{
             this->close();

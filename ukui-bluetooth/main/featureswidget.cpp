@@ -977,6 +977,8 @@ QStringList FeaturesWidget::getDeviceConnectTimeList()
 
 void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
 {
+    qDebug () << __FUNCTION__ << "app is sleep: " << sleep << __LINE__;
+
     if(!sleep){
         qDebug() << "System wakes up from sleep !!!" << dev_remove_flag;
         sleep_flag = false;
@@ -1003,15 +1005,21 @@ void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
             }else{
 
             }
-            connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
-            dev_callbak_flag = 0;
-            Connect_the_last_connected_device();
+
+            if (m_manager->adapters().size())
+            {
+                connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
+                dev_callbak_flag = 0;
+                Connect_the_last_connected_device();
+            }
         });
 
     }else{
         sleep_flag = true;
         qDebug() << "System goes to sleep !!!" << dev_remove_flag;
     }
+    qDebug() << Q_FUNC_INFO << "end";
+
 }
 
 void FeaturesWidget::adapterPoweredChanged(bool value)
@@ -1030,6 +1038,7 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
             bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
         bluetooth_tray_icon->show();
     }
+    qDebug() << Q_FUNC_INFO << "end";
 }
 
 void FeaturesWidget::Remove_device_by_devicePtr(BluezQt::DevicePtr ptr)
@@ -1042,12 +1051,14 @@ void FeaturesWidget::Remove_device_by_devicePtr(BluezQt::DevicePtr ptr)
         else
             qDebug() << Q_FUNC_INFO << "Agent Device Remove Failed!!!";
     });
+    qDebug() << Q_FUNC_INFO << "end";
 }
 
 void FeaturesWidget::adapterDeviceRemove(BluezQt::DevicePtr ptr)
 {
     qDebug() << Q_FUNC_INFO << ptr.data()->address() << ptr.data()->name();
     removeDeviceInfoToFile(ptr.data()->address());
+    qDebug() << Q_FUNC_INFO << "end";
 }
 
 void FeaturesWidget::TraySignalProcessing(QAction *action)
