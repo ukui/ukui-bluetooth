@@ -284,6 +284,7 @@ void BluetoothFileTransferWidget::get_transfer_status(QString status)
 
 void BluetoothFileTransferWidget::tranfer_error()
 {
+    Initialize_and_start_animation();
     if(main_animation_group->state() == QAbstractAnimation::Running){
         connect(main_animation_group,&QParallelAnimationGroup::finished,this,[=]{
             tip_text->setVisible(false);
