@@ -19,7 +19,7 @@ void BluetoothObexAgent::authorizePush(BluezQt::ObexTransferPtr transfer, BluezQ
 {
 //    qDebug() << Q_FUNC_INFO << transfer->status() << transfer->fileName() << transfer->name() <<transfer->objectPath().path() << transfer->transferred();
     if(transfer->status() == BluezQt::ObexTransfer::Queued ){//|| transfer->status() == BluezQt::ObexTransfer::Complete
-        FileReceivingPopupWidget *receiving_widget = new FileReceivingPopupWidget(session->destination(),transfer->name(),session->source());
+        receiving_widget = new FileReceivingPopupWidget(session->destination(),transfer->name(),session->source());
         qDebug() << Q_FUNC_INFO << __LINE__;
 
         connect(receiving_widget,&FileReceivingPopupWidget::accepted,this,[=]{
@@ -53,6 +53,13 @@ QDBusObjectPath BluetoothObexAgent::objectPath() const
 void BluetoothObexAgent::cancel()
 {
     qDebug() << Q_FUNC_INFO;
+    if (nullptr == receiving_widget)
+    {
+        qDebug() << Q_FUNC_INFO << "receiving_widget is null" ;
+        return ;
+    }
+
+    receiving_widget->file_transfer_completed(BluezQt::ObexTransfer::Error);
 }
 
 void BluetoothObexAgent::release()

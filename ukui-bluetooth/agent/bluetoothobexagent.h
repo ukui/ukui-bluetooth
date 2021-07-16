@@ -38,6 +38,8 @@ public:
     int daemonIsNotRunning();
     void receiveDisConnectSignal(QString address);
 
+private:
+    FileReceivingPopupWidget *receiving_widget ;
 
 };
 
