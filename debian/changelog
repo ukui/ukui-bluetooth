@@ -1,3 +1,23 @@
+ukui-bluetooth (1.0.0-1kylin1k62) v101; urgency=medium
+
+  * Bug  :
+    - bug#66593 手机向笔记本发送文件中途断开连接，无接收文件失败等提示信息且一直处于接收文件状态中
+    - bug#67071 系统进入睡眠或者休眠后唤醒登录系统，任务栏蓝牙应用未启动，通知提示缺失蓝牙适配器
+    - bug#64914 测试机与辅助机连接后，再把辅助机蓝牙关闭，向辅助机传输文件，约20次出现不弹出蓝牙发送窗口，出现后需要重启才能恢复
+  * Task :
+  * Other:
+
+ -- guang tang <tangguang@kylinos.cn>  Fri, 16 Jul 2021 16:12:22 +0800
+
+ukui-bluetooth (1.0.0-1kylin1k61) v101; urgency=medium
+
+  * Bug  :
+  * Task :
+  * Other:
+         -华为990去掉文件传输功能
+ 
+ -- liuyuanpeng <liuyuanpeng@kylinos.cn>  Mon, 12 Jul 2021 19:28:21 +0800
+
 ukui-bluetooth (1.0.0-1kylin1k60) v101; urgency=medium
 
   * Bug  :
