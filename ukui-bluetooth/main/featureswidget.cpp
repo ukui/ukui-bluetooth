@@ -60,8 +60,6 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
 
     if(m_manager->adapters().size() == 0){
         qDebug() << "no bluetooth adapter !!!";
-        QString text = QString(tr("no bluetooth adapter!"));
-        SendNotifyMessage(text);
         qDebug() << "Program exit !!!";
         exit_flag = true;
         return;
@@ -869,6 +867,10 @@ void FeaturesWidget::adapterChangeFUN()
         settings->set("adapter-address-list",QVariant::fromValue(adapter_list));
 
         if(adapter_list.size() == 0){
+
+            QString text = QString(tr("no bluetooth adapter!"));
+            SendNotifyMessage(text);
+
             if(bluetooth_tray_icon->isVisible()){
                 bluetooth_tray_icon->setVisible(false);
             }
