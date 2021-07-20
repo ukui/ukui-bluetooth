@@ -100,6 +100,7 @@ PinCodeWidget::~PinCodeWidget()
 void PinCodeWidget::Connection_timed_out()
 {
     QMessageBox msgBox;
+    msgBox.setParent(this);
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setWindowTitle(tr("Pair"));
     msgBox.setText(tr("Connection error !!!"));

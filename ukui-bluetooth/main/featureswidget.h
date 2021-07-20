@@ -84,7 +84,7 @@ public:
 
     void Dbus_file_transfer(QStringList);
     void Monitor_sleep_signal();
-
+    bool Connect_device_name_white_list(QString dev_name);
     void Connect_the_last_connected_device();
     void adapterChangeFUN();
     void writeDeviceInfoToFile(const QString& devAddress,const QString& devName, const BluezQt::Device::Type type);

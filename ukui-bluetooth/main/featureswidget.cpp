@@ -783,6 +783,17 @@ void FeaturesWidget::M_registerAgent()
     }
 }
 
+bool FeaturesWidget::Connect_device_name_white_list(QString dev_name)
+{
+    qDebug() << Q_FUNC_INFO << __LINE__;
+
+    if (("Mi Air 2S" == dev_name)
+
+       )
+        return true;
+    return false;
+}
+
 void FeaturesWidget::Connect_the_last_connected_device()
 {
     qDebug() << Q_FUNC_INFO << "startDiscovery";
@@ -817,10 +828,13 @@ void FeaturesWidget::Connect_the_last_connected_device()
     foreach (QString dev_address, target_list) {
         BluezQt::Device* dev = m_adapter->deviceForAddress(dev_address).data();
         if (dev != nullptr) {
-            qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
-            if (dev->isPaired() && !dev->isConnected()
-                     && (dev->type() == BluezQt::Device::Headset || dev->type() == BluezQt::Device::Headphones || dev->type() == BluezQt::Device::AudioVideo)) {
-                qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name();
+            qDebug() << Q_FUNC_INFO << dev->type() << dev->name();
+            if (dev->isPaired() && !dev->isConnected() &&
+                    (dev->type() == BluezQt::Device::Headset ||
+                     dev->type() == BluezQt::Device::Headphones ||
+                     dev->type() == BluezQt::Device::AudioVideo ||
+                     Connect_device_name_white_list(dev->name()))) {
+                qDebug() << Q_FUNC_INFO << dev->type() << dev->name();
 
                 BluezQt::PendingCall *pp = dev->connectToDevice();
                 connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
@@ -1208,3 +1222,4 @@ void FeaturesWidget::Dbus_bluetooth_switch(bool value)
         Turn_on_or_off_bluetooth(value);
     }
 }
+
