@@ -1160,7 +1160,15 @@ void FeaturesWidget::file_transfer_creator(QString dev)
 void FeaturesWidget::close_session()
 {
     if(pre_session.path() != ""){
-        obex_manager->removeSession(pre_session);
+        if (nullptr != filePtr)
+        {
+            qDebug() << Q_FUNC_INFO << "filePtr" <<__LINE__;
+            BluezQt::PendingCall * stopFileSend = filePtr->cancel();
+            connect(stopFileSend,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
+                qDebug() << Q_FUNC_INFO  << q->errorText() << __LINE__;
+                obex_manager->removeSession(pre_session);
+            });
+        }
     }
 }
 
