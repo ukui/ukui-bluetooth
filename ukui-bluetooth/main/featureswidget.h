@@ -18,7 +18,11 @@
 #include <KF5/BluezQt/bluezqt/initmanagerjob.h>
 #include <KF5/BluezQt/bluezqt/device.h>
 #include <KF5/BluezQt/bluezqt/agent.h>
+
+#ifdef BATTERY
 #include <KF5/BluezQt/bluezqt/battery.h>
+#endif
+
 #include <KF5/BluezQt/bluezqt/pendingcall.h>
 #include <KF5/BluezQt/bluezqt/obexmanager.h>
 #include <KF5/BluezQt/bluezqt/initobexmanagerjob.h>

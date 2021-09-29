@@ -203,6 +203,7 @@ void FeaturesWidget::InitTrayMenu()
                         status->setText(tr("Disconnection"));
                     }
 
+#ifdef BATTERY
                     BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
                     qDebug() << Q_FUNC_INFO << __LINE__ << dev_battery.isNull();
                     if(!dev_battery.isNull()){
@@ -212,6 +213,8 @@ void FeaturesWidget::InitTrayMenu()
                        battery->setText(tr("Power ")+QString::number(dev_battery->percentage(),10)+"%");
                        device_menu->addAction(battery);
                     }
+#endif
+
                 }else{
                     device_action->setChecked(false);
 
@@ -255,6 +258,7 @@ void FeaturesWidget::InitTrayMenu()
                             device_menu->removeAction(remove);
                         }
 
+#ifdef BATTERY
                         BluezQt::BatteryPtr dev_battery = device_list.at(i)->battery();
                         if(!dev_battery.isNull()){
                            QAction *battery = new QAction();
@@ -263,6 +267,7 @@ void FeaturesWidget::InitTrayMenu()
                            battery->setText(tr("Power ")+QString::number(dev_battery->percentage(),10)+"%");
                            device_menu->addAction(battery);
                         }
+#endif
 
                         send->setText(tr("Send files"));
                         if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
