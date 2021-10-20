@@ -119,6 +119,7 @@ BluetoothFileTransferWidget::BluetoothFileTransferWidget(QString name, QString d
     m_progressbar = new QProgressBar(this);
     m_progressbar->setOrientation(Qt::Horizontal);
     m_progressbar->setGeometry(32,175,376,10);
+    m_progressbar->setTextVisible(false);
     m_progressbar->setVisible(false);
 
     dev_widget = new DeviceSeleterWidget(this,dev_address);

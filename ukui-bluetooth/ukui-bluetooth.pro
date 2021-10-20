@@ -30,6 +30,8 @@ INSTALLS += inst1 \
 #    inst3 \
     target
 
+exists(/usr/include/KF5/BluezQt/bluezqt/battery.h){DEFINES += BATTERY}
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the

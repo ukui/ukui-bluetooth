@@ -26,8 +26,10 @@ BluetoothAgent::BluetoothAgent(QObject *parent)
 
 void BluetoothAgent::emitRemoveSignal(BluezQt::DevicePtr device) {
     if (device.data()->isPaired()) {
-        sleep(1);
-        emit agentRemoveDevice(device);
+        QTimer::singleShot(100,this,[=]{
+            emit agentRemoveDevice(device);
+        });
+
     }
 }
 
@@ -41,15 +43,50 @@ void BluetoothAgent::requestPinCode(BluezQt::DevicePtr device, const BluezQt::Re
     qDebug() << Q_FUNC_INFO;
     m_device = device;
     m_pinRequested = true;
+    m_hasClosePinCode = true;
 
-    request.accept(QString());
+    emit stopNotifyTimer(device);
 
+    Keypincodewidget = new PinCodeWidget(device->name(), true);
+
+    connect(Keypincodewidget,&PinCodeWidget::accepted,this,[=]{
+        request.accept(Keypincodewidget->getEnteredPINCode());
+        emit startNotifyTimer(device);
+        m_hasClosePinCode = false;
+        return;
+    });
+
+    connect(Keypincodewidget,&PinCodeWidget::rejected,this,[=]{
+        request.reject();
+        m_hasClosePinCode = false;
+        return;
+    });
+
+    connect(device.data(), &BluezQt::Device::pairedChanged, this, [=](bool st){
+        if (st == false) {
+            request.reject();
+            if (pincodewidget != nullptr && m_hasClosePinCode != false) {
+                m_hasClosePinCode = false;
+                pincodewidget->close();
+            }
+        }
+        return;
+    });
+
+    connect(Keypincodewidget, &PinCodeWidget::destroyed, this, [=] {
+        Keypincodewidget = nullptr;
+        m_hasClosePinCode = false;
+    });
+    //保持在最前
+    Keypincodewidget->show();
+    Keypincodewidget->activateWindow();
 }
 
 void BluetoothAgent::displayPinCode(BluezQt::DevicePtr device, const QString &pinCode)
 {
     m_device = device;
     m_displayedPinCode = pinCode;
+    printf("\n\nCCCCCCCCCCCCCCCCCC - %s\n\n", pinCode.toStdString().data());
     qDebug() << Q_FUNC_INFO;
 }
 
@@ -68,6 +105,7 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
     if(m_displayedPasskey == passkey)
         return;
 
+    emit stopNotifyTimer(device);
     m_device = device;
     m_displayedPasskey = passkey;
     m_enteredPasskey = entered;
@@ -75,8 +113,10 @@ void BluetoothAgent::displayPasskey(BluezQt::DevicePtr device, const QString &pa
     connect(device.data(), &BluezQt::Device::pairedChanged, this, [=](bool st){
         qDebug() << Q_FUNC_INFO << st << __LINE__;
         if (st) {
-            if (Keypincodewidget)
+            if (Keypincodewidget) {
                 Keypincodewidget->setHidden(true);
+                emit startNotifyTimer(device);
+            }
         }else{
             if(Keypincodewidget){}
 //                Keypincodewidget->close();
@@ -111,6 +151,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
     if(pincodewidget != nullptr){
         return;
     }
+    emit stopNotifyTimer(device);
     m_device = device;
     m_requestedPasskey = passkey;
 
@@ -119,6 +160,7 @@ void BluetoothAgent::requestConfirmation(BluezQt::DevicePtr device, const QStrin
 
     connect(pincodewidget,&PinCodeWidget::accepted,this,[=]{
         request.accept();
+        emit startNotifyTimer(device);
         return;
     });
 

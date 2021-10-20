@@ -47,8 +47,12 @@ public:
 signals:
     void requestAccept();
     void requestReject();
+    void stopNotifyTimer(BluezQt::DevicePtr);
+    void startNotifyTimer(BluezQt::DevicePtr);
     void agentRemoveDevice(BluezQt::DevicePtr);
 private:
+
+    int64_t _pinCodeDisplay;
 
     BluezQt::DevicePtr m_device;
     // requestPinCode

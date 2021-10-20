@@ -53,6 +53,7 @@
 #include <QDir>
 #include <QFile>
 #include <QDateTime>
+#include <QFileInfo>
 #include <QWidgetAction>
 #include <QDBusMessage>
 #include <QMessageBox>
@@ -70,7 +71,9 @@ class FeaturesWidget : public QWidget
 public:
     FeaturesWidget(QWidget *parent = nullptr);
     ~FeaturesWidget();
+    void showBluetoothTrayIcon();
     void InitTrayMenu();
+    void setWidgetPosition();
     void InitAgentAndDbus();
     void M_registerAgent();
 
@@ -93,6 +96,7 @@ public:
     void adapterChangeFUN();
     void writeDeviceInfoToFile(const QString& devAddress,const QString& devName, const BluezQt::Device::Type type);
     void removeDeviceInfoToFile(const QString& devAddress);
+    void setTrayIcon(bool);
     QStringList getDeviceConnectTimeList();
     bool exit_flag = false;
 signals:
@@ -109,7 +113,12 @@ public slots:
     void adapterPoweredChanged(bool value);
     void adapterDeviceRemove(BluezQt::DevicePtr ptr);
     void Remove_device_by_devicePtr(BluezQt::DevicePtr ptr);
+    void Start_notify_timer(BluezQt::DevicePtr);
+    void Stop_notify_timer(BluezQt::DevicePtr);
+    void showWarnningMesgBox();
+
 private:
+    QList<QString>  is_connected;
     QSystemTrayIcon *bluetooth_tray_icon = nullptr;
     QMenu           *tray_Menu           = nullptr;
     SwitchAction    *m_action            = nullptr;
@@ -129,6 +138,7 @@ private:
     BluetoothDbus               *session_dbus       = nullptr;
     BluetoothFileTransferWidget *transfer_widget    = nullptr;
 
+    BluezQt::DevicePtr          m_device;
     BluezQt::Manager            *m_manager          = nullptr;
     BluezQt::Adapter            *m_adapter          = nullptr;
     BluezQt::ObexManager        *obex_manager       = nullptr;
@@ -137,6 +147,7 @@ private:
     BluezQt::ObexObjectPush     *opp                = nullptr;
     BluezQt::ObexTransferPtr    filePtr             = nullptr;
 
+    QTimer *notify_timer;
     QDBusObjectPath pre_session;
     bool            dev_remove_flag = false;
     bool            sleep_flag      = false;
@@ -144,5 +155,8 @@ private:
     QString         pair_device_file;
     int             dev_callbak_flag = 0;
     bool            pair_flag = true;
+
+    QTimer * callBackConnectTimer;
+    void initAllTimer();
 } ;
 #endif // FEATURESWIDGET_H

@@ -11,7 +11,8 @@ BluetoothObexAgent::BluetoothObexAgent(QObject *parent):ObexAgent(parent)
                 exit(1);
         }
         // "QDBusConnection::ExportAllSlots"表示把类Hotel的所有Slot都导出为这个Object的method
-        qDebug() << Q_FUNC_INFO << bus.registerObject("/", "org.bluez.obex.Agent1", this, QDBusConnection::ExportAllContents);
+        //qDebug() << Q_FUNC_INFO <<
+        bus.registerObject("/", "org.bluez.obex.Agent1", this, QDBusConnection::ExportAllContents);
     }
 }
 
@@ -30,7 +31,7 @@ void BluetoothObexAgent::authorizePush(BluezQt::ObexTransferPtr transfer, BluezQ
             connect(receiving_widget,&FileReceivingPopupWidget::cancel,this,[=]{
                 transfer->cancel();
                 qDebug() << Q_FUNC_INFO << "cancel" <<  __LINE__;
-                receiveDisConnectSignal(session->destination());
+                //receiveDisConnectSignal(session->destination());
 
             });
         });

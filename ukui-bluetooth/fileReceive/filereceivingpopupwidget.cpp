@@ -91,6 +91,7 @@ FileReceivingPopupWidget::FileReceivingPopupWidget(QString address, QString sour
 
     transfer_progress = new QProgressBar(this);
     transfer_progress->setGeometry(29,147,376,6);
+    transfer_progress->setTextVisible(false);
     transfer_progress->setVisible(false);
 
     cancel_btn = new QPushButton(tr("Cancel"),this);

@@ -1,8 +1,210 @@
-#include "featureswidget.h"
+﻿#include "featureswidget.h"
+#include <fcntl.h>
+
+enum rfkill_type {
+    RFKILL_TYPE_ALL = 0,
+    RFKILL_TYPE_WLAN,
+    RFKILL_TYPE_BLUETOOTH,
+    RFKILL_TYPE_UWB,
+    RFKILL_TYPE_WIMAX,
+    RFKILL_TYPE_WWAN,
+};
+
+enum rfkill_operation {
+    RFKILL_OP_ADD = 0,
+    RFKILL_OP_DEL,
+    RFKILL_OP_CHANGE,
+    RFKILL_OP_CHANGE_ALL,
+};
+
+struct rfkill_event {
+    uint32_t idx;
+    uint8_t  type;
+    uint8_t  op;
+    uint8_t  soft;
+    uint8_t  hard;
+};
+
+enum {
+    OPT_b = (1 << 0), /* must be = 1 */
+    OPT_u = (1 << 1),
+    OPT_l = (1 << 2),
+};
+
+static guint watch = 0;
+bool spe_bt_node = false;
+bool not_hci_node = true;
+bool M_adapter_flag = false;
+bool M_power_on = false;
+
+
+static gboolean rfkill_event(GIOChannel *chan,
+                GIOCondition cond, gpointer data)
+{
+    unsigned char buf[32];
+    struct rfkill_event *event = (struct rfkill_event *)buf;
+    char sysname[PATH_MAX];
+    ssize_t len;
+    int fd, id;
+
+    if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR))
+        return FALSE;
+
+    fd = g_io_channel_unix_get_fd(chan);
+
+    memset(buf, 0, sizeof(buf));
+    len = read(fd, buf, sizeof(buf));
+    if (len < 0) {
+        if (errno == EAGAIN)
+            return TRUE;
+        return FALSE;
+    }
+
+    if (len != sizeof(struct rfkill_event))
+        return TRUE;
+
+    qDebug("RFKILL event idx %u type %u op %u soft %u hard %u",
+                    event->idx, event->type, event->op,
+                        event->soft, event->hard);
+
+    if (event->type != RFKILL_TYPE_BLUETOOTH &&
+                    event->type != RFKILL_TYPE_ALL)
+    {
+        qDebug() << Q_FUNC_INFO << "Not bt====" ;
+        return TRUE;
+    }
+
+    memset(sysname, 0, sizeof(sysname));
+    snprintf(sysname, sizeof(sysname) - 1,
+            "/sys/class/rfkill/rfkill%u/name", event->idx);
+
+    fd = open(sysname, O_RDONLY);
+    if (fd < 0)
+    {
+        qDebug () << Q_FUNC_INFO  << __LINE__;
+
+        return TRUE;
+    }
+
+    if (read(fd, sysname, sizeof(sysname) - 1) < 4) {
+        close(fd);
+        qDebug () << Q_FUNC_INFO  << __LINE__;
+
+        return TRUE;
+    }
+
+    close(fd);
+
+    if (g_str_has_prefix(sysname, "tpacpi_bluetooth_sw") == TRUE)
+    {
+        spe_bt_node = true;
+        qDebug () << Q_FUNC_INFO <<  "spe_bt_node" << spe_bt_node  << __LINE__;
+        if (event->soft)
+        {
+            not_hci_node = true ;
+            qDebug () << Q_FUNC_INFO <<  "event->soft:" << event->soft  << __LINE__;
+        }
+        else
+            not_hci_node = false ;
+    }
+    else if (g_str_has_prefix(sysname, "hci") == TRUE)
+    {
+        qDebug () << Q_FUNC_INFO <<  "not_hci_node:FALSE"  << __LINE__;
+        not_hci_node = false;
+    }
+    else
+    {
+        qDebug () << Q_FUNC_INFO  << "not_hci_node:TRUE" << __LINE__;
+        not_hci_node = true;
+    }
+
+
+    return TRUE;
+}
+void rfkill_init(void)
+{
+    qDebug () << Q_FUNC_INFO << __LINE__;
+
+    int fd;
+    GIOChannel *channel;
+
+    fd = open("/dev/rfkill", O_RDWR);
+    if (fd < 0) {
+        return;
+    }
+
+    channel = g_io_channel_unix_new(fd);
+    g_io_channel_set_close_on_unref(channel, TRUE);
+
+    watch = g_io_add_watch(channel,
+                GIOCondition(G_IO_IN | G_IO_NVAL | G_IO_HUP | G_IO_ERR),
+                rfkill_event, NULL);
+
+    g_io_channel_unref(channel);
+}
+
+void rfkill_set_idx(void)
+{
+    qDebug () << Q_FUNC_INFO  << __LINE__;
+    struct rfkill_event event;
+
+    int rf_fd;
+    int mode;
+    int rf_type;
+    int rf_idx;
+    unsigned rf_opt = 0;
+
+    /* Must have one or two params */
+    mode = O_RDWR | O_NONBLOCK;
+
+    rf_type = RFKILL_TYPE_BLUETOOTH;
+    rf_idx = -1;
+
+    rf_fd = open("/dev/rfkill", mode);
+
+    memset(&event, 0, sizeof(event));
+    if (rf_type >= 0) {
+        event.type = rf_type;
+        event.op = RFKILL_OP_CHANGE_ALL;
+    }
+
+    if (rf_idx >= 0) {
+        event.idx = rf_idx;
+        event.op = RFKILL_OP_CHANGE;
+    }
+
+    /* Note: OPT_b == 1 */
+    event.soft = (rf_opt & OPT_b);
+
+    write(rf_fd, &event, sizeof(event));
+
+}
+
+void rfkill_exit(void)
+{
+    if (watch == 0)
+        return;
+
+    g_source_remove(watch);
+    watch = 0;
+}
+
+
+static qint64 getFileSize(QString filename)
+{
+    QFileInfo info(filename);
+    if (info.exists())
+        return info.size();
+    else
+        return 0;
+}
 
 FeaturesWidget::FeaturesWidget(QWidget *parent)
     : QWidget(parent)
 {
+    rfkill_init();
+    rfkill_set_idx();
+
     //=============初始化蓝牙管理器，失败则退出进程===================
     m_manager = new BluezQt::Manager(this);
     BluezQt::InitManagerJob *job = m_manager->init();
@@ -61,40 +263,104 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     if(m_manager->adapters().size() == 0){
         qDebug() << "no bluetooth adapter !!!";
         qDebug() << "Program exit !!!";
-        exit_flag = true;
-        return;
+        not_hci_node = true;
+        M_adapter_flag = false;
     }else if(m_manager->adapters().size() == 1){
         m_adapter = m_manager->adapters().at(0).data();
         settings->set("adapter-address",QVariant::fromValue(m_adapter->address()));
+        M_adapter_flag = true;
+
     }else{
         if(adapter_list.indexOf(Default_Adapter) != -1){
             m_adapter = m_manager->adapterForAddress(Default_Adapter).data();
         }else{
             m_adapter = m_manager->adapterForAddress(adapter_list.at(0)).data();
         }
+        M_adapter_flag = true;
+
     }
+    initAllTimer();
 
-    bluetooth_tray_icon = new QSystemTrayIcon(this);
+    showBluetoothTrayIcon();
+
     adapterChangeFUN();
+    if (!not_hci_node)
+        cur_adapter_address = m_adapter->address();
 
-    cur_adapter_address = m_adapter->address();
+    qDebug() << "===========" << m_manager->isBluetoothBlocked();
 
-    qDebug() << m_adapter->isPowered() << "===========" << m_manager->isBluetoothBlocked();
-
-
-    Turn_on_or_off_bluetooth(settings->get("switch").toBool());
+    if (!not_hci_node)
+        Turn_on_or_off_bluetooth(settings->get("switch").toBool());
 
     if(File_save_path.isEmpty()){
         settings->set("file-save-path",QVariant::fromValue(QDir::homePath()));
     }
+
     qDebug() << Q_FUNC_INFO << m_manager->isInitialized() << m_manager->isOperational();
 
+    if (!not_hci_node)
+        NotifyOnOff();
+
+
+    if (!not_hci_node)
+        Monitor_sleep_signal();
+
+    if(!not_hci_node && !m_manager->isBluetoothBlocked() && m_adapter->isPowered()){
+        QTimer::singleShot(500,this,[=]{
+            Connect_the_last_connected_device();
+        });
+    }
+    qDebug() << Q_FUNC_INFO << "end" << __LINE__;
+
+}
+
+FeaturesWidget::~FeaturesWidget()
+{
+    delete settings;
+    rfkill_exit();
+}
+
+void FeaturesWidget::initAllTimer()
+{
+    notify_timer = new QTimer();
+    connect(notify_timer, &QTimer::timeout, this, [=]()
+    {
+        if (nullptr == m_device)
+        {
+            QString text = QString(tr("The connection with the Bluetooth device is successful!"));
+            SendNotifyMessage(text);
+        }
+        else
+        {
+            if (m_device->isPaired() && m_device->isConnected())
+            {
+                is_connected.push_back(m_device->name());
+                QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(m_device->name()));
+                SendNotifyMessage(text);
+            }
+        }
+    });
+
+    callBackConnectTimer = new QTimer();
+    callBackConnectTimer->setInterval(1000);//2000 ms 最好
+    connect(callBackConnectTimer, &QTimer::timeout, this, [=]()
+    {
+        callBackConnectTimer->stop();
+        Connect_the_last_connected_device();
+    });
+
+}
+
+void FeaturesWidget::showBluetoothTrayIcon()
+{
+    qDebug () <<Q_FUNC_INFO << __LINE__;
     QPalette palette;
     palette.setBrush(QPalette::Base,QColor(Qt::black));
     palette.setBrush(QPalette::Active, QPalette::Text,QColor(Qt::white));
     palette.setBrush(QPalette::Disabled, QPalette::Text,QColor(Qt::darkGray));
     palette.setBrush(QPalette::WindowText, QColor(Qt::white));
     palette.setBrush(QPalette::ButtonText, QColor(Qt::white));
+
     tray_Menu = new QMenu(this);
 //    tray_Menu = new NewMenu();
     tray_Menu->setProperty("setIconHighlightEffectDefaultColor", tray_Menu->palette().color(QPalette::Active, QPalette::Base));
@@ -107,19 +373,24 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
     bluetooth_tray_icon = new QSystemTrayIcon(this);
     bluetooth_tray_icon->setContextMenu(tray_Menu);
     bluetooth_tray_icon->setToolTip(tr("Bluetooth"));
-    bluetooth_tray_icon->show();
     bluetooth_tray_icon->setVisible(settings->get("tray-show").toBool());
 
-    if(settings->get("switch").toString() == "false"){
-        if(QIcon::hasThemeIcon("bluetooth-error"))
-            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
+    if (spe_bt_node)
+    {
+        setTrayIcon(not_hci_node);
+    }
+    else
+    {
+        if (m_manager->adapters().size())
+        {
+            setTrayIcon((nullptr != m_adapter) && (m_adapter->isPowered()));
+        }
         else
-            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
-    }else{
-        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+        {
+            bluetooth_tray_icon->setVisible(false);
+        }
     }
 
-    NotifyOnOff();
     connect(bluetooth_tray_icon,
             &QSystemTrayIcon::activated,
             [=](QSystemTrayIcon::ActivationReason reason){
@@ -127,32 +398,48 @@ FeaturesWidget::FeaturesWidget(QWidget *parent)
                 {
                     case QSystemTrayIcon::DoubleClick: /* 来自于双击激活。 */
                     case QSystemTrayIcon::Trigger: /* 来自于单击激活。 */
+                       InitTrayMenu();
+                       break;
                     case QSystemTrayIcon::Context:
-                        InitTrayMenu();
+                        //InitTrayMenu();
                         break;
                 }
             });
 
-    Monitor_sleep_signal();
-
-    if(!m_manager->isBluetoothBlocked() && m_adapter->isPowered()){
-        QTimer::singleShot(500,this,[=]{
-            Connect_the_last_connected_device();
-        });
-    }
 }
 
-FeaturesWidget::~FeaturesWidget()
-{
-    delete settings;
-}
 
 void FeaturesWidget::InitTrayMenu()
 {
+    qDebug() << Q_FUNC_INFO << spe_bt_node << not_hci_node << M_adapter_flag;
     tray_Menu->clear();
 
+    bool btPower = false ;
+    if (spe_bt_node)
+    {
+        if (not_hci_node)
+            btPower = false;
+        else
+        {
+            if (!M_adapter_flag)
+                return;
+            else
+                btPower = m_adapter->isPowered();
+        }
+    }
+    else
+    {
+        if (not_hci_node)
+            return;
+        else
+        {
+            btPower = m_adapter->isPowered();
+        }
+    }
+
     m_action = new SwitchAction(this);
-    m_action->setBtnStatus(m_adapter->isPowered());
+    //m_action->setBtnStatus(m_adapter->isPowered());
+    m_action->setBtnStatus(btPower);
     connect(m_action,&SwitchAction::sendBtnStatus,this,[=](bool value){
         Turn_on_or_off_bluetooth(value);
     });
@@ -161,8 +448,9 @@ void FeaturesWidget::InitTrayMenu()
     tray_Menu->addAction(switch_txt);
     tray_Menu->addSeparator();
 
-    qDebug() << Q_FUNC_INFO << flag << m_adapter->isPowered();
-    if(m_adapter->isPowered()){
+    qDebug() << Q_FUNC_INFO << flag << btPower;//m_adapter->isPowered();
+    //if(m_adapter->isPowered()){
+    if(btPower){
         QList<BluezQt::DevicePtr> device_list = m_adapter->devices();
         qDebug() << Q_FUNC_INFO << device_list.size();
         QAction *head = new QAction(tr("My Devices"));
@@ -214,7 +502,6 @@ void FeaturesWidget::InitTrayMenu()
                        device_menu->addAction(battery);
                     }
 #endif
-
                 }else{
                     device_action->setChecked(false);
 
@@ -268,7 +555,6 @@ void FeaturesWidget::InitTrayMenu()
                            device_menu->addAction(battery);
                         }
 #endif
-
                         send->setText(tr("Send files"));
                         if(device_list.at(i)->type()==BluezQt::Device::Phone || device_list.at(i)->type()==BluezQt::Device::Computer)
                         {
@@ -319,9 +605,65 @@ void FeaturesWidget::InitTrayMenu()
     QAction *settins_action = new QAction(tr("Bluetooth settings"),tray_Menu);
     settins_action->setCheckable(true);
     tray_Menu->addAction(settins_action);
-    tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
-    tray_Menu->exec();
+    //tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
+    //tray_Menu->exec();
+    setWidgetPosition();
 
+}
+
+void FeaturesWidget::setWidgetPosition()
+{
+    #define MARGIN 4
+
+    //menu->exec();
+    int width = tray_Menu->sizeHint().width();
+    int height= tray_Menu->sizeHint().height();
+    qDebug()<<"menu 's  width  height"<<width<<height;
+
+    QDBusInterface iface("org.ukui.panel",
+                         "/panel/position",
+                         "org.ukui.panel",
+                         QDBusConnection::sessionBus());
+    QDBusReply<QVariantList> reply=iface.call("GetPrimaryScreenGeometry");
+    //reply获取的参数共5个，分别是 主屏可用区域的起点x坐标，主屏可用区域的起点y坐标，主屏可用区域的宽度，主屏可用区域高度，任务栏位置
+//    reply.value();
+if (!iface.isValid() || !reply.isValid() || reply.value().size()<5) {
+        qCritical() << QDBusConnection::sessionBus().lastError().message();
+        this->setGeometry(0,0,width,height);
+    }
+
+
+//    qDebug()<<reply.value().at(4).toInt();
+    QVariantList position_list=reply.value();
+
+    switch(reply.value().at(4).toInt()){
+    case 1:
+        //任务栏位于上方
+        tray_Menu->setGeometry(position_list.at(0).toInt()+position_list.at(2).toInt()-width-MARGIN,
+                          position_list.at(1).toInt()+MARGIN,
+                          width,height);
+        break;
+        //任务栏位于左边
+    case 2:
+        tray_Menu->setGeometry(position_list.at(0).toInt()+MARGIN,
+                          position_list.at(1).toInt()+reply.value().at(3).toInt()-height-MARGIN,
+                          width,height);
+        break;
+        //任务栏位于右边
+    case 3:
+        tray_Menu->setGeometry(position_list.at(0).toInt()+position_list.at(2).toInt()-width-MARGIN,
+                          position_list.at(1).toInt()+reply.value().at(3).toInt()-height-MARGIN,
+                          width,height);
+        break;
+        //任务栏位于下方
+    default:
+        tray_Menu->setGeometry(position_list.at(0).toInt()+position_list.at(2).toInt()-width-MARGIN,
+                          position_list.at(1).toInt()+reply.value().at(3).toInt()-height-MARGIN,
+                          width,height);
+        break;
+    }
+
+    tray_Menu->show();
 }
 
 void FeaturesWidget::InitAgentAndDbus()
@@ -334,9 +676,27 @@ void FeaturesWidget::InitAgentAndDbus()
     connect(session_dbus,&BluetoothDbus::switch_signals,this,&FeaturesWidget::Dbus_bluetooth_switch);
 
     bluetoothAgent = new BluetoothAgent(this);
-    connect(bluetoothAgent, &BluetoothAgent::agentRemoveDevice, this, &FeaturesWidget::Remove_device_by_devicePtr);
+    connect(bluetoothAgent, &BluetoothAgent::agentRemoveDevice, this, &FeaturesWidget::Remove_device_by_devicePtr);    connect(bluetoothAgent, &BluetoothAgent::startNotifyTimer, this, &FeaturesWidget::Start_notify_timer);
+    connect(bluetoothAgent, &BluetoothAgent::stopNotifyTimer, this, &FeaturesWidget::Stop_notify_timer);
 
     bluetoothObexAgent = new BluetoothObexAgent(this);
+}
+
+void FeaturesWidget::Start_notify_timer(BluezQt::DevicePtr) {
+    notify_timer->setSingleShot(true);
+    notify_timer->start(2000);
+}
+
+void FeaturesWidget::Stop_notify_timer(BluezQt::DevicePtr) {
+    notify_timer->stop();
+}
+
+void FeaturesWidget::showWarnningMesgBox()
+{
+    QMessageBox *mbox = new QMessageBox(QMessageBox::Warning,tr("Warning"),tr("The selected file is empty, please select the file again !"),QMessageBox::Ok);
+    QDesktopWidget *desktop = QApplication::desktop();
+    mbox->move((desktop->width()-mbox->width())/2,(desktop->height()-mbox->height())/2);
+    mbox->exec();
 }
 
 void FeaturesWidget::Pair_device_by_address(QString address)
@@ -476,7 +836,10 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
         connect(pair_call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *pair_q){
 
             if(pair_q->error() == 0)
+            {
                 qDebug() << Q_FUNC_INFO << "pair successful" << __LINE__;
+                writeDeviceInfoToFile(device->address(),device->name(),device->type());
+            }
             else
                 qDebug() << Q_FUNC_INFO << "pair failure" << __LINE__;
 
@@ -506,6 +869,9 @@ void FeaturesWidget::Connect_device(BluezQt::DevicePtr device)
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
             if(q->error() == 0){
                 qDebug() << Q_FUNC_INFO << __LINE__;
+                 QTimer::singleShot(500, [=]{
+                     emit device->connectedChanged(true);
+                 });
         //            QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device->name()));
         //            SendNotifyMessage(text);
                 settings->set("finally-connect-the-device",QVariant::fromValue(device->address()));
@@ -559,12 +925,16 @@ void FeaturesWidget::NotifyOnOff()
             connect(device_list.at(i).data(),&BluezQt::Device::connectedChanged,this,[=](bool value){
                 qDebug() << Q_FUNC_INFO << "connectedChanged";
                 if(value) {
-                    QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(device_list.at(i)->name()));
-                    SendNotifyMessage(text);
+                    m_device = device_list.at(i);
+                    notify_timer->setSingleShot(true);
+                    notify_timer->start(2000);
                 }
                 else {
+                    if (!is_connected.contains(device_list.at(i)->name()))
+                        return;
                     QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(device_list.at(i)->name()));
                     SendNotifyMessage(text);
+                    is_connected.removeOne(device_list.at(i)->name());
                 }
             });
         }
@@ -579,8 +949,10 @@ void FeaturesWidget::NotifyOnOff()
                 QTimer::singleShot(500,this,[=]{
                     pair_flag = true;
                 });
-                QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
-                SendNotifyMessage(text);
+                m_device = dev;
+                notify_timer->setSingleShot(true);
+                notify_timer->start(2000);
+
             }
         });
 
@@ -588,12 +960,17 @@ void FeaturesWidget::NotifyOnOff()
             qDebug() << Q_FUNC_INFO << "connectedChanged" << value;
             if (dev.data()->isPaired()) {
                 if(value) {
-                    QString text = QString(tr("The connection with the Bluetooth device “%1” is successful!").arg(dev->name()));
-                    SendNotifyMessage(text);
+                    m_device = dev;
+                    notify_timer->setSingleShot(true);
+                    notify_timer->start(2000);
+
                 }
                 else {
+                    if (!is_connected.contains(dev->name()))
+                        return;
                     QString text = QString(tr("Bluetooth device “%1” disconnected!").arg(dev->name()));
                     SendNotifyMessage(text);
+                    is_connected.removeOne(dev->name());
                 }
             }
         });
@@ -602,6 +979,7 @@ void FeaturesWidget::NotifyOnOff()
 
 void FeaturesWidget::Send_files_by_address(QString address)
 {
+    selected_file = nullptr;
     if(!obex_manager->isOperational()){
         BluezQt::PendingCall *call = obex_manager->startService();
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
@@ -666,6 +1044,11 @@ void FeaturesWidget::Send_files_by_address(QString address)
 
     if(!selected_file.isNull()){
 
+        if (getFileSize(selected_file) == 0) {
+            showWarnningMesgBox();
+            return;
+        }
+
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,address);
             connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
@@ -695,24 +1078,48 @@ void FeaturesWidget::Send_files_by_address(QString address)
 
 void FeaturesWidget::Turn_on_or_off_bluetooth(bool f)
 {
-    if(f){
-        if (m_manager->isBluetoothBlocked())
-            m_manager->setBluetoothBlocked(false);
-        BluezQt::PendingCall *call = m_adapter->setPowered(true);
-        connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
-            if(p->error() == 0){
-                flag = true;
-                qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
-                Connect_the_last_connected_device();
-            }else
-                qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
-        });
+    qDebug() << Q_FUNC_INFO << f;
+
+    if(f)
+    {
+        if (spe_bt_node)
+        {
+            M_power_on = true;
+            if (not_hci_node)
+            {
+                rfkill_set_idx();
+            }
+        }
+
+
+        qDebug() << Q_FUNC_INFO
+                 << "spe_bt_node:"  << spe_bt_node
+                 << " not_hci_node" << not_hci_node;
+
+
+        if (!not_hci_node)
+        {
+            if (m_manager->isBluetoothBlocked())
+                m_manager->setBluetoothBlocked(false);
+            BluezQt::PendingCall *call = m_adapter->setPowered(true);
+            connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
+                if(p->error() == 0){
+                    flag = true;
+                    qDebug() << Q_FUNC_INFO<< "Set turn on Bluetooth: " << m_adapter->isPowered();
+                }else
+                    qDebug() << "Failed to turn on Bluetooth:" << p->errorText();
+            });
+        }
     }else{
+        if (spe_bt_node)
+        {
+            M_power_on = false;
+        }
         BluezQt::PendingCall *call = m_adapter->setPowered(false);
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *p){
             if(p->error() == 0){
                 flag = false;
-                qDebug() << Q_FUNC_INFO << m_adapter->isPowered();
+                qDebug() << Q_FUNC_INFO <<"Set turn off Bluetooth: " << m_adapter->isPowered();
                 m_manager->setBluetoothBlocked(true);
             }else
                 qDebug() << "Failed to turn off Bluetooth:" << p->errorText();
@@ -734,6 +1141,12 @@ void FeaturesWidget::Dbus_file_transfer(QStringList file_path)
     qDebug() << "Select file:" << file_path;
     selected_file = QUrl(file_path.first()).path();
     if(!selected_file.isNull()){
+
+        if (getFileSize(selected_file) == 0) {
+            showWarnningMesgBox();
+            return;
+        }
+
         if (BluetoothFileTransferWidget::isShow == false) {
             transfer_widget = new BluetoothFileTransferWidget(selected_file,"");
             connect(transfer_widget,&BluetoothFileTransferWidget::sender_dev_name,this,&FeaturesWidget::file_transfer_creator);
@@ -775,7 +1188,6 @@ void FeaturesWidget::M_registerAgent()
 {
     qDebug() << m_manager->registerAgent(bluetoothAgent)->errorText();
 
-
     if(!obex_manager->isOperational()){
         BluezQt::PendingCall *call = obex_manager->startService();
         connect(call,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *q){
@@ -801,9 +1213,7 @@ bool FeaturesWidget::Connect_device_name_white_list(QString dev_name)
 
 void FeaturesWidget::Connect_the_last_connected_device()
 {
-    qDebug() << Q_FUNC_INFO << "startDiscovery";
-    //if(!m_adapter->isDiscovering())
-    //    m_adapter->startDiscovery();
+    qDebug() << Q_FUNC_INFO << "Connect Back to start";
     QList<BluezQt::DevicePtr> devlist = m_adapter->devices();
     foreach (BluezQt::DevicePtr devptr, devlist) {
         BluezQt::Device* dev = devptr.data();
@@ -816,6 +1226,7 @@ void FeaturesWidget::Connect_the_last_connected_device()
                 connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
                     if(call->error() == 0)
                     {
+                        emit dev->connectedChanged(true);
                         writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
                     }
                     else
@@ -845,6 +1256,9 @@ void FeaturesWidget::Connect_the_last_connected_device()
                 connect(pp,&BluezQt::PendingCall::finished,this,[=](BluezQt::PendingCall *call){
                     if(call->error() == 0){
                         writeDeviceInfoToFile(dev->address(),dev->name(),dev->type());
+                        QTimer::singleShot(500, [=]{
+                            emit dev->connectedChanged(true);
+                        });
                     }else{
                         qDebug() << Q_FUNC_INFO << "AudioVideo" << dev->name() << call->errorText();
                     }
@@ -863,17 +1277,22 @@ void FeaturesWidget::Connect_the_last_connected_device()
                 disconnect(dev, &BluezQt::Device::rssiChanged, nullptr, nullptr);
             }
         }
-        //if(m_adapter->isDiscovering())
-        //    m_adapter->stopDiscovery();
-        qDebug() << Q_FUNC_INFO << "stopDiscovery";
+        qDebug() << Q_FUNC_INFO << "rssiChanged Connecting Back to the end";
     });
+    qDebug() << Q_FUNC_INFO << "Connecting Back to the end";
+
 }
 
 // ===================蓝牙管理器设备操作监听======（主要针对系统的休眠和增加新的蓝牙硬件）=======================
 void FeaturesWidget::adapterChangeFUN()
 {
-    connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
-    connect(m_adapter,&BluezQt::Adapter::deviceRemoved,this,&FeaturesWidget::adapterDeviceRemove);
+    qDebug() << Q_FUNC_INFO << __LINE__;
+
+    if (!not_hci_node)
+    {
+        connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
+        connect(m_adapter,&BluezQt::Adapter::deviceRemoved,this,&FeaturesWidget::adapterDeviceRemove);
+    }
 
     connect(m_manager,&BluezQt::Manager::adapterRemoved,this,[=](BluezQt::AdapterPtr adapter){
         qDebug() << Q_FUNC_INFO << adapter->address() << adapter->name() <<__LINE__;
@@ -886,12 +1305,22 @@ void FeaturesWidget::adapterChangeFUN()
         settings->set("adapter-address-list",QVariant::fromValue(adapter_list));
 
         if(adapter_list.size() == 0){
+            not_hci_node = true;
+            M_adapter_flag = false;
+            qDebug() << Q_FUNC_INFO << spe_bt_node << not_hci_node << __LINE__;
+            if (!spe_bt_node && not_hci_node)
+            {
+                //非休眠状态下提示蓝牙适配器
+                if (!sleep_flag)
+                {
+                    QString text = QString(tr("no bluetooth adapter!"));
+                    SendNotifyMessage(text);
+                }
 
-            QString text = QString(tr("no bluetooth adapter!"));
-            SendNotifyMessage(text);
-
-            if(bluetooth_tray_icon->isVisible()){
-                bluetooth_tray_icon->setVisible(false);
+                if(bluetooth_tray_icon->isVisible())
+                {
+                    bluetooth_tray_icon->setVisible(false);
+                }
             }
         }else{
             QTimer::singleShot(200,this,[=]{
@@ -910,6 +1339,7 @@ void FeaturesWidget::adapterChangeFUN()
     connect(m_manager,&BluezQt::Manager::adapterAdded,this,[=](BluezQt::AdapterPtr adapter){
         qDebug() << Q_FUNC_INFO << adapter->address() << adapter->name() << bluetooth_tray_icon->isVisible() << adapter.data()->isPowered() <<__LINE__;
         adapter_list.append(adapter->address());
+        not_hci_node = false;
 
         if (!bluetooth_tray_icon->isVisible())
             bluetooth_tray_icon->setVisible(true);
@@ -917,21 +1347,32 @@ void FeaturesWidget::adapterChangeFUN()
         settings->set("adapter-address-list",QVariant::fromValue(adapter_list));
         m_adapter = adapter.data();
         connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
+        M_adapter_flag = true ;
+        if (spe_bt_node && M_power_on)
+        {
+            Turn_on_or_off_bluetooth(true);
+        }
+        NotifyOnOff();
+
     });
 
     connect(m_manager,&BluezQt::Manager::adapterChanged,this,[=](BluezQt::AdapterPtr adapter){
-        qDebug() << Q_FUNC_INFO <<__LINE__;
+        qDebug() << Q_FUNC_INFO << "adapterChanged" <<__LINE__;
 
-        if (m_adapter->address() == adapter.data()->address())
+        if (m_adapter->address() != adapter.data()->address())
+        {
             m_adapter = adapter.data();
+            connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
+        }
     });
 
     connect(m_manager,&BluezQt::Manager::usableAdapterChanged,this,[=](BluezQt::AdapterPtr adapter){
-        qDebug() << Q_FUNC_INFO <<__LINE__;
+        qDebug() << Q_FUNC_INFO << "usableAdapterChanged" <<__LINE__;
     });
 
     connect(m_manager,&BluezQt::Manager::operationalChanged,this,[=](bool status){
-        qDebug() <<  Q_FUNC_INFO << status;
+        qDebug() <<  Q_FUNC_INFO << "operationalChanged " << status << __LINE__;
+        setTrayIcon(status);
         if (status) {
             NotifyOnOff();
             M_registerAgent();
@@ -954,6 +1395,18 @@ void FeaturesWidget::removeDeviceInfoToFile(const QString &devAddress)
     m << devAddress;
     QDBusMessage response = QDBusConnection::systemBus().call(m);
     qDebug() << Q_FUNC_INFO << devAddress << response.errorMessage();
+}
+
+void FeaturesWidget::setTrayIcon(bool v)
+{
+    if (v) {
+        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+    } else {
+        if(QIcon::hasThemeIcon("bluetooth-error"))
+            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
+        else
+            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
+    }
 }
 
 QStringList FeaturesWidget::getDeviceConnectTimeList()
@@ -1031,7 +1484,8 @@ void FeaturesWidget::Monitor_sleep_Slot(bool sleep)
             {
                 connect(m_adapter,&BluezQt::Adapter::poweredChanged,this,&FeaturesWidget::adapterPoweredChanged);
                 dev_callbak_flag = 0;
-                Connect_the_last_connected_device();
+                callBackConnectTimer->start(1000);
+                //Connect_the_last_connected_device();
             }
         });
 
@@ -1048,16 +1502,10 @@ void FeaturesWidget::adapterPoweredChanged(bool value)
     qDebug() << Q_FUNC_INFO << value;
     settings->set("switch",QVariant::fromValue(value));
     flag = value;
+    setTrayIcon(value);
     if (value == true) {//开启
-        bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
-        bluetooth_tray_icon->show();
-        Connect_the_last_connected_device();
-    }else {//关闭
-        if(QIcon::hasThemeIcon("bluetooth-error"))
-            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-error"));
-        else
-            bluetooth_tray_icon->setIcon(QIcon::fromTheme("bluetooth-active-symbolic"));
-        bluetooth_tray_icon->show();
+        callBackConnectTimer->start(1000);
+        //Connect_the_last_connected_device();
     }
     qDebug() << Q_FUNC_INFO << "end";
 }
