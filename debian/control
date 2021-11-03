@@ -26,7 +26,7 @@ Depends: libkf5bluezqt6,
          libnotify-bin,
 	 bluez (>= 5), 
          bluez-obexd, 
-         peony-bluetooth (>= 3.2.2+0611),
+         peony-extensions (>= 3.2.2+0611),
          ${shlibs:Depends}, ${misc:Depends}
 Recommends: pulseaudio-module-bluetooth
 Conflicts: blueman
