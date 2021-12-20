@@ -1,3 +1,9 @@
+ukui-bluetooth (1.0.2-1) unstable; urgency=medium
+
+  * New upstream release. 
+
+ -- Allen <zouchang@kylinos.cn>  Thu, 04 Nov 2021 16:56:11 +0800
+
 ukui-bluetooth (1.0.1-1~0820) focal; urgency=medium
 
   * New upstream release.
