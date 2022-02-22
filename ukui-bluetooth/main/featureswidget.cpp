@@ -52,7 +52,7 @@ enum {
 
 static guint watch = 0;
 bool spe_bt_node = false;
-bool not_hci_node = true;
+bool not_hci_node = false;
 bool M_adapter_flag = false;
 bool M_power_on = false;
 
@@ -624,10 +624,13 @@ void FeaturesWidget::InitTrayMenu()
     QAction *settins_action = new QAction(tr("Bluetooth settings"),tray_Menu);
     settins_action->setCheckable(true);
     tray_Menu->addAction(settins_action);
-    //tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
-    //tray_Menu->exec();
-    setWidgetPosition();
 
+    if (!QFile("/usr/bin/ukui-panel").exists()) {
+        tray_Menu->move(bluetooth_tray_icon->geometry().x()+16,bluetooth_tray_icon->geometry().y()-50);
+        tray_Menu->exec();
+    } else {
+        setWidgetPosition();
+    }
 }
 
 void FeaturesWidget::setWidgetPosition()
